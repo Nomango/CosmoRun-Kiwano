@@ -1,32 +1,39 @@
-# Prerequisites
-*.d
+# Build folders
+build/
+output/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+x64/
+Debug/
+Release/
 
-# Precompiled Headers
-*.gch
-*.pch
+# CMake folders
+/cmake-build-release/
+/cmake-build-debug/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Application folders
+.vs
+.idea
 
-# Fortran module files
-*.mod
-*.smod
+# vs2010
+ipch/
+*.opensdf
+*.sdf
+*.suo
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+*.user
+*.lnk
 
-# Executables
-*.exe
-*.out
-*.app
+# NuGet packages
+packages/
+
+!*.dll
+!*.lib
+
+# Resources bin
+*.aps
+
+# Mac cache files
+.DS_Store
+
+# Documents
+docs/
