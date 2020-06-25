@@ -9,9 +9,12 @@ public:
 	{
 		Logger::GetInstance().ShowConsole(true);
 
-		// ´´½¨´°¿Ú
-		WindowPtr window = Window::Create("Cosmo Run", 800, 600);
-		SetMainWindow(window);
+		Settings s;
+		s.window.title = "CosmoRun";
+		s.window.width = 800;
+		s.window.height = 600;
+		s.debug_mode = true;
+		SetSettings(s);
 	}
 
 	void OnReady() override
