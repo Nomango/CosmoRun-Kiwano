@@ -6,29 +6,16 @@ KGE_DECLARE_SMART_PTR(Background);
 class Background : public Actor
 {
 public:
-	enum class Mode
-	{
-		Blue,
-		Purple,
-		Gold,
-	};
-
-	static BackgroundPtr Create(Size size);
+	static BackgroundPtr Create(ColorMode mode, Size size);
 
 	void Resize(Size size);
 
-	void SetMode(Mode mode);
+	void SetColor(ColorMode mode);
 
 private:
-	void Init(Size size);
+	void Init(ColorMode mode, Size size);
 
 	BrushPtr GetCurrentBrush();
-
-	BrushPtr GetBlueBrush();
-
-	BrushPtr GetPurpleBrush();
-
-	BrushPtr GetGoldBrush();
 
 	BrushPtr GetBackgroundBrush(Color top, Color bottom);
 
@@ -40,5 +27,5 @@ private:
 	RectActorPtr bg_rect_;
 	RectActorPtr bg_shadow_;
 	ActorPtr dynamic_layer_;
-	Mode mode_ = Mode::Blue;
+	ColorMode mode_ = ColorMode::Blue;
 };

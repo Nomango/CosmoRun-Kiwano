@@ -24,6 +24,15 @@
     <ClCompile Include="Background.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="GameLayer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeFace.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Cubes.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -33,6 +42,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLayer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeFace.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Cubes.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

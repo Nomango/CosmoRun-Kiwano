@@ -37,18 +37,20 @@ public:
 	}
 };
 
-BackgroundPtr Background::Create(Size size)
+BackgroundPtr Background::Create(ColorMode mode, Size size)
 {
 	BackgroundPtr ptr = memory::New<Background>();
 	if (ptr)
 	{
-		ptr->Init(size);
+		ptr->Init(mode, size);
 	}
 	return ptr;
 }
 
-void Background::Init(Size size)
+void Background::Init(ColorMode mode, Size size)
 {
+	mode_ = mode;
+
 	bg_rect_ = RectActor::Create(size);
 	AddChild(bg_rect_);
 
@@ -75,7 +77,7 @@ void Background::Resize(Size size)
 	bg_shadow_->SetFillBrush(GetShadowBrush());
 }
 
-void Background::SetMode(Mode mode)
+void Background::SetColor(ColorMode mode)
 {
 	if (mode_ != mode)
 	{
@@ -95,31 +97,16 @@ BrushPtr Background::GetCurrentBrush()
 {
 	switch (mode_)
 	{
-	case Background::Mode::Blue:
-		return GetBlueBrush();
-	case Background::Mode::Purple:
-		return GetPurpleBrush();
-	case Background::Mode::Gold:
-		return GetGoldBrush();
+	case ColorMode::Blue:
+		return GetBackgroundBrush(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
+	case ColorMode::Purple:
+		return GetBackgroundBrush(Color::Rgb(118, 40, 78), Color::Rgb(45, 31, 66));
+	case ColorMode::Gold:
+		return GetBackgroundBrush(Color::Rgb(7, 35, 82), Color::Rgb(55, 26, 19));
 	default:
 		break;
 	}
 	return BrushPtr();
-}
-
-BrushPtr Background::GetBlueBrush()
-{
-	return GetBackgroundBrush(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
-}
-
-BrushPtr Background::GetPurpleBrush()
-{
-	return GetBackgroundBrush(Color::Rgb(118, 40, 78), Color::Rgb(45, 31, 66));
-}
-
-BrushPtr Background::GetGoldBrush()
-{
-	return GetBackgroundBrush(Color::Rgb(7, 35, 82), Color::Rgb(55, 26, 19));
 }
 
 BrushPtr Background::GetBackgroundBrush(Color top, Color bottom)
