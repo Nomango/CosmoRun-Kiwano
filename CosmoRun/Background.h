@@ -22,8 +22,6 @@ public:
 private:
 	void Init(Size size);
 
-	BrushPtr GetShadowBrush();
-
 	BrushPtr GetCurrentBrush();
 
 	BrushPtr GetBlueBrush();
@@ -31,6 +29,12 @@ private:
 	BrushPtr GetPurpleBrush();
 
 	BrushPtr GetGoldBrush();
+
+	BrushPtr GetBackgroundBrush(Color top, Color bottom);
+
+	BrushPtr GetShadowBrush();
+
+	void SpawnTriangles(Task* task, Duration dt);
 
 private:
 	RectActorPtr bg_rect_;
