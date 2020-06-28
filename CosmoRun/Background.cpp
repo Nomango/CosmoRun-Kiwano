@@ -5,54 +5,66 @@ BackgroundPtr Background::Create(Size size)
 	BackgroundPtr ptr = memory::New<Background>();
 	if (ptr)
 	{
-		ptr->Resize(size);
+		ptr->Init(size);
 	}
 	return ptr;
 }
 
+void Background::Init(Size size)
+{
+	bg_rect_ = RectActor::Create(size);
+	AddChild(bg_rect_);
+
+	dynamic_layer_ = Actor::Create();
+	AddChild(dynamic_layer_);
+
+	bg_shadow_ = RectActor::Create(size);
+	AddChild(bg_shadow_);
+
+	Resize(size);
+}
+
 void Background::Resize(Size size)
 {
-	canvas_ = Canvas::Create(size);
-	AddChild(canvas_);
+	SetSize(size);
 
-	Repaint();
+	bg_rect_->SetRectSize(size);
+	bg_rect_->SetFillBrush(GetCurrentBrush());
+
+	bg_shadow_->SetRectSize(size);
+	bg_shadow_->SetFillBrush(GetShadowBrush());
 }
 
 void Background::SetMode(Mode mode)
 {
-	mode_ = mode;
-	Repaint();
+	if (mode_ != mode)
+	{
+		mode_ = mode;
+
+		// µ­Èëµ­³öÊ½ÇÐ»»±³¾°É«
+		auto action = Tween::Group({
+			Tween::FadeOut(150_msec).DoneCallback([=](Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); }),
+			Tween::FadeIn(150_msec)
+		});
+		bg_rect_->StopAllActions();
+		bg_rect_->AddAction(action);
+	}
 }
 
-void Background::Repaint()
+BrushPtr Background::GetShadowBrush()
 {
-	auto ctx = canvas_->GetContext2D();
-
-	ctx->BeginDraw();
-	{
-		BrushPtr brush = GetCurrentBrush();
-
-		// äÖÈ¾±³¾°É«
-		ctx->SetCurrentBrush(brush);
-		ctx->FillRectangle(canvas_->GetBounds());
-
-		// äÖÈ¾»ÒÉ«ÃÉ²ã
-		Size size = canvas_->GetSize();
-		RadialGradientStyle style = RadialGradientStyle(
-			size / 2,
-			Vec2{},
-			Vec2{ size.x * 0.7f, size.y * 0.6f },
-			{
-				GradientStop(0.8f, Color::Rgba(Color::Black, 0.0f)),
-				GradientStop(1.0f, Color::Rgba(Color::Black, 0.3f)),
-			}
-		);
-		brush = Brush::Create(style);
-
-		ctx->SetCurrentBrush(brush);
-		ctx->FillRectangle(canvas_->GetBounds());
-	}
-	ctx->EndDraw();
+	// »ÒÉ«ÃÉ²ã»­Ë¢
+	Size size = this->GetSize();
+	RadialGradientStyle style = RadialGradientStyle(
+		size / 2,
+		Vec2{},
+		Vec2{ size.x * 0.7f, size.y * 0.6f },
+		{
+			GradientStop(0.8f, Color::Rgba(Color::Black, 0.0f)),
+			GradientStop(1.0f, Color::Rgba(Color::Black, 0.3f)),
+		}
+	);
+	return Brush::Create(style);
 }
 
 BrushPtr Background::GetCurrentBrush()
@@ -73,7 +85,7 @@ BrushPtr Background::GetCurrentBrush()
 
 BrushPtr Background::GetBlueBrush()
 {
-	float height = canvas_->GetHeight();
+	float height = this->GetHeight();
 	LinearGradientStyle style = LinearGradientStyle(
 		Point{ 0, 0 },
 		Point{ 0, height },
@@ -88,7 +100,7 @@ BrushPtr Background::GetBlueBrush()
 
 BrushPtr Background::GetPurpleBrush()
 {
-	float height = canvas_->GetHeight();
+	float height = this->GetHeight();
 	LinearGradientStyle style = LinearGradientStyle(
 		Point{ 0, 0 },
 		Point{ 0, height },
@@ -103,7 +115,7 @@ BrushPtr Background::GetPurpleBrush()
 
 BrushPtr Background::GetGoldBrush()
 {
-	float height = canvas_->GetHeight();
+	float height = this->GetHeight();
 	LinearGradientStyle style = LinearGradientStyle(
 		Point{ 0, 0 },
 		Point{ 0, height },

@@ -11,6 +11,8 @@ public:
 
 	void Init();
 
+	void OnKeyDown(Event* evt);
+
 private:
 	BackgroundPtr background_;
 };

@@ -20,7 +20,9 @@ public:
 	void SetMode(Mode mode);
 
 private:
-	void Repaint();
+	void Init(Size size);
+
+	BrushPtr GetShadowBrush();
 
 	BrushPtr GetCurrentBrush();
 
@@ -31,6 +33,8 @@ private:
 	BrushPtr GetGoldBrush();
 
 private:
-	CanvasPtr canvas_;
+	RectActorPtr bg_rect_;
+	RectActorPtr bg_shadow_;
+	ActorPtr dynamic_layer_;
 	Mode mode_ = Mode::Blue;
 };
