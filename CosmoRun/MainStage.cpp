@@ -12,20 +12,20 @@ MainStagePtr MainStage::Create()
 
 void MainStage::Init()
 {
-	background_ = Background::Create(mode_, GetSize());
+	background_ = Background::Create(color_, GetSize());
 	AddChild(background_);
 
-	game_layer_ = GameLayer::Create(mode_, GetSize());
+	game_layer_ = GameLayer::Create(color_, GetSize());
 	AddChild(game_layer_);
 
 	// °´¼ü¼àÌý
 	AddListener<KeyDownEvent>(Closure(this, &MainStage::OnKeyDown));
 }
 
-void MainStage::SetColor(ColorMode mode)
+void MainStage::SetColor(ColorEnum color)
 {
-	background_->SetColor(mode);
-	game_layer_->SetColor(mode);
+	background_->SetColor(color);
+	game_layer_->SetColor(color);
 }
 
 void MainStage::OnKeyDown(Event* evt)
@@ -40,14 +40,14 @@ void MainStage::OnKeyDown(Event* evt)
 
 	if (key_evt->code == KeyCode::Num1)
 	{
-		SetColor(ColorMode::Blue);
+		SetColor(ColorEnum::Blue);
 	}
 	else if (key_evt->code == KeyCode::Num2)
 	{
-		SetColor(ColorMode::Purple);
+		SetColor(ColorEnum::Purple);
 	}
 	else if (key_evt->code == KeyCode::Num3)
 	{
-		SetColor(ColorMode::Gold);
+		SetColor(ColorEnum::Gold);
 	}
 }

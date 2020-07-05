@@ -4,7 +4,7 @@
 using namespace kiwano;
 
 // 颜色模式
-enum class ColorMode
+enum class ColorEnum
 {
 	Blue,		// 蓝色
 	Purple,		// 紫色

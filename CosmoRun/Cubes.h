@@ -2,22 +2,32 @@
 #include "Common.h"
 #include "CubeFace.h"
 
+#define CUBE_QUEUE_LENGTH 10
+
 KGE_DECLARE_SMART_PTR(Cubes);
 
 class Cubes : public PolygonActor
 {
 public:
-	static CubesPtr Create(ColorMode mode, float side_length, int depth);
+	Cubes(ColorEnum color, float side_length);
 
-	void Init(ColorMode mode, float side_length, int depth);
-
-	void SetColor(ColorMode mode);
+	void SetColor(ColorEnum color);
 
 private:
-	void BuildFaces(ColorMode mode, float side_length, int depth);
+	void BuildCubes(int length);
 
-	void RangeFaces(Function<void(CubeFace*)> func);
+	void CreateRandomCube();
+
+	CubeFace::Type GetRandomType();
+
+	void AddCube(CubeFacePtr face);
+
+	void RemoveTail();
+
+	CubeFace* Head() const;
 
 private:
-	CubeFace* center_ = nullptr;
+	std::list<CubeFace*> cubes_;
+	ColorEnum color_;
+	float side_length_ = 0;
 };

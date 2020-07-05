@@ -13,19 +13,27 @@ public:
 		Right,
 	};
 
-	static CubeFacePtr Create(ColorMode mode, Type type, float side_length);
+	enum class Direction
+	{
+		Up,
+		Down,
+		LeftUp,
+		LeftDown,
+		RightUp,
+		RightDown
+	};
 
-	void Init(ColorMode mode, Type type, float side_length);
+	CubeFace(ColorEnum color, Type type, float side_length);
+
+	void SetParent(CubeFace* parent);
 
 	Type GetType() const;
 
-	void SetColor(ColorMode mode);
+	void SetColor(ColorEnum color);
 
-	void SetBorder(int index, CubeFace* face);
-
-	CubeFace* GetBorder(int index) const;
+	void RemoveSelf();
 
 private:
 	Type type_;
-	CubeFace* borders_[4] = { 0 };
+	float side_length_;
 };

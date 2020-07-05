@@ -12,12 +12,12 @@ public:
 
 	void Init();
 
-	void SetColor(ColorMode mode);
+	void SetColor(ColorEnum color);
 
 	void OnKeyDown(Event* evt);
 
 private:
-	ColorMode mode_ = ColorMode::Blue;
+	ColorEnum color_ = ColorEnum::Blue;
 	BackgroundPtr background_;
 	GameLayerPtr game_layer_;
 };

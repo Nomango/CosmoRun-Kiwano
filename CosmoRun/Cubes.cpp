@@ -1,76 +1,73 @@
 #include "Cubes.h"
 
-CubesPtr Cubes::Create(ColorMode mode, float side_length, int depth)
+Cubes::Cubes(ColorEnum color, float side_length)
+	: color_(color)
+	, side_length_(side_length)
 {
-	CubesPtr ptr = memory::New<Cubes>();
-	if (ptr)
+	this->BuildCubes(CUBE_QUEUE_LENGTH);
+}
+
+void Cubes::SetColor(ColorEnum color)
+{
+	if (color_ != color)
 	{
-		ptr->Init(mode, side_length, depth);
+		color_ = color;
+
+		for (auto face : cubes_)
+		{
+			face->SetColor(color);
+		}
 	}
-	return ptr;
 }
 
-void Cubes::Init(ColorMode mode, float side_length, int depth)
+void Cubes::BuildCubes(int length)
 {
-	this->BuildFaces(mode, side_length, depth);
-}
-
-void Cubes::SetColor(ColorMode mode)
-{
-	RangeFaces([=](CubeFace* face)
-		{
-			face->SetColor(mode);
-		});
-}
-
-void Cubes::BuildFaces(ColorMode mode, float side_length, int depth)
-{
-	Function<CubeFace* (CubeFace*, int, int)> recursive_build = [&](CubeFace* parent, int index, int depth) -> CubeFace*
+	cubes_.clear();
+	for (int i = 0; i < length; i++)
 	{
-		if (depth <= 0)
-			return nullptr;
-
-		CubeFace::Type type = CubeFace::Type::Top;
-		if (parent)
+		if (i == 0)
 		{
-			switch (parent->GetType())
-			{
-			case CubeFace::Type::Top:
-			case CubeFace::Type::Left:
-			case CubeFace::Type::Right:
-			default:
-				break;
-			}
+			// 构建头节点
+			CubeFacePtr face = new CubeFace(color_, CubeFace::Type::Top, side_length_);
+			AddCube(face);
 		}
-
-		CubeFacePtr face = CubeFace::Create(mode, type, side_length);
-		this->AddChild(face);
-
-		for (int i = 0; i < 4; i++)
+		else
 		{
-			auto border = recursive_build(face.Get(), i, depth - 1);
-			face->SetBorder(i, border);
+			CreateRandomCube();
 		}
-		return face.Get();
-	};
-
-	center_ = recursive_build(nullptr, 0, depth);
+	}
 }
 
-void Cubes::RangeFaces(Function<void(CubeFace*)> func)
+void Cubes::CreateRandomCube()
 {
-	Function<void(CubeFace*)> recursive_func = [&](CubeFace* center)
-	{
-		if (center)
-		{
-			func(center);
+	CubeFace::Type type = GetRandomType();
 
-			for (int i = 0; i < 4; i++)
-			{
-				recursive_func(center->GetBorder(0));
-			}
-		}
-	};
+	CubeFacePtr face = new CubeFace(color_, type, side_length_);
+	face->SetParent(Head());
+	AddCube(face);
+}
 
-	recursive_func(center_);
+CubeFace::Type Cubes::GetRandomType()
+{
+	CubeFace::Type type = CubeFace::Type::Top;
+	return type;
+}
+
+void Cubes::AddCube(CubeFacePtr face)
+{
+	// 新方块添加到list尾部
+	this->AddChild(face);
+	cubes_.push_back(face.Get());
+}
+
+void Cubes::RemoveTail()
+{
+	// 路径的尾巴其实是list的头
+	cubes_.front()->RemoveSelf();
+	cubes_.erase(cubes_.begin());
+}
+
+CubeFace* Cubes::Head() const
+{
+	return nullptr;
 }

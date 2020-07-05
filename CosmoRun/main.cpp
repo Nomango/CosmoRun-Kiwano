@@ -13,7 +13,9 @@ public:
 		s.window.title = "CosmoRun";
 		s.window.width = 800;
 		s.window.height = 600;
+#ifdef KGE_DEBUG
 		s.debug_mode = true;
+#endif
 		SetSettings(s);
 	}
 

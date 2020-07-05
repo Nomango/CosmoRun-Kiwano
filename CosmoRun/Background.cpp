@@ -37,19 +37,19 @@ public:
 	}
 };
 
-BackgroundPtr Background::Create(ColorMode mode, Size size)
+BackgroundPtr Background::Create(ColorEnum color, Size size)
 {
 	BackgroundPtr ptr = memory::New<Background>();
 	if (ptr)
 	{
-		ptr->Init(mode, size);
+		ptr->Init(color, size);
 	}
 	return ptr;
 }
 
-void Background::Init(ColorMode mode, Size size)
+void Background::Init(ColorEnum color, Size size)
 {
-	mode_ = mode;
+	color_ = color;
 
 	bg_rect_ = RectActor::Create(size);
 	AddChild(bg_rect_);
@@ -77,11 +77,11 @@ void Background::Resize(Size size)
 	bg_shadow_->SetFillBrush(GetShadowBrush());
 }
 
-void Background::SetColor(ColorMode mode)
+void Background::SetColor(ColorEnum color)
 {
-	if (mode_ != mode)
+	if (color_ != color)
 	{
-		mode_ = mode;
+		color_ = color;
 
 		// 淡入淡出式切换背景色
 		auto action = Tween::Group({
@@ -95,13 +95,13 @@ void Background::SetColor(ColorMode mode)
 
 BrushPtr Background::GetCurrentBrush()
 {
-	switch (mode_)
+	switch (color_)
 	{
-	case ColorMode::Blue:
+	case ColorEnum::Blue:
 		return GetBackgroundBrush(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
-	case ColorMode::Purple:
+	case ColorEnum::Purple:
 		return GetBackgroundBrush(Color::Rgb(118, 40, 78), Color::Rgb(45, 31, 66));
-	case ColorMode::Gold:
+	case ColorEnum::Gold:
 		return GetBackgroundBrush(Color::Rgb(7, 35, 82), Color::Rgb(55, 26, 19));
 	default:
 		break;

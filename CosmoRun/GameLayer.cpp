@@ -2,27 +2,27 @@
 
 #define DEFAULT_CUBES_DEPTH 10
 
-GameLayerPtr GameLayer::Create(ColorMode mode, Size size)
+GameLayerPtr GameLayer::Create(ColorEnum color, Size size)
 {
 	GameLayerPtr ptr = memory::New<GameLayer>();
 	if (ptr)
 	{
-		ptr->Init(mode, size);
+		ptr->Init(color, size);
 	}
 	return ptr;
 }
 
-void GameLayer::Init(ColorMode mode, Size size)
+void GameLayer::Init(ColorEnum color, Size size)
 {
 	SetSize(size);
 
-	cubes_ = Cubes::Create(mode, GetWidth() * 0.1f, DEFAULT_CUBES_DEPTH);
+	cubes_ = new Cubes(color, GetWidth() * 0.1f);
 	AddChild(cubes_);
 }
 
-void GameLayer::SetColor(ColorMode mode)
+void GameLayer::SetColor(ColorEnum color)
 {
-	cubes_->SetColor(mode);
+	cubes_->SetColor(color);
 }
 
 void GameLayer::StartGame()

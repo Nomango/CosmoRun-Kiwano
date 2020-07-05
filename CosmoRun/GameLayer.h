@@ -7,11 +7,11 @@ KGE_DECLARE_SMART_PTR(GameLayer);
 class GameLayer : public Actor
 {
 public:
-	static GameLayerPtr Create(ColorMode mode, Size size);
+	static GameLayerPtr Create(ColorEnum color, Size size);
 
-	void Init(ColorMode mode, Size size);
+	void Init(ColorEnum color, Size size);
 
-	void SetColor(ColorMode mode);
+	void SetColor(ColorEnum color);
 
 	void StartGame();
 
