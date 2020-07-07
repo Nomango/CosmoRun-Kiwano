@@ -1,20 +1,26 @@
 #pragma once
 #include "Common.h"
-#include "Cubes.h"
+#include "Cube.h"
+
+#define CUBE_QUEUE_LENGTH 10
 
 KGE_DECLARE_SMART_PTR(GameLayer);
 
 class GameLayer : public Actor
 {
 public:
-	static GameLayerPtr Create(ColorEnum color, Size size);
-
-	void Init(ColorEnum color, Size size);
+	GameLayer(ColorEnum color, Size size);
 
 	void SetColor(ColorEnum color);
 
 	void StartGame();
 
 private:
-	CubesPtr cubes_;
+	void BuildCubes(int length);
+
+	void AddCube(CubePtr cube);
+
+private:
+	ColorEnum color_;
+	std::list<Cube*> cubes_;
 };

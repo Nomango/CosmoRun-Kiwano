@@ -5,8 +5,9 @@ KGE_DECLARE_SMART_PTR(Triangle);
 class Triangle : public PolygonActor
 {
 public:
-	Triangle(float side_length)
+	Triangle(float side_length, BrushPtr brush)
 	{
+		// 设置三角形的三个顶点
 		float h = side_length * math::Sin(60.f);
 		SetVertices({
 			Point(),
@@ -14,8 +15,10 @@ public:
 			Point(side_length * 0.5f, h),
 		});
 
-		SetFillColor(Color(Color::White, 0.2f));
+		// 设置填充颜色
+		SetFillBrush(brush);
 
+		// 添加动画：旋转 + 缩放 + 淡出 + 位移
 		Duration dt = 1_msec * math::Random(1000, 2500);
 		float angle_start = math::Random(-180.0f, 180.0f);
 		float angle_end = math::Random(-480.0f, 480.0f);
@@ -32,38 +35,31 @@ public:
 			Tween::ScaleTo(dt, scale_to, scale_to),
 			Tween::FadeOut(dt),
 			Tween::MoveBy(dt, Vec2(move_x, move_y)),
-		}, true).RemoveTargetWhenDone();
+		}, true).RemoveTargetWhenDone();  // 动画结束时自动移除三角形
 		this->AddAction(action);
 	}
 };
 
-BackgroundPtr Background::Create(ColorEnum color, Size size)
+Background::Background(ColorEnum color, Size size)
+	: color_(color)
 {
-	BackgroundPtr ptr = memory::New<Background>();
-	if (ptr)
-	{
-		ptr->Init(color, size);
-	}
-	return ptr;
-}
-
-void Background::Init(ColorEnum color, Size size)
-{
-	color_ = color;
-
+	// 背景色
 	bg_rect_ = RectActor::Create(size);
 	AddChild(bg_rect_);
 
+	// 动态三角形图层
 	dynamic_layer_ = Actor::Create();
 	AddChild(dynamic_layer_);
 
+	// 背景阴影
 	bg_shadow_ = RectActor::Create(size);
 	AddChild(bg_shadow_);
 
-	Resize(size);
-
+	// 添加任务：每隔130ms生成一个三角形
 	TaskPtr task = Task::Create(Closure(this, &Background::SpawnTriangles), 130_msec);
 	AddTask(task);
+
+	Resize(size);
 }
 
 void Background::Resize(Size size)
@@ -111,6 +107,7 @@ BrushPtr Background::GetCurrentBrush()
 
 BrushPtr Background::GetBackgroundBrush(Color top, Color bottom)
 {
+	// 背景画刷，梯度渐变色
 	float height = this->GetHeight();
 	LinearGradientStyle style = LinearGradientStyle(
 		Point{ 0, 0 },
@@ -126,7 +123,7 @@ BrushPtr Background::GetBackgroundBrush(Color top, Color bottom)
 
 BrushPtr Background::GetShadowBrush()
 {
-	// 灰色蒙层画刷
+	// 背景阴影画刷
 	Size size = this->GetSize();
 	RadialGradientStyle style = RadialGradientStyle(
 		size / 2,
@@ -136,13 +133,20 @@ BrushPtr Background::GetShadowBrush()
 			GradientStop(0.8f, Color::Rgba(Color::Black, 0.0f)),
 			GradientStop(1.0f, Color::Rgba(Color::Black, 0.3f)),
 		}
-		);
+	);
 	return Brush::Create(style);
 }
 
 void Background::SpawnTriangles(Task* task, Duration dt)
 {
-	TrianglePtr t = new Triangle(GetWidth() * 0.05f);
+	// 创建三角形的画刷
+	if (!triangle_brush_)
+	{
+		triangle_brush_ = Brush::Create(Color(Color::White, 0.2f));
+	}
+
+	TrianglePtr t = new Triangle(GetWidth() * 0.05f, triangle_brush_);
+	// 随机设置三角形的位置
 	t->SetPositionX(GetWidth() * math::Random(0.0f, 1.0f));
 	t->SetPositionY(GetHeight() * math::Random(0.0f, 1.0f));
 	dynamic_layer_->AddChild(t);

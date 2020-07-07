@@ -6,15 +6,13 @@ KGE_DECLARE_SMART_PTR(Background);
 class Background : public Actor
 {
 public:
-	static BackgroundPtr Create(ColorEnum color, Size size);
+	Background(ColorEnum color, Size size);
 
 	void Resize(Size size);
 
 	void SetColor(ColorEnum color);
 
 private:
-	void Init(ColorEnum color, Size size);
-
 	BrushPtr GetCurrentBrush();
 
 	BrushPtr GetBackgroundBrush(Color top, Color bottom);
@@ -24,8 +22,9 @@ private:
 	void SpawnTriangles(Task* task, Duration dt);
 
 private:
+	ColorEnum color_;
 	RectActorPtr bg_rect_;
 	RectActorPtr bg_shadow_;
 	ActorPtr dynamic_layer_;
-	ColorEnum color_ = ColorEnum::Blue;
+	BrushPtr triangle_brush_;
 };

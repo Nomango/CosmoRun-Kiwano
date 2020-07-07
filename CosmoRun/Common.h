@@ -10,3 +10,14 @@ enum class ColorEnum
 	Purple,		// 紫色
 	Gold,		// 金色
 };
+
+// 方向
+enum class Direction
+{
+	LeftUp,
+	LeftDown,
+	RightUp,
+	RightDown,
+	Up,
+	Down,
+};

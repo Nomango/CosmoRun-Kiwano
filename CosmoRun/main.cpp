@@ -7,7 +7,7 @@ class DemoRunner
 public:
 	DemoRunner()
 	{
-		Logger::GetInstance().ShowConsole(true);
+		//Logger::GetInstance().ShowConsole(true);
 
 		Settings s;
 		s.window.title = "CosmoRun";
@@ -21,7 +21,7 @@ public:
 
 	void OnReady() override
 	{
-		MainStagePtr stage = MainStage::Create();
+		MainStagePtr stage = new MainStage;
 		Director::GetInstance().EnterStage(stage);
 	}
 };

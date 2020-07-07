@@ -1,6 +1,8 @@
 #pragma once
 #include "Common.h"
 
+class Cube;
+
 KGE_DECLARE_SMART_PTR(CubeFace);
 
 class CubeFace : public PolygonActor
@@ -13,17 +15,7 @@ public:
 		Right,
 	};
 
-	enum class Direction
-	{
-		Up,
-		Down,
-		LeftUp,
-		LeftDown,
-		RightUp,
-		RightDown
-	};
-
-	CubeFace(ColorEnum color, Type type, float side_length);
+	CubeFace(Type type, Direction d, float side_length);
 
 	void SetParent(CubeFace* parent);
 
@@ -33,7 +25,26 @@ public:
 
 	void RemoveSelf();
 
+	Cube* GetCube() const;
+
+	void SetCube(Cube* cube);
+
+	void ResetBrush(ColorEnum color);
+
+private:
+	void CreateVertices();
+
+	BrushPtr GetFillBrush(ColorEnum color);
+
+	BrushPtr GetTopFillBrush(Color light, Color dark);
+
+	BrushPtr GetStrokeBrush(ColorEnum color);
+
+	BrushPtr GetStrokeBrush(Color light, Color dark);
+
 private:
 	Type type_;
+	Direction direction_;
 	float side_length_;
+	Cube* parent_ = nullptr;
 };

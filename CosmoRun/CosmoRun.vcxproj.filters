@@ -30,7 +30,7 @@
     <ClCompile Include="CubeFace.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Cubes.cpp">
+    <ClCompile Include="Cube.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClInclude Include="CubeFace.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Cubes.h">
+    <ClInclude Include="Cube.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

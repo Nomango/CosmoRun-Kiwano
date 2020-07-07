@@ -140,8 +140,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeFace.cpp" />
-    <ClCompile Include="Cubes.cpp" />
     <ClCompile Include="GameLayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainStage.cpp" />
@@ -149,8 +149,8 @@
   <ItemGroup>
     <ClInclude Include="Background.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeFace.h" />
-    <ClInclude Include="Cubes.h" />
     <ClInclude Include="GameLayer.h" />
     <ClInclude Include="MainStage.h" />
   </ItemGroup>

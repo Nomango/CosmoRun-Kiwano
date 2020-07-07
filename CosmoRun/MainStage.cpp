@@ -1,21 +1,12 @@
 #include "MainStage.h"
 
-MainStagePtr MainStage::Create()
+MainStage::MainStage()
 {
-	MainStagePtr ptr = memory::New<MainStage>();
-	if (ptr)
-	{
-		ptr->Init();
-	}
-	return ptr;
-}
-
-void MainStage::Init()
-{
-	background_ = Background::Create(color_, GetSize());
+	background_ = new Background(color_, GetSize());
 	AddChild(background_);
 
-	game_layer_ = GameLayer::Create(color_, GetSize());
+	game_layer_ = new GameLayer(color_, GetSize());
+	game_layer_->SetPosition(GetSize() / 2);
 	AddChild(game_layer_);
 
 	// °´¼ü¼àÌý

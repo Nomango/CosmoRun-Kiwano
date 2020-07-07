@@ -8,9 +8,7 @@ KGE_DECLARE_SMART_PTR(MainStage);
 class MainStage : public Stage
 {
 public:
-	static MainStagePtr Create();
-
-	void Init();
+	MainStage();
 
 	void SetColor(ColorEnum color);
 
