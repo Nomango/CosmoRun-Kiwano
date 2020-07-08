@@ -18,20 +18,34 @@ public:
 
     const std::array<int, 3>& GetPos() const;
 
-    Cube* GetNext() const;
+    int GetFacesCount() const;
 
-    void SetNext(Cube* next);
+    CubeFace* GetFace(CubeFace::Type type) const;
 
-    CubeFace* GetFace() const;
-
-    CubeFace* SetFace(CubeFace::Type type, Direction d);
+    CubeFace* AddFace(CubeFace::Type type, Direction d);
 
     void SetColor(ColorEnum color);
 
 private:
     float side_length_;
     ColorEnum color_;
-    CubeFace* face_;
-    Cube* next_;
+    std::vector<CubeFace*> faces_;
     std::array<int, 3> pos_;
+};
+
+class CubeMap
+{
+public:
+    CubePtr CreateCube(int x, int y, int z, float side_length);
+
+    Cube* GetCubeFromMap(int x, int y, int z);
+
+    void RemoveCubeInMap(int x, int y, int z);
+
+    void SetColor(ColorEnum color);
+
+    void Clear();
+
+private:
+    std::map<int, Cube*> cube_map_;
 };

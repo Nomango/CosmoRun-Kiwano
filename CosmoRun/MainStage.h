@@ -14,6 +14,8 @@ public:
 
 	void OnKeyDown(Event* evt);
 
+	void Move(Vec2 trans);
+
 private:
 	ColorEnum color_ = ColorEnum::Blue;
 	BackgroundPtr background_;

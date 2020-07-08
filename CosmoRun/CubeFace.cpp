@@ -34,14 +34,24 @@ void CubeFace::RemoveSelf()
 {
 }
 
+CubeFace* CubeFace::GetNext() const
+{
+	return next_;
+}
+
+void CubeFace::SetNext(CubeFace* face)
+{
+	next_ = face;
+}
+
 Cube* CubeFace::GetCube() const
 {
-	return parent_;
+	return cube_;
 }
 
 void CubeFace::SetCube(Cube* cube)
 {
-	parent_ = cube;
+	cube_ = cube;
 }
 
 void CubeFace::CreateVertices()

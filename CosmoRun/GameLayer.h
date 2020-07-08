@@ -11,22 +11,25 @@ class GameLayer : public Actor
 public:
 	GameLayer(ColorEnum color, Size size);
 
-	void SetColor(ColorEnum color);
+	void Restart();
 
 	void StartGame();
 
+	void SetColor(ColorEnum color);
+
 private:
-	void BuildCubes(int length);
+	void InitCubes(int length);
 
 	void CreateRandomCube();
 
 	CubeDesc GetRandomCubeDesc() const;
 
-	Cube* CreateCube(CubeFace::Type type, Direction d);
+	CubeFace* CreateCubeFace(CubeFace::Type type, Direction d);
 
-	Cube* AddCube(int x, int y, int z, CubeFace::Type type, Direction d);
+	CubeFace* AddCubeFace(int x, int y, int z, CubeFace::Type type, Direction d);
 
 private:
+	CubeMap cube_map_;
 	ColorEnum color_;
-	std::list<Cube*> cubes_;
+	std::vector<CubeFace*> cube_faces_;
 };

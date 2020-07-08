@@ -25,6 +25,10 @@ public:
 
 	void RemoveSelf();
 
+	CubeFace* GetNext() const;
+
+	void SetNext(CubeFace* face);
+
 	Cube* GetCube() const;
 
 	void SetCube(Cube* cube);
@@ -46,5 +50,6 @@ private:
 	Type type_;
 	Direction direction_;
 	float side_length_;
-	Cube* parent_ = nullptr;
+	CubeFace* next_ = nullptr;
+	Cube* cube_ = nullptr;
 };

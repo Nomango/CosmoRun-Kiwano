@@ -89,6 +89,12 @@ void Background::SetColor(ColorEnum color)
 	}
 }
 
+void Background::Move(Vec2 trans)
+{
+	// Ö»ÒÆ¶¯¶¯Ì¬²ã
+	dynamic_layer_->Move(trans);
+}
+
 BrushPtr Background::GetCurrentBrush()
 {
 	switch (color_)

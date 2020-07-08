@@ -2,8 +2,6 @@
 
 Cube::Cube(int x, int y, int z, float side_length)
 	: pos_{ x, y, z }
-	, face_{}
-	, next_{}
 	, color_{}
 	, side_length_(side_length)
 {
@@ -19,22 +17,24 @@ const std::array<int, 3>& Cube::GetPos() const
 	return pos_;
 }
 
-Cube* Cube::GetNext() const
+int Cube::GetFacesCount() const
 {
-	return next_;
+	return int(faces_.size());
 }
 
-void Cube::SetNext(Cube* next)
+CubeFace* Cube::GetFace(CubeFace::Type type) const
 {
-	next_ = next;
+	for (auto face : faces_)
+	{
+		if (face->GetType() == type)
+		{
+			return face;
+		}
+	}
+	return nullptr;
 }
 
-CubeFace* Cube::GetFace() const
-{
-	return face_;
-}
-
-CubeFace* Cube::SetFace(CubeFace::Type type, Direction d)
+CubeFace* Cube::AddFace(CubeFace::Type type, Direction d)
 {
 	CubeFacePtr face = new CubeFace(type, d, side_length_);
 
@@ -59,8 +59,8 @@ CubeFace* Cube::SetFace(CubeFace::Type type, Direction d)
 
 	this->AddChild(face);
 
-	face_ = face.Get();
-	return face_;
+	faces_.push_back(face.Get());
+	return face.Get();
 }
 
 void Cube::SetColor(ColorEnum color)
@@ -69,6 +69,46 @@ void Cube::SetColor(ColorEnum color)
 	{
 		color_ = color;
 
-		face_->SetColor(color);
+		for (auto face : faces_)
+		{
+			face->SetColor(color);
+		}
 	}
+}
+
+CubePtr CubeMap::CreateCube(int x, int y, int z, float side_length)
+{
+	CubePtr cube = new Cube(x, y, z, side_length);
+
+	int key = x + (y << 8) + (z << 16);
+	cube_map_.insert(std::make_pair(key, cube.Get()));
+	return cube;
+}
+
+Cube* CubeMap::GetCubeFromMap(int x, int y, int z)
+{
+	int key = x + (y << 8) + (z << 16);
+	auto iter = cube_map_.find(key);
+	if (iter != cube_map_.end())
+		return iter->second;
+	return nullptr;
+}
+
+void CubeMap::RemoveCubeInMap(int x, int y, int z)
+{
+	int key = x + (y << 8) + (z << 16);
+	cube_map_.erase(key);
+}
+
+void CubeMap::SetColor(ColorEnum color)
+{
+	for (auto pair : cube_map_)
+	{
+		pair.second->SetColor(color);
+	}
+}
+
+void CubeMap::Clear()
+{
+	cube_map_.clear();
 }

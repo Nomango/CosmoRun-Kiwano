@@ -12,6 +12,8 @@ public:
 
 	void SetColor(ColorEnum color);
 
+	void Move(Vec2 trans);
+
 private:
 	BrushPtr GetCurrentBrush();
 
