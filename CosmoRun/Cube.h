@@ -4,6 +4,12 @@
 
 KGE_DECLARE_SMART_PTR(Cube);
 
+struct CubeDesc
+{
+    CubeFace::Type type;
+    Direction direction;
+};
+
 class Cube :
     public Actor
 {
@@ -12,15 +18,20 @@ public:
 
     const std::array<int, 3>& GetPos() const;
 
-    CubeFace* GetFace(CubeFace::Type type) const;
+    Cube* GetNext() const;
 
-    void AddFace(CubeFace::Type type, Direction d);
+    void SetNext(Cube* next);
+
+    CubeFace* GetFace() const;
+
+    CubeFace* SetFace(CubeFace::Type type, Direction d);
 
     void SetColor(ColorEnum color);
 
 private:
     float side_length_;
     ColorEnum color_;
+    CubeFace* face_;
+    Cube* next_;
     std::array<int, 3> pos_;
-    std::list<CubeFace*> faces_;
 };

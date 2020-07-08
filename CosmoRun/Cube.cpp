@@ -2,7 +2,8 @@
 
 Cube::Cube(int x, int y, int z, float side_length)
 	: pos_{ x, y, z }
-	, faces_{}
+	, face_{}
+	, next_{}
 	, color_{}
 	, side_length_(side_length)
 {
@@ -18,19 +19,22 @@ const std::array<int, 3>& Cube::GetPos() const
 	return pos_;
 }
 
-CubeFace* Cube::GetFace(CubeFace::Type type) const
+Cube* Cube::GetNext() const
 {
-	for (auto face : faces_)
-	{
-		if (face->GetType() == type)
-		{
-			return face;
-		}
-	}
-	return nullptr;
+	return next_;
 }
 
-void Cube::AddFace(CubeFace::Type type, Direction d)
+void Cube::SetNext(Cube* next)
+{
+	next_ = next;
+}
+
+CubeFace* Cube::GetFace() const
+{
+	return face_;
+}
+
+CubeFace* Cube::SetFace(CubeFace::Type type, Direction d)
 {
 	CubeFacePtr face = new CubeFace(type, d, side_length_);
 
@@ -53,15 +57,18 @@ void Cube::AddFace(CubeFace::Type type, Direction d)
 		break;
 	}
 
-	faces_.push_back(face.Get());
 	this->AddChild(face);
+
+	face_ = face.Get();
+	return face_;
 }
 
 void Cube::SetColor(ColorEnum color)
 {
-	color_ = color;
-	for (auto face : faces_)
+	if (color_ != color)
 	{
-		face->SetColor(color_);
+		color_ = color;
+
+		face_->SetColor(color);
 	}
 }

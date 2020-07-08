@@ -8,13 +8,14 @@ CubeFace::CubeFace(Type type, Direction d, float side_length)
 	CreateVertices();
 }
 
-void CubeFace::SetParent(CubeFace* parent)
-{
-}
-
 CubeFace::Type CubeFace::GetType() const
 {
 	return type_;
+}
+
+Direction CubeFace::GetDirection() const
+{
+	return direction_;
 }
 
 void CubeFace::SetColor(ColorEnum color)

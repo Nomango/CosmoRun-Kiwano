@@ -17,9 +17,9 @@ public:
 
 	CubeFace(Type type, Direction d, float side_length);
 
-	void SetParent(CubeFace* parent);
-
 	Type GetType() const;
+
+	Direction GetDirection() const;
 
 	void SetColor(ColorEnum color);
 

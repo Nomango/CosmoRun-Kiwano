@@ -18,7 +18,13 @@ public:
 private:
 	void BuildCubes(int length);
 
-	void AddCube(CubePtr cube);
+	void CreateRandomCube();
+
+	CubeDesc GetRandomCubeDesc() const;
+
+	Cube* CreateCube(CubeFace::Type type, Direction d);
+
+	Cube* AddCube(int x, int y, int z, CubeFace::Type type, Direction d);
 
 private:
 	ColorEnum color_;
