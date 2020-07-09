@@ -4,25 +4,32 @@
 
 KGE_DECLARE_SMART_PTR(Cube);
 
+typedef std::array<int, 3> CubePos;
+
 struct CubeDesc
 {
     CubeFace::Type type;
     Direction direction;
+
+    bool operator==(const CubeDesc& rhs) const
+    {
+        return type == rhs.type && direction == rhs.direction;
+    }
 };
 
 class Cube :
     public Actor
 {
 public:
-    Cube(int x, int y, int z, float side_length);
+    Cube(const CubePos& pos, float side_length);
 
-    const std::array<int, 3>& GetPos() const;
+    const CubePos& GetPos() const;
 
     int GetFacesCount() const;
 
     CubeFace* GetFace(CubeFace::Type type) const;
 
-    CubeFace* AddFace(CubeFace::Type type, Direction d);
+    CubeFace* AddFace(CubeDesc desc);
 
     void SetColor(ColorEnum color);
 
@@ -36,11 +43,11 @@ private:
 class CubeMap
 {
 public:
-    CubePtr CreateCube(int x, int y, int z, float side_length);
+    CubePtr CreateCube(const CubePos& pos, float side_length);
 
-    Cube* GetCubeFromMap(int x, int y, int z);
+    Cube* GetCubeFromMap(const CubePos& pos);
 
-    void RemoveCubeInMap(int x, int y, int z);
+    void RemoveCubeInMap(const CubePos& pos);
 
     void SetColor(ColorEnum color);
 

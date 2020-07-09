@@ -1,15 +1,15 @@
 #include "Cube.h"
 
-Cube::Cube(int x, int y, int z, float side_length)
-	: pos_{ x, y, z }
+Cube::Cube(const CubePos& pos, float side_length)
+	: pos_{ pos }
 	, color_{}
 	, side_length_(side_length)
 {
 	// 根据xyz坐标计算方块位置
 	float offset_x = side_length * math::Cos(30.0f);
 	float offset_y = side_length * math::Sin(30.0f);
-	this->SetPositionX(x * offset_x - y * offset_x);
-	this->SetPositionY(x * offset_y + y * offset_y - z * side_length);
+	this->SetPositionX(pos[0] * offset_x - pos[1] * offset_x);
+	this->SetPositionY(pos[0] * offset_y + pos[1] * offset_y - pos[2] * side_length);
 }
 
 const std::array<int, 3>& Cube::GetPos() const
@@ -34,9 +34,9 @@ CubeFace* Cube::GetFace(CubeFace::Type type) const
 	return nullptr;
 }
 
-CubeFace* Cube::AddFace(CubeFace::Type type, Direction d)
+CubeFace* Cube::AddFace(CubeDesc desc)
 {
-	CubeFacePtr face = new CubeFace(type, d, side_length_);
+	CubeFacePtr face = new CubeFace(desc.type, desc.direction, side_length_);
 
 	face->SetCube(this);
 	face->SetColor(color_);
@@ -44,7 +44,7 @@ CubeFace* Cube::AddFace(CubeFace::Type type, Direction d)
 
 	// 计算方块面相对于方块位置的偏移
 	float offset_x = side_length_ * math::Cos(30.0f);
-	switch (type)
+	switch (desc.type)
 	{
 	case CubeFace::Type::Top:
 		face->SetPosition(0, 0);
@@ -76,27 +76,27 @@ void Cube::SetColor(ColorEnum color)
 	}
 }
 
-CubePtr CubeMap::CreateCube(int x, int y, int z, float side_length)
+CubePtr CubeMap::CreateCube(const CubePos& pos, float side_length)
 {
-	CubePtr cube = new Cube(x, y, z, side_length);
+	CubePtr cube = new Cube(pos, side_length);
 
-	int key = x + (y << 8) + (z << 16);
+	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.insert(std::make_pair(key, cube.Get()));
 	return cube;
 }
 
-Cube* CubeMap::GetCubeFromMap(int x, int y, int z)
+Cube* CubeMap::GetCubeFromMap(const CubePos& pos)
 {
-	int key = x + (y << 8) + (z << 16);
+	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	auto iter = cube_map_.find(key);
 	if (iter != cube_map_.end())
 		return iter->second;
 	return nullptr;
 }
 
-void CubeMap::RemoveCubeInMap(int x, int y, int z)
+void CubeMap::RemoveCubeInMap(const CubePos& pos)
 {
-	int key = x + (y << 8) + (z << 16);
+	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.erase(key);
 }
 

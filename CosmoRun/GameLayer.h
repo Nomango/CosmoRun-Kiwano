@@ -20,13 +20,17 @@ public:
 private:
 	void InitCubes(int length);
 
-	void CreateRandomCube();
+	void AddRandomFace();
 
-	CubeDesc GetRandomCubeDesc() const;
+	std::vector<CubeDesc> GetRandomChoices();
 
-	CubeFace* CreateCubeFace(CubeFace::Type type, Direction d);
+	void FilterChoices(std::vector<CubeDesc>& choices);
 
-	CubeFace* AddCubeFace(int x, int y, int z, CubeFace::Type type, Direction d);
+	CubePos GetNewCubePos(CubeDesc desc);
+
+	CubeFace* CreateCubeFace(CubeDesc desc);
+
+	CubeFace* AddCubeFace(const CubePos& pos, CubeDesc desc);
 
 private:
 	CubeMap cube_map_;
