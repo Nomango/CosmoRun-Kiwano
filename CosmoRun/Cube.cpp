@@ -6,10 +6,10 @@ Cube::Cube(const CubePos& pos, float side_length)
 	, side_length_(side_length)
 {
 	// 根据xyz坐标计算方块位置
-	float offset_x = side_length * math::Cos(30.0f);
-	float offset_y = side_length * math::Sin(30.0f);
-	this->SetPositionX(pos[0] * offset_x - pos[1] * offset_x);
-	this->SetPositionY(pos[0] * offset_y + pos[1] * offset_y - pos[2] * side_length);
+	float width = side_length * math::Cos(30.0f);
+	float height = side_length * math::Sin(30.0f);
+	this->SetPositionX(pos[0] * width - pos[1] * width);
+	this->SetPositionY(pos[0] * height + pos[1] * height - pos[2] * side_length);
 }
 
 const std::array<int, 3>& Cube::GetPos() const
@@ -43,17 +43,18 @@ CubeFace* Cube::AddFace(CubeDesc desc)
 	face->SetAnchor(0.5f, 0.5f);
 
 	// 计算方块面相对于方块位置的偏移
-	float offset_x = side_length_ * math::Cos(30.0f);
+	float width = side_length_ * math::Cos(30.0f);
+	float height = side_length_ * math::Sin(30.0f);
 	switch (desc.type)
 	{
 	case CubeFace::Type::Top:
-		face->SetPosition(0, 0);
+		face->SetPosition(0, -height);
 		break;
 	case CubeFace::Type::Left:
-		face->SetPosition(-offset_x / 2, side_length_ * 3 / 4);
+		face->SetPosition(-width, -height);
 		break;
 	case CubeFace::Type::Right:
-		face->SetPosition(offset_x / 2, side_length_ * 3 / 4);
+		face->SetPosition(0, 0);
 		break;
 	}
 
@@ -74,6 +75,15 @@ void Cube::SetColor(ColorEnum color)
 			face->SetColor(color);
 		}
 	}
+}
+
+void Cube::RemoveFace(Actor* face)
+{
+	this->RemoveChild(face);
+
+	// 自动移除自身
+	if (this->GetFacesCount() == 0)
+		this->RemoveFromParent();
 }
 
 CubePtr CubeMap::CreateCube(const CubePos& pos, float side_length)

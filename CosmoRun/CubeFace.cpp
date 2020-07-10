@@ -1,4 +1,5 @@
 #include "CubeFace.h"
+#include "Cube.h"
 
 CubeFace::CubeFace(Type type, Direction d, float side_length)
 	: type_(type)
@@ -30,8 +31,19 @@ void CubeFace::SetColor(ColorEnum color)
 	this->AddAction(action);
 }
 
+bool CubeFace::IsCollidedWith(CubeFace* other)
+{
+	for (auto vertex : other->GetCollisionTestVertices())
+		if (this->GetShape()->ContainsPoint(this->ConvertToLocal(vertex)))
+			return true;
+	return false;
+}
+
 void CubeFace::RemoveSelf()
 {
+	// 动画结束后移除自身
+	auto action = Tween::FadeOut(2_sec).DoneCallback(Closure(GetCube(), &Cube::RemoveFace));
+	AddAction(action);
 }
 
 CubeFace* CubeFace::GetNext() const
@@ -87,6 +99,47 @@ void CubeFace::CreateVertices()
 		});
 		break;
 	}
+}
+
+const Vector<Point>& CubeFace::GetCollisionTestVertices()
+{
+	if (!collision_test_vertices_.empty())
+		return collision_test_vertices_;
+
+	float width = side_length_ * math::Cos(30.0f);
+	float height = side_length_ * math::Sin(30.0f);
+
+	switch (type_)
+	{
+	case CubeFace::Type::Top:
+		collision_test_vertices_.assign({
+			ConvertToWorld({ width, height }),
+			ConvertToWorld({ width / 2, height / 2 }),
+			ConvertToWorld({ width / 2 * 3, height / 2 }),
+			ConvertToWorld({ width / 2, height / 2 * 3 }),
+			ConvertToWorld({ width / 2 * 3, height / 2 * 3 }),
+			});
+		break;
+	case CubeFace::Type::Left:
+		collision_test_vertices_.assign({
+			ConvertToWorld({ width / 2, height / 4 }),
+			ConvertToWorld({ width / 2, height / 4 * 3 }),
+			ConvertToWorld({ width / 2, height / 4 * 5 }),
+			ConvertToWorld({ 0, height / 4 * 2 }),
+			ConvertToWorld({ width, height / 4 * 4 }),
+			});
+		break;
+	case CubeFace::Type::Right:
+		collision_test_vertices_.assign({
+			ConvertToWorld({ width / 2, height / 4 }),
+			ConvertToWorld({ width / 2, height / 4 * 3 }),
+			ConvertToWorld({ width / 2, height / 4 * 5 }),
+			ConvertToWorld({ width, height / 4 * 2 }),
+			ConvertToWorld({ 0, height / 4 * 4 }),
+			});
+		break;
+	}
+	return collision_test_vertices_;
 }
 
 void CubeFace::ResetBrush(ColorEnum color)

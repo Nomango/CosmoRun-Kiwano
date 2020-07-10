@@ -2,8 +2,6 @@
 #include "Common.h"
 #include "Cube.h"
 
-#define CUBE_QUEUE_LENGTH 10
-
 KGE_DECLARE_SMART_PTR(GameLayer);
 
 class GameLayer : public Actor
@@ -22,15 +20,17 @@ private:
 
 	void AddRandomFace();
 
+	void RemoveHeadFace();
+
+	CubeDesc GetRandomChoice();
+
 	std::vector<CubeDesc> GetRandomChoices();
 
 	void FilterChoices(std::vector<CubeDesc>& choices);
 
 	CubePos GetNewCubePos(CubeDesc desc);
 
-	CubeFace* CreateCubeFace(CubeDesc desc);
-
-	CubeFace* AddCubeFace(const CubePos& pos, CubeDesc desc);
+	CubeFace* AppendCubeFace(CubeDesc desc);
 
 private:
 	CubeMap cube_map_;

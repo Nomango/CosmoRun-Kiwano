@@ -3,6 +3,21 @@
 #define MAX_CUBE_NUMBER 12
 #define PREPARE_CUBE_NUMBER 2
 
+std::map<CubeFace::Type, String> type_map = {
+		{ CubeFace::Type::Top, "top   " },
+		{ CubeFace::Type::Left, "left  " },
+		{ CubeFace::Type::Right, "right " },
+};
+
+std::map<Direction, String> d_map = {
+	{ Direction::Up, "up" },
+	{ Direction::Down, "down" },
+	{ Direction::LeftDown, "left down" },
+	{ Direction::LeftUp, "left up" },
+	{ Direction::RightDown, "right down" },
+	{ Direction::RightUp, "right up" },
+};
+
 GameLayer::GameLayer(ColorEnum color, Size size)
 	: color_(color)
 {
@@ -11,13 +26,13 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 
 void GameLayer::StartGame()
 {
-	InitCubes(CUBE_QUEUE_LENGTH);
+	InitCubes(MAX_CUBE_NUMBER);
 }
 
 void GameLayer::Restart()
 {
 	// 调试用
-	InitCubes(CUBE_QUEUE_LENGTH);
+	InitCubes(MAX_CUBE_NUMBER);
 }
 
 void GameLayer::SetColor(ColorEnum color)
@@ -39,20 +54,24 @@ void GameLayer::InitCubes(int length)
 	cube_map_.Clear();
 	this->RemoveAllChildren();
 
+	CircleActorPtr c = CircleActor::Create(3);
+	c->SetFillColor(Color::Red);
+	this->AddChild(c, 1);
+
 	// 创建第一个方块
 	std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
 	int choice = math::Random(0, int(choices.size() - 1));
 
-	this->AddCubeFace({ 0, 0, 0 }, { CubeFace::Type::Top, choices[choice] });
+	this->AppendCubeFace({ CubeFace::Type::Top, choices[choice] });
 
 	// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
 	for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
 	{
-		CreateCubeFace({ CubeFace::Type::Top, choices[choice] });
+		AppendCubeFace({ CubeFace::Type::Top, choices[choice] });
 	}
 
 	// 随机生成后面的方块
-	for (int i = 0; i < MAX_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
+	for (int i = 0; i < length - PREPARE_CUBE_NUMBER; i++)
 	{
 		// 创建随机方块
 		AddRandomFace();
@@ -64,40 +83,100 @@ void GameLayer::InitCubes(int length)
 
 void GameLayer::AddRandomFace()
 {
-	bool failed = false;
-
-	do
+	try
 	{
-		auto choices = GetRandomChoices();
-		if (choices.empty())
+		// 获取随机的方块类型
+		auto desc = GetRandomChoice();
+
+		// 创建新方块
+		auto face = AppendCubeFace(desc);
+
+		// 判断是否有冲突
+		/*if (cube_faces_.size() > 3)
 		{
-			failed = true;
-			break;
-		}
-
-		// 随机选择一种可能
-		int choice = math::Random(0, int(choices.size() - 1));
-
-		CreateCubeFace(choices[choice]);
-	} while (0);
-
-	if (failed)
+			for (size_t i = 0; i < cube_faces_.size() - 2; i++)
+			{
+				if (cube_faces_[i]->IsCollidedWith(face))
+				{
+					RemoveHeadFace();
+					throw Exception("new face collided");
+				}
+			}
+		}*/
+	}
+	catch (Exception&)
 	{
-		if (cube_faces_.size() < 5)
+		// 获取随机方块失败，需要删掉之前的方块重新生成
+		if (cube_faces_.size() >= 3 && cube_faces_.size() <= 5)
 		{
-			cube_faces_.pop_back();
+			RemoveHeadFace();
+
 			AddRandomFace();
 			AddRandomFace();
 		}
 		else
 		{
-			cube_faces_.pop_back();
-			cube_faces_.pop_back();
+			// 方块数量较多时，可能存在圈性路径，需要多删几个
+			RemoveHeadFace();
+			RemoveHeadFace();
+
 			AddRandomFace();
 			AddRandomFace();
 			AddRandomFace();
 		}
 	}
+}
+
+void GameLayer::RemoveHeadFace()
+{
+	KGE_LOG("-remove- ", type_map[cube_faces_.back()->GetType()], d_map[cube_faces_.back()->GetDirection()]);
+
+	cube_faces_.back()->RemoveSelf();
+	//auto head = cube_faces_.back();
+	//head->GetCube()->RemoveFace(head);
+	cube_faces_.pop_back();
+
+	if (cube_faces_.empty())
+		KGE_LOG("??");
+}
+
+CubeDesc GameLayer::GetRandomChoice()
+{
+	auto choices = GetRandomChoices();
+	if (choices.empty())
+	{
+		throw Exception("choices is empty");
+	}
+
+	// 随机选择一种可能
+	int choice = math::Random(0, int(choices.size() - 1));
+
+	// 不允许视觉上相邻的方块
+	auto pos = GetNewCubePos(choices[choice]);
+	auto head = cube_faces_.back();
+	for (auto face : cube_faces_)
+	{
+		if (face == head)
+			continue;
+
+		CubePos pos2 = face->GetCube()->GetPos();
+		CubePos offset = { pos[0] - pos2[0], pos[1] - pos2[1], pos[2] - pos2[2] };
+
+		if (face->GetType() == choices[choice].type)
+		{
+			if (offset == CubePos{ 0, 0, 0 }
+				|| offset == CubePos{ 1, 0, 0 }
+				|| offset == CubePos{ -1, 0, 0 }
+				|| offset == CubePos{ 0, 1, 0 }
+				|| offset == CubePos{ 0, -1, 0 }
+				|| offset == CubePos{ 0, 0, 1 }
+				|| offset == CubePos{ 0, 0, -1 })
+			{
+				throw Exception("choice is collided");
+			}
+		}
+	}
+	return choices[choice];
 }
 
 std::vector<CubeDesc> GameLayer::GetRandomChoices()
@@ -254,7 +333,7 @@ std::vector<CubeDesc> GameLayer::GetRandomChoices()
 
 	// 筛选掉不合理的选择
 	FilterChoices(choices);
-	KGE_LOG("choices", choices.size());
+	// KGE_LOG("choices", choices.size());
 	return choices;
 }
 
@@ -361,6 +440,9 @@ void GameLayer::FilterChoices(std::vector<CubeDesc>& choices)
 
 CubePos GameLayer::GetNewCubePos(CubeDesc desc)
 {
+	if (cube_faces_.empty())
+		return CubePos{ 0, 0, 0 };
+
 	CubeFace* head = cube_faces_.back();
 
 	// 计算相对位置
@@ -470,21 +552,10 @@ CubePos GameLayer::GetNewCubePos(CubeDesc desc)
 	return pos;
 }
 
-CubeFace* GameLayer::CreateCubeFace(CubeDesc desc)
+CubeFace* GameLayer::AppendCubeFace(CubeDesc desc)
 {
 	// 获取新方块位置
 	auto pos = GetNewCubePos(desc);
-
-	// 创建新方块
-	auto face = this->AddCubeFace(pos, desc);
-
-	CubeFace* head = cube_faces_.back();
-	head->SetNext(face);
-	return face;
-}
-
-CubeFace* GameLayer::AddCubeFace(const CubePos& pos, CubeDesc desc)
-{
 	CubePtr cube = cube_map_.GetCubeFromMap(pos);
 	if (!cube)
 	{
@@ -493,24 +564,15 @@ CubeFace* GameLayer::AddCubeFace(const CubePos& pos, CubeDesc desc)
 		this->AddChild(cube);
 	}
 
-	std::map<CubeFace::Type, String> type_map = {
-		{ CubeFace::Type::Top, "top" },
-		{ CubeFace::Type::Left, "left" },
-		{ CubeFace::Type::Right, "right" },
-	};
-
-	std::map<Direction, String> d_map = {
-		{ Direction::Up, "up" },
-		{ Direction::Down, "down" },
-		{ Direction::LeftDown, "left down" },
-		{ Direction::LeftUp, "left up" },
-		{ Direction::RightDown, "right down" },
-		{ Direction::RightUp, "right up" },
-	};
-
 	KGE_LOG(type_map[desc.type], d_map[desc.direction]);
 
 	auto face = cube->AddFace(desc);
+
+	if (!cube_faces_.empty())
+	{
+		CubeFace* head = cube_faces_.back();
+		head->SetNext(face);
+	}
 	cube_faces_.push_back(face);
 	return face;
 }

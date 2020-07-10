@@ -33,6 +33,8 @@ public:
 
     void SetColor(ColorEnum color);
 
+    void RemoveFace(Actor* face);
+
 private:
     float side_length_;
     ColorEnum color_;

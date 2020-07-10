@@ -23,6 +23,8 @@ public:
 
 	void SetColor(ColorEnum color);
 
+	bool IsCollidedWith(CubeFace* other);
+
 	void RemoveSelf();
 
 	CubeFace* GetNext() const;
@@ -38,6 +40,8 @@ public:
 private:
 	void CreateVertices();
 
+	const Vector<Point>& GetCollisionTestVertices();
+
 	BrushPtr GetFillBrush(ColorEnum color);
 
 	BrushPtr GetTopFillBrush(Color light, Color dark);
@@ -52,4 +56,5 @@ private:
 	float side_length_;
 	CubeFace* next_ = nullptr;
 	Cube* cube_ = nullptr;
+	Vector<Point> collision_test_vertices_;
 };
