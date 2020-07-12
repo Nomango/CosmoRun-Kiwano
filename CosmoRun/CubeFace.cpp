@@ -1,7 +1,7 @@
 #include "CubeFace.h"
 #include "Cube.h"
 
-CubeFace::CubeFace(Type type, Direction d, float side_length)
+CubeFace::CubeFace(FaceType type, Direction d, float side_length)
 	: type_(type)
 	, direction_(d)
 	, side_length_(side_length)
@@ -9,7 +9,7 @@ CubeFace::CubeFace(Type type, Direction d, float side_length)
 	CreateVertices();
 }
 
-CubeFace::Type CubeFace::GetType() const
+FaceType CubeFace::GetType() const
 {
 	return type_;
 }
@@ -31,11 +31,22 @@ void CubeFace::SetColor(ColorEnum color)
 	this->AddAction(action);
 }
 
-bool CubeFace::IsCollidedWith(CubeFace* other)
+bool CubeFace::IsCollidedWith(const CubePos& pos, CubeDesc desc)
 {
-	for (auto vertex : other->GetCollisionTestVertices())
-		if (this->GetShape()->ContainsPoint(this->ConvertToLocal(vertex)))
-			return true;
+	auto self_pos = GetCube()->GetPos();
+	int x1 = self_pos[0] - self_pos[2];
+	int y1 = self_pos[1] - self_pos[2];
+	int x2 = pos[0] - pos[2];
+	int y2 = pos[1] - pos[2];
+	int offset_x = (x2 - x1);
+	int offset_y = (y2 - y1);
+	if (offset_x == 0 && offset_y == 0)
+		return true;
+
+	if (offset_x <= 1 && offset_y <= 1)
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -74,7 +85,7 @@ void CubeFace::CreateVertices()
 
 	switch (type_)
 	{
-	case CubeFace::Type::Top:
+	case FaceType::Top:
 		this->SetVertices({
 			Point(width, 0),
 			Point(0, height),
@@ -82,7 +93,7 @@ void CubeFace::CreateVertices()
 			Point(2 * width, height)
 		});
 		break;
-	case CubeFace::Type::Left:
+	case FaceType::Left:
 		this->SetVertices({
 			Point(0, 0),
 			Point(0, side_length_),
@@ -90,7 +101,7 @@ void CubeFace::CreateVertices()
 			Point(width, height)
 		});
 		break;
-	case CubeFace::Type::Right:
+	case FaceType::Right:
 		this->SetVertices({
 			Point(width, 0),
 			Point(0, height),
@@ -99,47 +110,6 @@ void CubeFace::CreateVertices()
 		});
 		break;
 	}
-}
-
-const Vector<Point>& CubeFace::GetCollisionTestVertices()
-{
-	if (!collision_test_vertices_.empty())
-		return collision_test_vertices_;
-
-	float width = side_length_ * math::Cos(30.0f);
-	float height = side_length_ * math::Sin(30.0f);
-
-	switch (type_)
-	{
-	case CubeFace::Type::Top:
-		collision_test_vertices_.assign({
-			ConvertToWorld({ width, height }),
-			ConvertToWorld({ width / 2, height / 2 }),
-			ConvertToWorld({ width / 2 * 3, height / 2 }),
-			ConvertToWorld({ width / 2, height / 2 * 3 }),
-			ConvertToWorld({ width / 2 * 3, height / 2 * 3 }),
-			});
-		break;
-	case CubeFace::Type::Left:
-		collision_test_vertices_.assign({
-			ConvertToWorld({ width / 2, height / 4 }),
-			ConvertToWorld({ width / 2, height / 4 * 3 }),
-			ConvertToWorld({ width / 2, height / 4 * 5 }),
-			ConvertToWorld({ 0, height / 4 * 2 }),
-			ConvertToWorld({ width, height / 4 * 4 }),
-			});
-		break;
-	case CubeFace::Type::Right:
-		collision_test_vertices_.assign({
-			ConvertToWorld({ width / 2, height / 4 }),
-			ConvertToWorld({ width / 2, height / 4 * 3 }),
-			ConvertToWorld({ width / 2, height / 4 * 5 }),
-			ConvertToWorld({ width, height / 4 * 2 }),
-			ConvertToWorld({ 0, height / 4 * 4 }),
-			});
-		break;
-	}
-	return collision_test_vertices_;
 }
 
 void CubeFace::ResetBrush(ColorEnum color)
@@ -165,7 +135,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 	}
 
 	BrushPtr brush;
-	if (type_ == CubeFace::Type::Left)
+	if (type_ == FaceType::Left)
 	{
 		switch (color)
 		{
@@ -180,7 +150,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 			break;
 		}
 	}
-	else if (type_ == CubeFace::Type::Right)
+	else if (type_ == FaceType::Right)
 	{
 		switch (color)
 		{
@@ -275,7 +245,7 @@ BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
 
 BrushPtr CubeFace::GetStrokeBrush(Color light, Color dark)
 {
-	if (type_ == Type::Right)
+	if (type_ == FaceType::Right)
 	{
 		// 右侧的面颜色较深
 		return Brush::Create(dark);

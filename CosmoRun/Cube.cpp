@@ -12,7 +12,7 @@ Cube::Cube(const CubePos& pos, float side_length)
 	this->SetPositionY(pos[0] * height + pos[1] * height - pos[2] * side_length);
 }
 
-const std::array<int, 3>& Cube::GetPos() const
+const CubePos& Cube::GetPos() const
 {
 	return pos_;
 }
@@ -22,7 +22,7 @@ int Cube::GetFacesCount() const
 	return int(faces_.size());
 }
 
-CubeFace* Cube::GetFace(CubeFace::Type type) const
+CubeFace* Cube::GetFace(FaceType type) const
 {
 	for (auto face : faces_)
 	{
@@ -47,13 +47,13 @@ CubeFace* Cube::AddFace(CubeDesc desc)
 	float height = side_length_ * math::Sin(30.0f);
 	switch (desc.type)
 	{
-	case CubeFace::Type::Top:
+	case FaceType::Top:
 		face->SetPosition(0, -height);
 		break;
-	case CubeFace::Type::Left:
+	case FaceType::Left:
 		face->SetPosition(-width, -height);
 		break;
-	case CubeFace::Type::Right:
+	case FaceType::Right:
 		face->SetPosition(0, 0);
 		break;
 	}
