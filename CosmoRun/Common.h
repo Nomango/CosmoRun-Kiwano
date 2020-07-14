@@ -39,23 +39,6 @@ struct FaceDesc
 	FaceType type;
 	Direction direction;
 
-	inline bool IsIn(const std::initializer_list<FaceDesc>& list)
-	{
-		return std::find(list.begin(), list.end(), *this) != list.end();
-	}
-
-	inline bool IsIn(const std::initializer_list<FaceType>& list)
-	{
-		for (auto type : list)
-		{
-			if (type == this->type)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
 	inline bool operator==(const FaceDesc& rhs) const
 	{
 		return type == rhs.type && direction == rhs.direction;

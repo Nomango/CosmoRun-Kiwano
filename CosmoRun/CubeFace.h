@@ -16,9 +16,11 @@ public:
 
 	FaceDesc GetDesc() const;
 
+	bool IsIn(const std::initializer_list<FaceType>& list);
+
 	void SetColor(ColorEnum color);
 
-	void RemoveSelf();
+	void Show();
 
 	CubeFace* GetNext() const;
 

@@ -60,7 +60,7 @@ MainStage::MainStage()
 	AddChild(background_);
 
 	game_layer_ = new GameLayer(color_, GetSize());
-	game_layer_->Restart();
+	game_layer_->StartGame();
 	game_layer_->SetPosition(GetSize() / 2);
 	AddChild(game_layer_);
 

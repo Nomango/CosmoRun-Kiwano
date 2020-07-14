@@ -14,7 +14,7 @@ public:
 
     int GetFacesCount() const;
 
-    bool Has(std::initializer_list<FaceType> types) const;
+    std::vector<CubeFace*> GetFaces() const;
 
     CubeFace* GetFace(FaceType type) const;
 
@@ -38,7 +38,9 @@ public:
 
     Cube* GetCubeFromMap(const CubePos& pos);
 
-    void RemoveCubeInMap(const CubePos& pos);
+    void RemoveCubeInMap(Cube* cube);
+
+    void RemoveCubeFaceInMap(CubeFace* face);
 
     bool IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head);
 

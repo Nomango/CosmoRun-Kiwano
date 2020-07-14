@@ -22,16 +22,9 @@ int Cube::GetFacesCount() const
 	return int(faces_.size());
 }
 
-bool Cube::Has(std::initializer_list<FaceType> types) const
+std::vector<CubeFace*> Cube::GetFaces() const
 {
-	for (auto face : faces_)
-	{
-		if (face->GetDesc().IsIn(types))
-		{
-			return true;
-		}
-	}
-	return false;
+	return faces_;
 }
 
 CubeFace* Cube::GetFace(FaceType type) const
@@ -73,11 +66,16 @@ void Cube::SetColor(ColorEnum color)
 
 void Cube::RemoveFace(Actor* face)
 {
-	this->RemoveChild(face);
-
-	// 自动移除自身
-	if (this->GetFacesCount() == 0)
-		this->RemoveFromParent();
+	for (auto iter = faces_.begin(); iter != faces_.end();)
+	{
+		if (*iter == face)
+		{
+			this->RemoveChild(face);
+			iter = faces_.erase(iter);
+		}
+		else
+			++iter;
+	}
 }
 
 CubePtr CubeMap::CreateCube(const CubePos& pos, float side_length)
@@ -98,10 +96,23 @@ Cube* CubeMap::GetCubeFromMap(const CubePos& pos)
 	return nullptr;
 }
 
-void CubeMap::RemoveCubeInMap(const CubePos& pos)
+void CubeMap::RemoveCubeInMap(Cube* cube)
 {
+	auto pos = cube->GetPos();
 	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.erase(key);
+}
+
+void CubeMap::RemoveCubeFaceInMap(CubeFace* face)
+{
+	auto cube = face->GetCube();
+	cube->RemoveFace(face);
+
+	if (cube->GetFacesCount() == 0)
+	{
+		RemoveCubeInMap(cube);
+		cube->RemoveFromParent();
+	}
 }
 
 bool CubeMap::IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head)
@@ -109,9 +120,6 @@ bool CubeMap::IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head)
 	for (auto& pair : cube_map_)
 	{
 		auto cube = pair.second;
-		if (head->GetCube() == cube && cube->GetFacesCount() == 1)
-			continue;
-
 		auto self_pos = cube->GetPos();
 		int x1 = self_pos[0] - self_pos[2];
 		int y1 = self_pos[1] - self_pos[2];
@@ -120,59 +128,79 @@ bool CubeMap::IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head)
 		int offset_x = (x1 - x2);
 		int offset_y = (y1 - y2);
 
-		if (offset_x == 0 && offset_y == 0)
-			return true;
-
-		switch (desc.type)
+		for (auto face : cube->GetFaces())
 		{
-		case FaceType::Top:
-			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Left, FaceType::Right }))
+			if (face == head)
+				continue;
+
+			if (offset_x == 0 && offset_y == 0)
 				return true;
-			if (offset_x == -1 && offset_y == 0 && cube->Has({ FaceType::Top, FaceType::Right }))
-				return true;
-			if (offset_x == 0 && offset_y == -1 && cube->Has({ FaceType::Top, FaceType::Left }))
-				return true;
-			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Top }))
-				return true;
-			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Top }))
-				return true;
-			if (offset_x == -2 && offset_y == -1 && cube->Has({ FaceType::Right }))
-				return true;
-			if (offset_x == -1 && offset_y == -2 && cube->Has({ FaceType::Left }))
-				return true;
-			break;
-		case FaceType::Left:
-			if (offset_x == -1 && offset_y == 0 && cube->Has({ FaceType::Left, FaceType::Right }))
-				return true;
-			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Right }))
-				return true;
-			if (offset_x == 1 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Left }))
-				return true;
-			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Left }))
-				return true;
-			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Left }))
-				return true;
-			if (offset_x == -1 && offset_y == 1 && cube->Has({ FaceType::Right }))
-				return true;
-			if (offset_x == 1 && offset_y == 2 && cube->Has({ FaceType::Top }))
-				return true;
-			break;
-		case FaceType::Right:
-			if (offset_x == 0 && offset_y == -1 && cube->Has({ FaceType::Left, FaceType::Right }))
-				return true;
-			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Top, FaceType::Left }))
-				return true;
-			if (offset_x == 1 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Right }))
-				return true;
-			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Right }))
-				return true;
-			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Right }))
-				return true;
-			if (offset_x == 1 && offset_y == -1 && cube->Has({ FaceType::Left }))
-				return true;
-			if (offset_x == 2 && offset_y == 1 && cube->Has({ FaceType::Top }))
-				return true;
-			break;
+
+			switch (desc.type)
+			{
+			case FaceType::Top:
+				if (offset_x == -1 && offset_y == -1 && face->IsIn({ FaceType::Left, FaceType::Right }))
+					return true;
+				if (offset_x == -2 && offset_y == -2 && face->IsIn({ FaceType::Left, FaceType::Right }))
+					return true;
+				if (offset_x == -1 && offset_y == 0 && face->IsIn({ FaceType::Top, FaceType::Right }))
+					return true;
+				if (offset_x == 0 && offset_y == -1 && face->IsIn({ FaceType::Top, FaceType::Left }))
+					return true;
+				if (offset_x == 1 && offset_y == 0 && face->IsIn({ FaceType::Top }))
+					return true;
+				if (offset_x == 0 && offset_y == 1 && face->IsIn({ FaceType::Top }))
+					return true;
+				if (offset_x == -2 && offset_y == -1 && face->IsIn({ FaceType::Right }))
+					return true;
+				if (offset_x == -1 && offset_y == -2 && face->IsIn({ FaceType::Left }))
+					return true;
+				break;
+			case FaceType::Left:
+				if (offset_x == -1 && offset_y == 0 && face->IsIn({ FaceType::Left, FaceType::Right }))
+					return true;
+				if (offset_x == 0 && offset_y == 1 && face->IsIn({ FaceType::Top, FaceType::Right }))
+					return true;
+				if (offset_x == 1 && offset_y == 1 && face->IsIn({ FaceType::Top, FaceType::Left }))
+					return true;
+				if (offset_x == 1 && offset_y == 0 && face->IsIn({ FaceType::Left }))
+					return true;
+				if (offset_x == -1 && offset_y == -1 && face->IsIn({ FaceType::Left }))
+					return true;
+				if (offset_x == -1 && offset_y == 1 && face->IsIn({ FaceType::Right }))
+					return true;
+				if (offset_x == -2 && offset_y == -1 && face->IsIn({ FaceType::Right }))
+					return true;
+				if (offset_x == 1 && offset_y == 2 && face->IsIn({ FaceType::Right, FaceType::Top }))
+					return true;
+				if (offset_x == 2 && offset_y == 2 && face->IsIn({ FaceType::Top }))
+					return true;
+				if (offset_x == 2 && offset_y == 1 && face->IsIn({ FaceType::Top }))
+					return true;
+				break;
+			case FaceType::Right:
+				if (offset_x == 0 && offset_y == -1 && face->IsIn({ FaceType::Left, FaceType::Right }))
+					return true;
+				if (offset_x == 1 && offset_y == 0 && face->IsIn({ FaceType::Top, FaceType::Left }))
+					return true;
+				if (offset_x == 1 && offset_y == 1 && face->IsIn({ FaceType::Top, FaceType::Right }))
+					return true;
+				if (offset_x == 0 && offset_y == 1 && face->IsIn({ FaceType::Right }))
+					return true;
+				if (offset_x == -1 && offset_y == -1 && face->IsIn({ FaceType::Right }))
+					return true;
+				if (offset_x == 1 && offset_y == -1 && face->IsIn({ FaceType::Left }))
+					return true;
+				if (offset_x == -1 && offset_y == -2 && face->IsIn({ FaceType::Left }))
+					return true;
+				if (offset_x == 2 && offset_y == 1 && face->IsIn({ FaceType::Top, FaceType::Left }))
+					return true;
+				if (offset_x == 2 && offset_y == 2 && face->IsIn({ FaceType::Top }))
+					return true;
+				if (offset_x == 1 && offset_y == 2 && face->IsIn({ FaceType::Top }))
+					return true;
+				break;
+			}
 		}
 	}
 	return false;

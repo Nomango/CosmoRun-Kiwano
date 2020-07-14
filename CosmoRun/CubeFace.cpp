@@ -23,6 +23,18 @@ FaceDesc CubeFace::GetDesc() const
 	return desc_;
 }
 
+bool CubeFace::IsIn(const std::initializer_list<FaceType>& list)
+{
+	for (auto type : list)
+	{
+		if (type == desc_.type)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void CubeFace::SetColor(ColorEnum color)
 {
 	// 淡入淡出式切换颜色
@@ -35,11 +47,11 @@ void CubeFace::SetColor(ColorEnum color)
 	this->AddAction(action);
 }
 
-void CubeFace::RemoveSelf()
+void CubeFace::Show()
 {
-	// 动画结束后移除自身
-	auto action = Tween::FadeOut(2_sec).DoneCallback(Closure(GetCube(), &Cube::RemoveFace));
-	AddAction(action);
+	SetVisible(true);
+	SetOpacity(0);
+	AddAction(Tween::FadeIn(500_msec));
 }
 
 CubeFace* CubeFace::GetNext() const

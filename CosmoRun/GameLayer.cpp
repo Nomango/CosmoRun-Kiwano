@@ -1,7 +1,8 @@
 #include "GameLayer.h"
 
 #define MAX_CUBE_NUMBER 12
-#define PREPARE_CUBE_NUMBER 2
+#define HIDE_CUBE_NUMBER 9
+#define PREPARE_CUBE_NUMBER 3
 
 std::map<FaceType, String> type_map = {
 		{ FaceType::Top, "top   " },
@@ -20,19 +21,19 @@ std::map<Direction, String> d_map = {
 
 GameLayer::GameLayer(ColorEnum color, Size size)
 	: color_(color)
+	, current_face_(nullptr)
 {
 	SetSize(size);
 }
 
 void GameLayer::StartGame()
 {
-	InitCubes(MAX_CUBE_NUMBER);
-}
+	RemoveAllTasks();
 
-void GameLayer::Restart()
-{
-	// 调试用
 	InitCubes(MAX_CUBE_NUMBER);
+
+	TaskPtr task = Task::Create(Closure(this, &GameLayer::TickTest), 500_msec);
+	AddTask(task);
 }
 
 void GameLayer::SetColor(ColorEnum color)
@@ -45,54 +46,74 @@ void GameLayer::SetColor(ColorEnum color)
 	}
 }
 
+void GameLayer::RemoveFace(Actor* face)
+{
+	cube_map_.RemoveCubeFaceInMap((CubeFace*)face);
+}
+
 void GameLayer::InitCubes(int length)
 {
 	KGE_LOG();
 
-	cube_faces_.clear();
+	hide_faces_.clear();
 	cube_map_.Clear();
 	this->RemoveAllChildren();
-
-	CircleActorPtr c = CircleActor::Create(3);
-	c->SetFillColor(Color::Red);
-	this->AddChild(c, 1);
 
 	// 创建第一个方块
 	std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
 	int choice = math::Random(0, int(choices.size() - 1));
 
-	AppendCubeFace({ FaceType::Top, choices[choice] });
+	current_face_ = AppendCubeFace({ FaceType::Top, choices[choice] });
 
 	// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
 	for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
-	{
 		AppendCubeFace({ FaceType::Top, choices[choice] });
-	}
 
 	// 随机生成后面的方块
-	for (int i = 0; i < length - PREPARE_CUBE_NUMBER; i++)
-	{
-		// 创建随机方块
+	for (int i = 0; i < length + HIDE_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
 		AddRandomFace();
-	}
 
 	KGE_LOG();
 }
 
+void GameLayer::TickTest(Task* task, Duration dt)
+{
+	AddRandomFace();
+	RemoveTailFace();
+
+	auto face = hide_faces_.front();
+	AddAction(Tween::MoveTo(400_msec, GetSize() / 2 - face->GetCube()->GetPosition()));
+}
+
 void GameLayer::AddRandomFace()
 {
-	try
+	// 获取随机的方块类型
+	auto choices = GetRandomChoices();
+	if (!choices.empty())
 	{
-		// 获取随机的方块类型
-		auto desc = GetRandomChoice();
+		// 随机选择一种可能
+		int choice = math::Random(0, int(choices.size() - 1));
 
 		// 创建新方块
-		auto face = AppendCubeFace(desc);
+		AppendCubeFace(choices[choice]);
 	}
-	catch (Exception&)
+	else
 	{
 		// 获取随机方块失败，需要删掉之前的方块重新生成
-		if (cube_faces_.size() >= 3 && cube_faces_.size() <= 5)
+		if (hide_faces_.size() < 5)
+		{
+			KGE_LOG();
+			KGE_LOG("====");
+			for (auto face : hide_faces_)
+			{
+				KGE_LOG(type_map[face->GetType()], d_map[face->GetDirection()]);
+			}
+			KGE_LOG("====");
+			KGE_LOG();
+
+			throw Exception("Internal algorithm error");
+		}
+		else if (hide_faces_.size() == 5)
 		{
 			RemoveHeadFace();
 
@@ -101,7 +122,7 @@ void GameLayer::AddRandomFace()
 		}
 		else
 		{
-			// 方块数量较多时，可能存在圈性路径，需要多删几个
+			// 方块数量较多时，可能存在圈形路径，需要多删几个
 			RemoveHeadFace();
 			RemoveHeadFace();
 
@@ -112,37 +133,61 @@ void GameLayer::AddRandomFace()
 	}
 }
 
-void GameLayer::RemoveHeadFace()
+CubeFace* GameLayer::AppendCubeFace(FaceDesc desc)
 {
-	KGE_LOG("-remove- ", type_map[cube_faces_.back()->GetType()], d_map[cube_faces_.back()->GetDirection()]);
-
-	cube_faces_.back()->RemoveSelf();
-	//auto head = cube_faces_.back();
-	//head->GetCube()->RemoveFace(head);
-	cube_faces_.pop_back();
-
-	if (cube_faces_.empty())
-		KGE_LOG("??");
-}
-
-FaceDesc GameLayer::GetRandomChoice()
-{
-	auto choices = GetRandomChoices();
-	if (choices.empty())
+	// 获取新方块位置
+	auto pos = GetNewCubePos(desc);
+	CubePtr cube = cube_map_.GetCubeFromMap(pos);
+	if (!cube)
 	{
-		throw Exception("choices is empty");
+		float side_length = GetWidth() * 0.08f;
+		cube = cube_map_.CreateCube(pos, side_length);
+		this->AddChild(cube);
 	}
 
-	// 随机选择一种可能
-	int choice = math::Random(0, int(choices.size() - 1));
-	return choices[choice];
+	KGE_LOG("-new-", type_map[desc.type], d_map[desc.direction]);
+
+	// 创建新方块面，并设置为透明
+	auto face = cube->AddFace(desc);
+	face->SetVisible(false);
+
+	if (!hide_faces_.empty())
+	{
+		CubeFace* head = hide_faces_.back();
+		head->SetNext(face);
+	}
+	hide_faces_.push_back(face);
+
+	// 当隐藏的方块数量较多时，显示最后一个
+	if (hide_faces_.size() > HIDE_CUBE_NUMBER)
+	{
+		hide_faces_.front()->Show();
+		hide_faces_.pop_front();
+	}
+	return face;
+}
+
+void GameLayer::RemoveTailFace()
+{
+	auto action = Tween::FadeOut(500_msec).DoneCallback(Closure(this, &GameLayer::RemoveFace));
+	current_face_->AddAction(action);
+	current_face_ = current_face_->GetNext();
+}
+
+void GameLayer::RemoveHeadFace()
+{
+	KGE_LOG("-remove- ", type_map[hide_faces_.back()->GetType()], d_map[hide_faces_.back()->GetDirection()]);
+
+	auto head = hide_faces_.back();
+	cube_map_.RemoveCubeFaceInMap(head);
+	hide_faces_.pop_back();
 }
 
 std::vector<FaceDesc> GameLayer::GetRandomChoices()
 {
 	std::vector<FaceDesc> choices;
 
-	CubeFace* head = cube_faces_.back();
+	CubeFace* head = hide_faces_.back();
 	switch (head->GetType())
 	{
 	case FaceType::Top:
@@ -262,6 +307,7 @@ std::vector<FaceDesc> GameLayer::GetRandomChoices()
 				Face::Left_LeftUp,
 				Face::Top_RightDown,
 			};
+			break;
 		case Direction::RightUp:
 			choices = {
 				Face::Right_Up,
@@ -286,16 +332,7 @@ std::vector<FaceDesc> GameLayer::GetRandomChoices()
 		break;
 	}
 
-	// 筛选掉不合理的选择
-	FilterChoices(choices);
-	// KGE_LOG("choices", choices.size());
-	return choices;
-}
-
-void GameLayer::FilterChoices(std::vector<FaceDesc>& choices)
-{
-	CubeFace* head = cube_faces_.back();
-
+	// 筛选掉视觉上冲突的情况
 	for (auto iter = choices.begin(); iter != choices.end();)
 	{
 		auto pos = GetNewCubePos(*iter);
@@ -305,14 +342,17 @@ void GameLayer::FilterChoices(std::vector<FaceDesc>& choices)
 		else
 			++iter;
 	}
+
+	// KGE_LOG("choices", choices.size());
+	return choices;
 }
 
 CubePos GameLayer::GetNewCubePos(FaceDesc desc)
 {
-	if (cube_faces_.empty())
+	if (hide_faces_.empty())
 		return CubePos{ 0, 0, 0 };
 
-	CubeFace* head = cube_faces_.back();
+	CubeFace* head = hide_faces_.back();
 
 	// 计算相对位置
 	CubePos offset = { 0 };
@@ -392,29 +432,4 @@ CubePos GameLayer::GetNewCubePos(FaceDesc desc)
 		pos[i] += offset[i];
 	}
 	return pos;
-}
-
-CubeFace* GameLayer::AppendCubeFace(FaceDesc desc)
-{
-	// 获取新方块位置
-	auto pos = GetNewCubePos(desc);
-	CubePtr cube = cube_map_.GetCubeFromMap(pos);
-	if (!cube)
-	{
-		float side_length = GetWidth() * 0.08f;
-		cube = cube_map_.CreateCube(pos, side_length);
-		this->AddChild(cube);
-	}
-
-	KGE_LOG("-new-", type_map[desc.type], d_map[desc.direction]);
-
-	auto face = cube->AddFace(desc);
-
-	if (!cube_faces_.empty())
-	{
-		CubeFace* head = cube_faces_.back();
-		head->SetNext(face);
-	}
-	cube_faces_.push_back(face);
-	return face;
 }

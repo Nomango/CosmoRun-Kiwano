@@ -9,31 +9,32 @@ class GameLayer : public Actor
 public:
 	GameLayer(ColorEnum color, Size size);
 
-	void Restart();
-
 	void StartGame();
 
 	void SetColor(ColorEnum color);
 
+	void RemoveFace(Actor* face);
+
 private:
 	void InitCubes(int length);
 
+	void TickTest(Task* task, Duration dt);
+
 	void AddRandomFace();
+
+	CubeFace* AppendCubeFace(FaceDesc desc);
+
+	void RemoveTailFace();
 
 	void RemoveHeadFace();
 
-	FaceDesc GetRandomChoice();
-
 	std::vector<FaceDesc> GetRandomChoices();
 
-	void FilterChoices(std::vector<FaceDesc>& choices);
-
 	CubePos GetNewCubePos(FaceDesc desc);
-
-	CubeFace* AppendCubeFace(FaceDesc desc);
 
 private:
 	CubeMap cube_map_;
 	ColorEnum color_;
-	std::vector<CubeFace*> cube_faces_;
+	CubeFace* current_face_;
+	std::list<CubeFace*> hide_faces_;
 };
