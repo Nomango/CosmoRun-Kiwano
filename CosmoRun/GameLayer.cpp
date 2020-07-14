@@ -48,7 +48,6 @@ void GameLayer::SetColor(ColorEnum color)
 void GameLayer::InitCubes(int length)
 {
 	KGE_LOG();
-	KGE_LOG();
 
 	cube_faces_.clear();
 	cube_map_.Clear();
@@ -77,7 +76,6 @@ void GameLayer::InitCubes(int length)
 		AddRandomFace();
 	}
 
-	KGE_LOG();
 	KGE_LOG();
 }
 
@@ -127,7 +125,7 @@ void GameLayer::RemoveHeadFace()
 		KGE_LOG("??");
 }
 
-CubeDesc GameLayer::GetRandomChoice()
+FaceDesc GameLayer::GetRandomChoice()
 {
 	auto choices = GetRandomChoices();
 	if (choices.empty())
@@ -137,42 +135,14 @@ CubeDesc GameLayer::GetRandomChoice()
 
 	// 随机选择一种可能
 	int choice = math::Random(0, int(choices.size() - 1));
-
-	// 不允许视觉上相邻的方块
-	auto pos = GetNewCubePos(choices[choice]);
-	auto head = cube_faces_.back();
-
-	for (auto face : cube_faces_)
-	{
-		if (face == head)
-			continue;
-
-		CubePos pos2 = face->GetCube()->GetPos();
-		CubePos offset = { pos[0] - pos2[0], pos[1] - pos2[1], pos[2] - pos2[2] };
-
-		if (face->GetType() == choices[choice].type)
-		{
-			if (offset == CubePos{ 0, 0, 0 }
-				|| offset == CubePos{ 1, 0, 0 }
-				|| offset == CubePos{ -1, 0, 0 }
-				|| offset == CubePos{ 0, 1, 0 }
-				|| offset == CubePos{ 0, -1, 0 }
-				|| offset == CubePos{ 0, 0, 1 }
-				|| offset == CubePos{ 0, 0, -1 })
-			{
-				throw Exception("choice is collided");
-			}
-		}
-	}
 	return choices[choice];
 }
 
-std::vector<CubeDesc> GameLayer::GetRandomChoices()
+std::vector<FaceDesc> GameLayer::GetRandomChoices()
 {
-	CubeFace* head = cube_faces_.back();
+	std::vector<FaceDesc> choices;
 
-	// 找出下一个方块的可能类型和方向
-	std::vector<CubeDesc> choices;
+	CubeFace* head = cube_faces_.back();
 	switch (head->GetType())
 	{
 	case FaceType::Top:
@@ -180,44 +150,44 @@ std::vector<CubeDesc> GameLayer::GetRandomChoices()
 		switch (head->GetDirection())
 		{
 		case Direction::LeftUp:
-			choices.assign({
-				{ FaceType::Top, Direction::LeftUp },
-				{ FaceType::Top, Direction::LeftDown },
-				{ FaceType::Top, Direction::RightUp },
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Right, Direction::LeftDown },
-				});
+			choices = {
+				Face::Top_LeftUp,
+				Face::Top_LeftDown,
+				Face::Top_RightUp,
+				Face::Left_Up,
+				Face::Left_Down,
+				Face::Right_Up,
+			};
 			break;
 		case Direction::LeftDown:
-			choices.assign({
-				{ FaceType::Top, Direction::LeftUp },
-				{ FaceType::Top, Direction::LeftDown },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Left, Direction::Down },
-				{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::RightDown },
-				});
+			choices = {
+				Face::Top_LeftUp,
+				Face::Top_LeftDown,
+				Face::Top_RightDown,
+				Face::Right_Up,
+				Face::Right_Down,
+				Face::Left_Down,
+			};
 			break;
 		case Direction::RightUp:
-			choices.assign({
-				{ FaceType::Top, Direction::LeftUp },
-				{ FaceType::Top, Direction::RightUp },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::RightDown },
-				});
+			choices = {
+				Face::Top_LeftUp,
+				Face::Top_RightDown,
+				Face::Top_RightUp,
+				Face::Right_Up,
+				Face::Right_Down,
+				Face::Left_Up,
+			};
 			break;
 		case Direction::RightDown:
-			choices.assign({
-				{ FaceType::Top, Direction::LeftDown },
-				{ FaceType::Top, Direction::RightUp },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Right, Direction::Down },
-				{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Right, Direction::LeftDown },
-				});
+			choices = {
+				Face::Top_LeftDown,
+				Face::Top_RightDown,
+				Face::Top_RightUp,
+				Face::Left_Up,
+				Face::Left_Down,
+				Face::Right_Down,
+			};
 			break;
 		}
 		break;
@@ -227,45 +197,44 @@ std::vector<CubeDesc> GameLayer::GetRandomChoices()
 		switch (head->GetDirection())
 		{
 		case Direction::Up:
-			choices.assign({
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::RightDown },
-				{ FaceType::Top, Direction::RightUp },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Top, Direction::LeftUp },
-				});
+			choices = {
+				Face::Left_Up,
+				Face::Left_LeftUp,
+				Face::Left_RightDown,
+				Face::Right_LeftDown,
+				Face::Right_RightUp,
+				Face::Top_RightUp,
+			};
 			break;
 		case Direction::Down:
-			choices.assign({
-				{ FaceType::Left, Direction::Down },
-				{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::RightDown },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Top, Direction::LeftUp },
-				{ FaceType::Top, Direction::LeftDown },
-				});
+			choices = {
+				Face::Left_Down,
+				Face::Left_LeftUp,
+				Face::Left_RightDown,
+				Face::Right_LeftDown,
+				Face::Right_RightUp,
+				Face::Top_LeftDown,
+			};
 			break;
 		case Direction::LeftUp:
-			choices.assign({
-				{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::Down },
-				{ FaceType::Right, Direction::LeftDown },
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::Down },
-				});
+			choices = {
+				Face::Left_Up,
+				Face::Left_Down,
+				Face::Left_LeftUp,
+				Face::Right_LeftDown,
+				Face::Top_LeftDown,
+				Face::Top_RightUp,
+			};
 			break;
 		case Direction::RightDown:
-			choices.assign({
-				{ FaceType::Left, Direction::RightDown },
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::Down },
-				// 应该不存在下面的情况，注释掉
-				/*{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::Down },*/
-				});
+			choices = {
+				Face::Left_Up,
+				Face::Left_Down,
+				Face::Left_RightDown,
+				Face::Right_RightUp,
+				Face::Top_LeftDown,
+				Face::Top_RightUp,
+			};
 			break;
 		}
 		break;
@@ -275,45 +244,43 @@ std::vector<CubeDesc> GameLayer::GetRandomChoices()
 		switch (head->GetDirection())
 		{
 		case Direction::Up:
-			choices.assign({
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::LeftDown },
-				{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Top, Direction::LeftUp },
-				{ FaceType::Top, Direction::LeftDown },
-				{ FaceType::Top, Direction::RightUp },
-				});
+			choices = {
+				Face::Right_Up,
+				Face::Right_LeftDown,
+				Face::Right_RightUp,
+				Face::Left_RightDown,
+				Face::Left_LeftUp,
+				Face::Top_LeftUp,
+			};
 			break;
 		case Direction::Down:
-			choices.assign({
-				{ FaceType::Right, Direction::Down },
-				{ FaceType::Right, Direction::LeftDown },
-				{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Top, Direction::LeftDown },
-				{ FaceType::Top, Direction::RightDown },
-				{ FaceType::Top, Direction::RightUp },
-				});
-			break;
+			choices = {
+				Face::Right_Down,
+				Face::Right_LeftDown,
+				Face::Right_RightUp,
+				Face::Left_RightDown,
+				Face::Left_LeftUp,
+				Face::Top_RightDown,
+			};
 		case Direction::RightUp:
-			choices.assign({
-				{ FaceType::Left, Direction::RightDown },
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::Down },
-				{ FaceType::Right, Direction::RightUp },
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::Down },
-				});
+			choices = {
+				Face::Right_Up,
+				Face::Right_Down,
+				Face::Right_RightUp,
+				Face::Left_RightDown,
+				Face::Top_RightDown,
+				Face::Top_LeftUp,
+			};
 			break;
 		case Direction::LeftDown:
-			choices.assign({
-				{ FaceType::Right, Direction::LeftDown },
-				{ FaceType::Right, Direction::Up },
-				{ FaceType::Right, Direction::Down },
-				// 应该不存在下面的情况，注释掉
-				/*{ FaceType::Left, Direction::LeftUp },
-				{ FaceType::Left, Direction::Up },
-				{ FaceType::Left, Direction::Down },*/
-				});
+			choices = {
+				Face::Right_Up,
+				Face::Right_Down,
+				Face::Right_LeftDown,
+				Face::Left_LeftUp,
+				Face::Top_RightDown,
+				Face::Top_LeftUp,
+			};
 			break;
 		}
 		break;
@@ -325,131 +292,22 @@ std::vector<CubeDesc> GameLayer::GetRandomChoices()
 	return choices;
 }
 
-void GameLayer::FilterChoices(std::vector<CubeDesc>& choices)
+void GameLayer::FilterChoices(std::vector<FaceDesc>& choices)
 {
-	std::vector<CubeDesc> to_be_removed;
 	CubeFace* head = cube_faces_.back();
 
-	// 需要去除几种视觉上受影响的情况
-	// 1. 头方块已经被占用了两个面，不允许再占用最后一个面
-	bool must_new_cube = (head->GetCube()->GetFacesCount() == 2);
-	switch (head->GetType())
-	{
-	case FaceType::Top:
-		switch (head->GetDirection())
-		{
-		case Direction::LeftDown:
-			if (must_new_cube)
-			{
-				to_be_removed = {
-					{ FaceType::Left, Direction::Down },
-					{ FaceType::Left, Direction::LeftUp },
-					{ FaceType::Left, Direction::RightDown },
-				};
-			 }
-			break;
-		case Direction::RightDown:
-			if (must_new_cube)
-			{
-				to_be_removed = {
-					{ FaceType::Right, Direction::Down },
-					{ FaceType::Right, Direction::RightUp },
-					{ FaceType::Right, Direction::LeftDown },
-				};
-			}
-			break;
-		}
-		break;
-
-	case FaceType::Left:
-		switch (head->GetDirection())
-		{
-		case Direction::Up:
-			if (must_new_cube)
-			{
-				to_be_removed = {
-					{ FaceType::Top, Direction::RightUp },
-					{ FaceType::Top, Direction::RightDown },
-					{ FaceType::Top, Direction::LeftUp },
-				};
-			}
-			break;
-		}
-		break;
-
-	case FaceType::Right:
-		switch (head->GetDirection())
-		{
-		case Direction::Up:
-			if (must_new_cube)
-			{
-				to_be_removed = {
-					{ FaceType::Top, Direction::LeftUp },
-					{ FaceType::Top, Direction::LeftDown },
-					{ FaceType::Top, Direction::RightUp },
-				};
-			}
-			break;
-		}
-		break;
-	}
-
-	// 2. 不允许与其他方块面占用同一方块
 	for (auto iter = choices.begin(); iter != choices.end();)
 	{
 		auto pos = GetNewCubePos(*iter);
 
-		if (auto cube = cube_map_.GetCubeFromMap(pos))
-		{
-			if (head->GetCube() != cube)
-			{
-				iter = choices.erase(iter);
-				continue;
-			}
-		}
-		++iter;
-	}
-
-	// 移除不允许的情况
-	if (!to_be_removed.empty())
-	{
-		auto need_to_remove = [&](const CubeDesc& desc)
-		{
-			auto iter = std::find(to_be_removed.begin(), to_be_removed.end(), desc);
-			return iter != to_be_removed.end();
-		};
-
-		choices.erase(
-			std::remove_if(choices.begin(), choices.end(), need_to_remove),
-			choices.end()
-		);
-	}
-
-	for (auto iter = choices.begin(); iter != choices.end();)
-	{
-		auto pos = GetNewCubePos(*iter);
-
-		bool need_remove = false;
-		for (auto face : cube_faces_)
-		{
-			if (face == head)
-				continue;
-
-			if (face->IsCollidedWith(pos, *iter))
-			{
-				need_remove = true;
-				break;
-			}
-		}
-
-		if (need_remove)
+		if (cube_map_.IsCollidedWith(pos, *iter, head))
 			iter = choices.erase(iter);
 		else
 			++iter;
 	}
 }
 
-CubePos GameLayer::GetNewCubePos(CubeDesc desc)
+CubePos GameLayer::GetNewCubePos(FaceDesc desc)
 {
 	if (cube_faces_.empty())
 		return CubePos{ 0, 0, 0 };
@@ -462,95 +320,68 @@ CubePos GameLayer::GetNewCubePos(CubeDesc desc)
 	{
 	case FaceType::Top:
 
-		switch (head->GetDirection())
-		{
-		case Direction::LeftUp:
-			if (desc.type == FaceType::Top)
-				offset = { -1, 0, 0 };
-			else
-				offset = { -1, 0, 1 };
-			break;
-		case Direction::LeftDown:
-			if (desc.type == FaceType::Top)
-				offset = { 0, 1, 0 };
-			else
-				offset = { 0, 0, 0 };
-			break;
-		case Direction::RightUp:
-			if (desc.type == FaceType::Top)
-				offset = { 0, -1, 0 };
-			else
-				offset = { 0, -1, 1 };
-			break;
-		case Direction::RightDown:
-			if (desc.type == FaceType::Top)
-				offset = { 1, 0, 0 };
-			else
-				offset = { 0, 0, 0 };
-			break;
-		}
+		if (desc == Face::Top_LeftDown)
+			offset = { 0, 1, 0 };
+		else if (desc == Face::Top_LeftUp)
+			offset = { -1, 0, 0 };
+		else if (desc == Face::Top_RightDown)
+			offset = { 1, 0, 0 };
+		else if (desc == Face::Top_RightUp)
+			offset = { 0, -1, 0 };
+		else if (desc == Face::Left_Up)
+			offset = { 0, -1, 1 };
+		else if (desc == Face::Left_Down)
+			offset = { 0, 0, 0 };
+		else if (desc == Face::Right_Up)
+			offset = { -1, 0, 1 };
+		else if (desc == Face::Right_Down)
+			offset = { 0, 0, 0 };
+		else
+			assert(0);
 		break;
 
 	case FaceType::Left:
 
-		switch (head->GetDirection())
-		{
-		case Direction::Up:
-			if (desc.type == FaceType::Top)
-				offset = { 0, 0, 0 };
-			else
-				offset = { 0, 0, 1 };
-			break;
-		case Direction::Down:
-			if (desc.type == FaceType::Top)
-				offset = { 0, 1, -1 };
-			else
-				offset = { 0, 0, -1 };
-			break;
-		case Direction::LeftUp:
-			if (desc.type == FaceType::Left)
-				offset = { -1, 0, 0 };
-			else
-				offset = { -1, 1, 0 };
-			break;
-		case Direction::RightDown:
-			if (desc.type == FaceType::Left)
-				offset = { 1, 0, 0 };
-			else
-				offset = { 0, 0, 0 };
-			break;
-		}
+		if (desc == Face::Left_Down)
+			offset = { 0, 0, -1 };
+		else if (desc == Face::Left_Up)
+			offset = { 0, 0, 1 };
+		else if (desc == Face::Left_LeftUp)
+			offset = { -1, 0, 0 };
+		else if (desc == Face::Left_RightDown)
+			offset = { 1, 0, 0 };
+		else if (desc == Face::Right_LeftDown)
+			offset = { -1, 1, 0 };
+		else if (desc == Face::Right_RightUp)
+			offset = { 0, 0, 0 };
+		else if (desc == Face::Top_RightUp)
+			offset = { 0, 0, 0 };
+		else if (desc == Face::Top_LeftDown)
+			offset = { 0, 1, -1 };
+		else
+			assert(0);
 		break;
 
 	case FaceType::Right:
 
-		switch (head->GetDirection())
-		{
-		case Direction::Up:
-			if (desc.type == FaceType::Top)
-				offset = { 0, 0, 0 };
-			else
-				offset = { 0, 0, 1 };
-			break;
-		case Direction::Down:
-			if (desc.type == FaceType::Top)
-				offset = { 1, 0, -1 };
-			else
-				offset = { 0, 0, -1 };
-			break;
-		case Direction::RightUp:
-			if (desc.type == FaceType::Left)
-				offset = { 1, -1, 0 };
-			else
-				offset = { 0, -1, 0 };
-			break;
-		case Direction::LeftDown:
-			if (desc.type == FaceType::Left)
-				offset = { 0, 0, 0 };
-			else
-				offset = { 0, 1, 0 };
-			break;
-		}
+		if (desc == Face::Right_Down)
+			offset = { 0, 0, -1 };
+		else if (desc == Face::Right_Up)
+			offset = { 0, 0, 1 };
+		else if (desc == Face::Right_LeftDown)
+			offset = { 0, 1, 0 };
+		else if (desc == Face::Right_RightUp)
+			offset = { 0, -1, 0 };
+		else if (desc == Face::Left_LeftUp)
+			offset = { 0, 0, 0 };
+		else if (desc == Face::Left_RightDown)
+			offset = { 1, -1, 0 };
+		else if (desc == Face::Top_RightDown)
+			offset = { 1, 0, -1 };
+		else if (desc == Face::Top_LeftUp)
+			offset = { 0, 0, 0 };
+		else
+			assert(0);
 		break;
 	}
 
@@ -563,7 +394,7 @@ CubePos GameLayer::GetNewCubePos(CubeDesc desc)
 	return pos;
 }
 
-CubeFace* GameLayer::AppendCubeFace(CubeDesc desc)
+CubeFace* GameLayer::AppendCubeFace(FaceDesc desc)
 {
 	// 获取新方块位置
 	auto pos = GetNewCubePos(desc);
@@ -575,7 +406,7 @@ CubeFace* GameLayer::AppendCubeFace(CubeDesc desc)
 		this->AddChild(cube);
 	}
 
-	KGE_LOG(type_map[desc.type], d_map[desc.direction]);
+	KGE_LOG("-new-", type_map[desc.type], d_map[desc.direction]);
 
 	auto face = cube->AddFace(desc);
 

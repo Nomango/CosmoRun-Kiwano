@@ -2,8 +2,7 @@
 #include "Cube.h"
 
 CubeFace::CubeFace(FaceType type, Direction d, float side_length)
-	: type_(type)
-	, direction_(d)
+	: desc_{ type, d }
 	, side_length_(side_length)
 {
 	CreateVertices();
@@ -11,12 +10,17 @@ CubeFace::CubeFace(FaceType type, Direction d, float side_length)
 
 FaceType CubeFace::GetType() const
 {
-	return type_;
+	return desc_.type;
 }
 
 Direction CubeFace::GetDirection() const
 {
-	return direction_;
+	return desc_.direction;
+}
+
+FaceDesc CubeFace::GetDesc() const
+{
+	return desc_;
 }
 
 void CubeFace::SetColor(ColorEnum color)
@@ -29,25 +33,6 @@ void CubeFace::SetColor(ColorEnum color)
 
 	this->StopAllActions();
 	this->AddAction(action);
-}
-
-bool CubeFace::IsCollidedWith(const CubePos& pos, CubeDesc desc)
-{
-	auto self_pos = GetCube()->GetPos();
-	int x1 = self_pos[0] - self_pos[2];
-	int y1 = self_pos[1] - self_pos[2];
-	int x2 = pos[0] - pos[2];
-	int y2 = pos[1] - pos[2];
-	int offset_x = (x2 - x1);
-	int offset_y = (y2 - y1);
-	if (offset_x == 0 && offset_y == 0)
-		return true;
-
-	if (offset_x <= 1 && offset_y <= 1)
-	{
-		return true;
-	}
-	return false;
 }
 
 void CubeFace::RemoveSelf()
@@ -83,30 +68,30 @@ void CubeFace::CreateVertices()
 	float width = side_length_ * math::Cos(30.0f);
 	float height = side_length_ * math::Sin(30.0f);
 
-	switch (type_)
+	switch (desc_.type)
 	{
 	case FaceType::Top:
 		this->SetVertices({
-			Point(width, 0),
-			Point(0, height),
-			Point(width, 2 * height),
-			Point(2 * width, height)
+			Point(0, 0),
+			Point(-width, -height),
+			Point(0, -height * 2),
+			Point(width, -height),
 		});
 		break;
 	case FaceType::Left:
 		this->SetVertices({
 			Point(0, 0),
 			Point(0, side_length_),
-			Point(width, height + side_length_),
-			Point(width, height)
+			Point(-width, height),
+			Point(-width, -height),
 		});
 		break;
 	case FaceType::Right:
 		this->SetVertices({
-			Point(width, 0),
-			Point(0, height),
-			Point(0, height + side_length_),
-			Point(width, side_length_)
+			Point(0, 0),
+			Point(0, side_length_),
+			Point(width, height),
+			Point(width, -height),
 		});
 		break;
 	}
@@ -126,7 +111,7 @@ void CubeFace::ResetBrush(ColorEnum color)
 
 BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 {
-	String id = strings::Format("cube_face_fill_brush_%d_%d_%d", int(color), int(type_), int(direction_));
+	String id = strings::Format("cube_face_fill_brush_%d_%d_%d", int(color), int(desc_.type), int(desc_.direction));
 
 	// 查找缓存中是否有画刷
 	if (BrushPtr brush = ResourceCache::GetInstance().Get<Brush>(id))
@@ -135,7 +120,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 	}
 
 	BrushPtr brush;
-	if (type_ == FaceType::Left)
+	if (desc_.type == FaceType::Left)
 	{
 		switch (color)
 		{
@@ -150,7 +135,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 			break;
 		}
 	}
-	else if (type_ == FaceType::Right)
+	else if (desc_.type == FaceType::Right)
 	{
 		switch (color)
 		{
@@ -191,7 +176,7 @@ BrushPtr CubeFace::GetTopFillBrush(Color light, Color dark)
 	float height = side_length_ * math::Sin(30.0f);
 
 	Point start, end;
-	switch (direction_)
+	switch (desc_.direction)
 	{
 	case Direction::LeftUp:
 		start = Point{ width / 2, height / 2 };
@@ -217,7 +202,7 @@ BrushPtr CubeFace::GetTopFillBrush(Color light, Color dark)
 
 BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
 {
-	String id = strings::Format("cube_face_stroke_brush_%d_%d", int(color), int(type_));
+	String id = strings::Format("cube_face_stroke_brush_%d_%d", int(color), int(desc_.type));
 
 	// 查找缓存中是否有画刷
 	if (BrushPtr brush = ResourceCache::GetInstance().Get<Brush>(id))
@@ -245,7 +230,7 @@ BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
 
 BrushPtr CubeFace::GetStrokeBrush(Color light, Color dark)
 {
-	if (type_ == FaceType::Right)
+	if (desc_.type == FaceType::Right)
 	{
 		// 右侧的面颜色较深
 		return Brush::Create(dark);

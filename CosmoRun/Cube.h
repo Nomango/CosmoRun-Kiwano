@@ -14,9 +14,11 @@ public:
 
     int GetFacesCount() const;
 
+    bool Has(std::initializer_list<FaceType> types) const;
+
     CubeFace* GetFace(FaceType type) const;
 
-    CubeFace* AddFace(CubeDesc desc);
+    CubeFace* AddFace(FaceDesc desc);
 
     void SetColor(ColorEnum color);
 
@@ -37,6 +39,8 @@ public:
     Cube* GetCubeFromMap(const CubePos& pos);
 
     void RemoveCubeInMap(const CubePos& pos);
+
+    bool IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head);
 
     void SetColor(ColorEnum color);
 

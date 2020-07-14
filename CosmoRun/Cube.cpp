@@ -22,6 +22,18 @@ int Cube::GetFacesCount() const
 	return int(faces_.size());
 }
 
+bool Cube::Has(std::initializer_list<FaceType> types) const
+{
+	for (auto face : faces_)
+	{
+		if (face->GetDesc().IsIn(types))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 CubeFace* Cube::GetFace(FaceType type) const
 {
 	for (auto face : faces_)
@@ -34,29 +46,11 @@ CubeFace* Cube::GetFace(FaceType type) const
 	return nullptr;
 }
 
-CubeFace* Cube::AddFace(CubeDesc desc)
+CubeFace* Cube::AddFace(FaceDesc desc)
 {
 	CubeFacePtr face = new CubeFace(desc.type, desc.direction, side_length_);
-
 	face->SetCube(this);
 	face->SetColor(color_);
-	face->SetAnchor(0.5f, 0.5f);
-
-	// 计算方块面相对于方块位置的偏移
-	float width = side_length_ * math::Cos(30.0f);
-	float height = side_length_ * math::Sin(30.0f);
-	switch (desc.type)
-	{
-	case FaceType::Top:
-		face->SetPosition(0, -height);
-		break;
-	case FaceType::Left:
-		face->SetPosition(-width, -height);
-		break;
-	case FaceType::Right:
-		face->SetPosition(0, 0);
-		break;
-	}
 
 	this->AddChild(face);
 
@@ -108,6 +102,80 @@ void CubeMap::RemoveCubeInMap(const CubePos& pos)
 {
 	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.erase(key);
+}
+
+bool CubeMap::IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head)
+{
+	for (auto& pair : cube_map_)
+	{
+		auto cube = pair.second;
+		if (head->GetCube() == cube && cube->GetFacesCount() == 1)
+			continue;
+
+		auto self_pos = cube->GetPos();
+		int x1 = self_pos[0] - self_pos[2];
+		int y1 = self_pos[1] - self_pos[2];
+		int x2 = pos[0] - pos[2];
+		int y2 = pos[1] - pos[2];
+		int offset_x = (x1 - x2);
+		int offset_y = (y1 - y2);
+
+		if (offset_x == 0 && offset_y == 0)
+			return true;
+
+		switch (desc.type)
+		{
+		case FaceType::Top:
+			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Left, FaceType::Right }))
+				return true;
+			if (offset_x == -1 && offset_y == 0 && cube->Has({ FaceType::Top, FaceType::Right }))
+				return true;
+			if (offset_x == 0 && offset_y == -1 && cube->Has({ FaceType::Top, FaceType::Left }))
+				return true;
+			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Top }))
+				return true;
+			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Top }))
+				return true;
+			if (offset_x == -2 && offset_y == -1 && cube->Has({ FaceType::Right }))
+				return true;
+			if (offset_x == -1 && offset_y == -2 && cube->Has({ FaceType::Left }))
+				return true;
+			break;
+		case FaceType::Left:
+			if (offset_x == -1 && offset_y == 0 && cube->Has({ FaceType::Left, FaceType::Right }))
+				return true;
+			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Right }))
+				return true;
+			if (offset_x == 1 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Left }))
+				return true;
+			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Left }))
+				return true;
+			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Left }))
+				return true;
+			if (offset_x == -1 && offset_y == 1 && cube->Has({ FaceType::Right }))
+				return true;
+			if (offset_x == 1 && offset_y == 2 && cube->Has({ FaceType::Top }))
+				return true;
+			break;
+		case FaceType::Right:
+			if (offset_x == 0 && offset_y == -1 && cube->Has({ FaceType::Left, FaceType::Right }))
+				return true;
+			if (offset_x == 1 && offset_y == 0 && cube->Has({ FaceType::Top, FaceType::Left }))
+				return true;
+			if (offset_x == 1 && offset_y == 1 && cube->Has({ FaceType::Top, FaceType::Right }))
+				return true;
+			if (offset_x == 0 && offset_y == 1 && cube->Has({ FaceType::Right }))
+				return true;
+			if (offset_x == -1 && offset_y == -1 && cube->Has({ FaceType::Right }))
+				return true;
+			if (offset_x == 1 && offset_y == -1 && cube->Has({ FaceType::Left }))
+				return true;
+			if (offset_x == 2 && offset_y == 1 && cube->Has({ FaceType::Top }))
+				return true;
+			break;
+		}
+	}
+	return false;
 }
 
 void CubeMap::SetColor(ColorEnum color)

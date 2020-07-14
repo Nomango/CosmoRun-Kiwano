@@ -22,15 +22,15 @@ private:
 
 	void RemoveHeadFace();
 
-	CubeDesc GetRandomChoice();
+	FaceDesc GetRandomChoice();
 
-	std::vector<CubeDesc> GetRandomChoices();
+	std::vector<FaceDesc> GetRandomChoices();
 
-	void FilterChoices(std::vector<CubeDesc>& choices);
+	void FilterChoices(std::vector<FaceDesc>& choices);
 
-	CubePos GetNewCubePos(CubeDesc desc);
+	CubePos GetNewCubePos(FaceDesc desc);
 
-	CubeFace* AppendCubeFace(CubeDesc desc);
+	CubeFace* AppendCubeFace(FaceDesc desc);
 
 private:
 	CubeMap cube_map_;

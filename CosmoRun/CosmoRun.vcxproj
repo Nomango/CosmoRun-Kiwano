@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeFace.cpp" />
     <ClCompile Include="GameLayer.cpp" />

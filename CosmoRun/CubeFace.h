@@ -14,9 +14,9 @@ public:
 
 	Direction GetDirection() const;
 
-	void SetColor(ColorEnum color);
+	FaceDesc GetDesc() const;
 
-	bool IsCollidedWith(const CubePos& pos, CubeDesc desc);
+	void SetColor(ColorEnum color);
 
 	void RemoveSelf();
 
@@ -42,8 +42,7 @@ private:
 	BrushPtr GetStrokeBrush(Color light, Color dark);
 
 private:
-	FaceType type_;
-	Direction direction_;
+	FaceDesc desc_;
 	float side_length_;
 	CubeFace* next_ = nullptr;
 	Cube* cube_ = nullptr;
