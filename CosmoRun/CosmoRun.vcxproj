@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeFace.cpp" />
@@ -149,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Background.h" />
+    <ClInclude Include="Ball.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeFace.h" />

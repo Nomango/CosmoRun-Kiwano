@@ -155,5 +155,6 @@ void Background::SpawnTriangles(Task* task, Duration dt)
 	// 随机设置三角形的位置
 	t->SetPositionX(GetWidth() * math::Random(0.0f, 1.0f));
 	t->SetPositionY(GetHeight() * math::Random(0.0f, 1.0f));
+	t->Move(-dynamic_layer_->GetPosition());
 	dynamic_layer_->AddChild(t);
 }

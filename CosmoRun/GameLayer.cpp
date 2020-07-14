@@ -19,21 +19,23 @@ std::map<Direction, String> d_map = {
 	{ Direction::RightUp, "right up" },
 };
 
+
+
 GameLayer::GameLayer(ColorEnum color, Size size)
 	: color_(color)
-	, current_face_(nullptr)
+	, tail_(nullptr)
 {
 	SetSize(size);
+	side_length_ = GetWidth() * 0.08f;
+}
+
+void GameLayer::InitGame()
+{
+	InitCubes(MAX_CUBE_NUMBER);
 }
 
 void GameLayer::StartGame()
 {
-	RemoveAllTasks();
-
-	InitCubes(MAX_CUBE_NUMBER);
-
-	TaskPtr task = Task::Create(Closure(this, &GameLayer::TickTest), 500_msec);
-	AddTask(task);
 }
 
 void GameLayer::SetColor(ColorEnum color)
@@ -51,6 +53,12 @@ void GameLayer::RemoveFace(Actor* face)
 	cube_map_.RemoveCubeFaceInMap((CubeFace*)face);
 }
 
+void GameLayer::Move(Vec2 trans)
+{
+	cube_group_->Move(trans);
+	ball_->Move(trans);
+}
+
 void GameLayer::InitCubes(int length)
 {
 	KGE_LOG();
@@ -59,11 +67,21 @@ void GameLayer::InitCubes(int length)
 	cube_map_.Clear();
 	this->RemoveAllChildren();
 
+	// 创建小球
+	ball_ = new Ball(side_length_ * 0.18f);
+	ball_->SetPositionY(-side_length_ / 2);
+	this->AddChild(ball_, 1);
+
+	// 创建方块层
+	cube_group_ = Actor::Create();
+	this->AddChild(cube_group_);
+
 	// 创建第一个方块
 	std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
 	int choice = math::Random(0, int(choices.size() - 1));
 
-	current_face_ = AppendCubeFace({ FaceType::Top, choices[choice] });
+	tail_ = AppendCubeFace({ FaceType::Top, choices[choice] });
+	ball_->SetOn(tail_);
 
 	// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
 	for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
@@ -76,13 +94,10 @@ void GameLayer::InitCubes(int length)
 	KGE_LOG();
 }
 
-void GameLayer::TickTest(Task* task, Duration dt)
+void GameLayer::OnUpdate(Duration dt)
 {
-	AddRandomFace();
-	RemoveTailFace();
-
-	auto face = hide_faces_.front();
-	AddAction(Tween::MoveTo(400_msec, GetSize() / 2 - face->GetCube()->GetPosition()));
+	//AddRandomFace();
+	//RemoveTailFace();
 }
 
 void GameLayer::AddRandomFace()
@@ -100,8 +115,18 @@ void GameLayer::AddRandomFace()
 	else
 	{
 		// 获取随机方块失败，需要删掉之前的方块重新生成
-		if (hide_faces_.size() < 5)
+		if (hide_faces_.size() >= 5)
 		{
+			RemoveHeadFace();
+			RemoveHeadFace();
+
+			AddRandomFace();
+			AddRandomFace();
+			AddRandomFace();
+		}
+		else
+		{
+			// 数量小于5时仍然冲突，说明出现了算法异常
 			KGE_LOG();
 			KGE_LOG("====");
 			for (auto face : hide_faces_)
@@ -113,23 +138,6 @@ void GameLayer::AddRandomFace()
 
 			throw Exception("Internal algorithm error");
 		}
-		else if (hide_faces_.size() == 5)
-		{
-			RemoveHeadFace();
-
-			AddRandomFace();
-			AddRandomFace();
-		}
-		else
-		{
-			// 方块数量较多时，可能存在圈形路径，需要多删几个
-			RemoveHeadFace();
-			RemoveHeadFace();
-
-			AddRandomFace();
-			AddRandomFace();
-			AddRandomFace();
-		}
 	}
 }
 
@@ -140,9 +148,8 @@ CubeFace* GameLayer::AppendCubeFace(FaceDesc desc)
 	CubePtr cube = cube_map_.GetCubeFromMap(pos);
 	if (!cube)
 	{
-		float side_length = GetWidth() * 0.08f;
-		cube = cube_map_.CreateCube(pos, side_length);
-		this->AddChild(cube);
+		cube = cube_map_.CreateCube(pos, side_length_);
+		cube_group_->AddChild(cube);
 	}
 
 	KGE_LOG("-new-", type_map[desc.type], d_map[desc.direction]);
@@ -170,8 +177,8 @@ CubeFace* GameLayer::AppendCubeFace(FaceDesc desc)
 void GameLayer::RemoveTailFace()
 {
 	auto action = Tween::FadeOut(500_msec).DoneCallback(Closure(this, &GameLayer::RemoveFace));
-	current_face_->AddAction(action);
-	current_face_ = current_face_->GetNext();
+	tail_->AddAction(action);
+	tail_ = tail_->GetNext();
 }
 
 void GameLayer::RemoveHeadFace()
