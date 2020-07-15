@@ -16,6 +16,10 @@ public:
 
 	void StartGame();
 
+	void GameOver();
+
+	void Restart();
+
 	void Move(Vec2 trans);
 
 	void SetColor(ColorEnum color);

@@ -17,6 +17,8 @@ public:
 
 	CubeFace* GetOn() const;
 
+	bool IsSafe() const;
+
 	void SetOn(CubeFace* face);
 
 	void SetDirection(Direction d);
@@ -25,9 +27,15 @@ public:
 
 	void Turn();
 
-	void Move(Vec2 trans);
+	void MoveParticles(Vec2 trans);
+
+	void ResetParticles();
 
 private:
+	bool IsDirectionSame(FaceDesc curr, FaceDesc next) const;
+
+	Direction GetNextDirection(FaceDesc curr, FaceDesc next) const;
+
 	void SpawnParticles(Task* task, Duration dt);
 
 	void AddParticle(Duration t, float pos_range_min, float pos_range_max);

@@ -17,13 +17,13 @@ public:
 
     void RemoveFace(Actor* face);
 
+    void RemoveTailFace();
+
     CubeFace* GetTail() const;
 
     void SetColor(ColorEnum color);
 
 private:
-    void RemoveTailFace();
-
     void RemoveHeadFace();
 
     std::vector<FaceDesc> GetRandomChoices();

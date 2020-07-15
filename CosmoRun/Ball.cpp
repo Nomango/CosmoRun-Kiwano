@@ -43,6 +43,12 @@ CubeFace* Ball::GetOn() const
 	return where_;
 }
 
+bool Ball::IsSafe() const
+{
+	auto center = GetStage()->GetSize() / 2;
+	return where_->ContainsPoint(center);
+}
+
 void Ball::SetOn(CubeFace* face)
 {
 	where_ = face;
@@ -55,20 +61,171 @@ void Ball::SetDirection(Direction d)
 
 void Ball::ToNext()
 {
-	where_ = where_->GetNext();
+	auto next = where_->GetNext();
+	// 进入下一方块时，自动调整方向
+	if (next->GetType() != where_->GetType())
+		direction_ = next->GetDirection();
+	where_ = next;
 }
 
 void Ball::Turn()
 {
-	if (direction_ == Direction::LeftUp)
-		direction_ = Direction::RightUp;
+	if (direction_ != where_->GetDirection())
+		direction_ = where_->GetDirection();
 	else
-		direction_ = Direction::LeftUp;
+	{
+		CubeFace* next = where_->GetNext();
+		while (next)
+		{
+			if (next->GetType() == where_->GetType())
+			{
+				// 面的类型相同，方向却不同，直接转向新的方向
+				if (next->GetDirection() != where_->GetDirection())
+				{
+					direction_ = next->GetDirection();
+					break;
+				}
+			}
+			else
+			{
+				// 面的类型不同，需要用特殊的办法判断方向是否相同
+				if (!IsDirectionSame(where_->GetDesc(), next->GetDesc()))
+				{
+					direction_ = GetNextDirection(where_->GetDesc(), next->GetDesc());
+					break;
+				}
+			}
+			next = next->GetNext();
+		}
+	}
 }
 
-void Ball::Move(Vec2 trans)
+void Ball::MoveParticles(Vec2 trans)
 {
 	particles_->Move(trans);
+}
+
+void Ball::ResetParticles()
+{
+	particles_->AddAction(Tween::MoveTo(1_sec, Point(0, 0)));
+}
+
+bool Ball::IsDirectionSame(FaceDesc curr, FaceDesc next) const
+{
+	switch (curr.type)
+	{
+	case FaceType::Top:
+		switch (curr.direction)
+		{
+		case Direction::RightUp:
+			return next == Face::Left_Up;
+		case Direction::RightDown:
+			return next == Face::Right_Down;
+		case Direction::LeftDown:
+			return next == Face::Left_Down;
+		case Direction::LeftUp:
+			return next == Face::Right_Up;
+		}
+		break;
+
+	case FaceType::Left:
+		switch (curr.direction)
+		{
+		case Direction::Up:
+			return next == Face::Top_RightUp;
+		case Direction::RightDown:
+			return next == Face::Right_RightUp;
+		case Direction::Down:
+			return next == Face::Top_LeftDown;
+		case Direction::LeftUp:
+			return next == Face::Right_LeftDown;
+		}
+		break;
+
+	case FaceType::Right:
+		switch (curr.direction)
+		{
+		case Direction::Up:
+			return next == Face::Top_LeftUp;
+		case Direction::RightUp:
+			return next == Face::Left_RightDown;
+		case Direction::Down:
+			return next == Face::Top_RightDown;
+		case Direction::LeftDown:
+			return next == Face::Left_LeftUp;
+		}
+		break;
+	}
+	return false;
+}
+
+Direction Ball::GetNextDirection(FaceDesc curr, FaceDesc next) const
+{
+	switch (curr.type)
+	{
+	case FaceType::Top:
+		switch (curr.direction)
+		{
+		case Direction::RightUp:
+		case Direction::LeftDown:
+			if (next == Face::Right_Up)
+				return Direction::LeftUp;
+			else if (next == Face::Right_Down)
+				return Direction::RightDown;
+			break;
+		case Direction::LeftUp:
+		case Direction::RightDown:
+			if (next == Face::Left_Up)
+				return Direction::RightUp;
+			else if (next == Face::Left_Down)
+				return Direction::LeftDown;
+			break;
+		}
+		break;
+
+	case FaceType::Left:
+		switch (curr.direction)
+		{
+		case Direction::Up:
+		case Direction::Down:
+			if (next == Face::Right_RightUp)
+				return Direction::RightDown;
+			else if (next == Face::Right_LeftDown)
+				return Direction::LeftUp;
+			break;
+		case Direction::RightDown:
+		case Direction::LeftUp:
+			if (next == Face::Top_RightUp)
+				return Direction::Up;
+			else if (next == Face::Top_LeftDown)
+				return Direction::Down;
+			break;
+		}
+		break;
+
+	case FaceType::Right:
+		switch (curr.direction)
+		{
+		case Direction::Up:
+		case Direction::Down:
+			if (next == Face::Left_LeftUp)
+				return Direction::LeftDown;
+			else if (next == Face::Left_RightDown)
+				return Direction::RightUp;
+			break;
+		case Direction::RightUp:
+		case Direction::LeftDown:
+			if (next == Face::Top_LeftUp)
+				return Direction::Up;
+			else if (next == Face::Top_RightDown)
+				return Direction::Down;
+			break;
+		}
+		break;
+	}
+	// 执行到此处说明算法有问题
+	throw Exception("Internal algorithm error #2");
+	return Direction{};
 }
 
 void Ball::SpawnParticles(Task* task, Duration dt)

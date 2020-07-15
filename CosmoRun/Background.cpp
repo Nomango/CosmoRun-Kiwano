@@ -59,6 +59,7 @@ Background::Background(ColorEnum color, Size size)
 	TaskPtr task = Task::Create(Closure(this, &Background::SpawnTriangles), 130_msec);
 	AddTask(task);
 
+	SetPosition(-size / 2);
 	Resize(size);
 }
 
@@ -89,10 +90,15 @@ void Background::SetColor(ColorEnum color)
 	}
 }
 
-void Background::Move(Vec2 trans)
+void Background::MoveTriangles(Vec2 trans)
 {
 	// Ö»ÒÆ¶¯¶¯Ì¬²ã
 	dynamic_layer_->Move(trans);
+}
+
+void Background::ResetTriangles()
+{
+	dynamic_layer_->AddAction(Tween::MoveTo(1_sec, Point(0, 0)));
 }
 
 BrushPtr Background::GetCurrentBrush()

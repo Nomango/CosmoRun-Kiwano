@@ -43,6 +43,13 @@ struct FaceDesc
 	{
 		return type == rhs.type && direction == rhs.direction;
 	}
+
+	inline bool operator<(const FaceDesc& rhs) const
+	{
+		if (type == rhs.type)
+			return direction < rhs.direction;
+		return type < rhs.type;
+	}
 };
 
 // ·½¿éÃæÃ¶¾Ù

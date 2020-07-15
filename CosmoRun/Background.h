@@ -12,7 +12,9 @@ public:
 
 	void SetColor(ColorEnum color);
 
-	void Move(Vec2 trans);
+	void MoveTriangles(Vec2 trans);
+
+	void ResetTriangles();
 
 private:
 	BrushPtr GetCurrentBrush();

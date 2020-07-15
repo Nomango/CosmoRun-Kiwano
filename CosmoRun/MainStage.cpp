@@ -63,8 +63,8 @@ MainStage::MainStage()
 	// 按键监听
 	AddListener<KeyDownEvent>(Closure(this, &MainStage::OnKeyDown));
 
-	EventListenerPtr lis = new DragListener(Closure(this, &MainStage::Move));
-	AddListener(lis);
+	//EventListenerPtr lis = new DragListener(Closure(this, &MainStage::Move));
+	//AddListener(lis);
 }
 
 void MainStage::OnKeyDown(Event* evt)
@@ -72,9 +72,9 @@ void MainStage::OnKeyDown(Event* evt)
 	auto key_evt = evt->SafeCast<KeyDownEvent>();
 
 	// 空格键开始游戏
-	if (key_evt->code == KeyCode::Space)
+	if (key_evt->code == KeyCode::R)
 	{
-		game_layer_->StartGame();
+		game_layer_->Restart();
 	}
 
 	if (key_evt->code == KeyCode::Num1)

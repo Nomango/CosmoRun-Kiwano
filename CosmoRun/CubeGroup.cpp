@@ -85,7 +85,7 @@ void CubeGroup::AddRandomFace()
 			KGE_LOG("====");
 			KGE_LOG();
 
-			throw Exception("Internal algorithm error");
+			throw Exception("Internal algorithm error #1");
 		}
 	}
 }
