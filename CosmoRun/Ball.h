@@ -22,7 +22,7 @@ public:
 private:
 	void SpawnParticles(Task* task, Duration dt);
 
-	void AddParticle(Duration t, float pos_range);
+	void AddParticle(Duration t, float pos_range_min, float pos_range_max);
 
 private:
 	float radius_;

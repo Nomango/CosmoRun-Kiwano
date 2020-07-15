@@ -4,8 +4,8 @@
 
 KGE_DECLARE_SMART_PTR(Cube);
 
-class Cube :
-    public Actor
+class Cube
+    : public Actor
 {
 public:
     Cube(const CubePos& pos, float side_length);

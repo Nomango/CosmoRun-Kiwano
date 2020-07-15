@@ -144,6 +144,7 @@
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="CubeFace.cpp" />
+    <ClCompile Include="CubeGroup.cpp" />
     <ClCompile Include="GameLayer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainStage.cpp" />
@@ -154,6 +155,7 @@
     <ClInclude Include="Common.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="CubeFace.h" />
+    <ClInclude Include="CubeGroup.h" />
     <ClInclude Include="GameLayer.h" />
     <ClInclude Include="MainStage.h" />
   </ItemGroup>

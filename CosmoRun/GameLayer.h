@@ -2,6 +2,7 @@
 #include "Common.h"
 #include "Cube.h"
 #include "Ball.h"
+#include "CubeGroup.h"
 
 KGE_DECLARE_SMART_PTR(GameLayer);
 
@@ -14,35 +15,19 @@ public:
 
 	void StartGame();
 
-	void SetColor(ColorEnum color);
-
-	void RemoveFace(Actor* face);
-
 	void Move(Vec2 trans);
 
+	void SetColor(ColorEnum color);
+
 private:
-	void InitCubes(int length);
-
 	void OnUpdate(Duration dt) override;
-
-	void AddRandomFace();
-
-	CubeFace* AppendCubeFace(FaceDesc desc);
-
-	void RemoveTailFace();
-
-	void RemoveHeadFace();
-
-	std::vector<FaceDesc> GetRandomChoices();
-
-	CubePos GetNewCubePos(FaceDesc desc);
 
 private:
 	float side_length_;
+	float speed_scale_;
+	float v_angle_;
+	int score_;
 	ColorEnum color_;
-	CubeFace* tail_;
 	BallPtr ball_;
-	ActorPtr cube_group_;
-	CubeMap cube_map_;
-	std::list<CubeFace*> hide_faces_;
+	CubeGroupPtr cube_group_;
 };

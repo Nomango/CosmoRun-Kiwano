@@ -39,6 +39,9 @@
     <ClCompile Include="Ball.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CubeGroup.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Ball.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeGroup.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
