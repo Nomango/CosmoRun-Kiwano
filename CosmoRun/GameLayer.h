@@ -3,6 +3,7 @@
 #include "Cube.h"
 #include "Ball.h"
 #include "CubeGroup.h"
+#include "Background.h"
 
 KGE_DECLARE_SMART_PTR(GameLayer);
 
@@ -23,11 +24,12 @@ private:
 	void OnUpdate(Duration dt) override;
 
 private:
+	bool started_;
 	float side_length_;
 	float speed_scale_;
-	float v_angle_;
 	int score_;
 	ColorEnum color_;
+	BackgroundPtr background_;
 	BallPtr ball_;
 	CubeGroupPtr cube_group_;
 };

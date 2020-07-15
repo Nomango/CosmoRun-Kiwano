@@ -11,11 +11,19 @@ public:
 
 	float GetRadius() const;
 
+	float GetVelocityAngle() const;
+
+	Direction GetDirection() const;
+
 	CubeFace* GetOn() const;
 
 	void SetOn(CubeFace* face);
 
+	void SetDirection(Direction d);
+
 	void ToNext();
+
+	void Turn();
 
 	void Move(Vec2 trans);
 
@@ -26,6 +34,8 @@ private:
 
 private:
 	float radius_;
+	float v_angle_;
+	Direction direction_;
 	CubeFace* where_ = nullptr;
 	ActorPtr particles_;
 	BrushPtr particle_brush_;

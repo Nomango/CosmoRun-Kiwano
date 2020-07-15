@@ -2,6 +2,7 @@
 
 Ball::Ball(float radius)
 	: radius_(radius)
+	, direction_(Direction::Up)
 {
 	CircleActorPtr ball1 = CircleActor::Create(radius);
 	CircleActorPtr ball2 = CircleActor::Create(radius * 0.7f);
@@ -27,6 +28,16 @@ float Ball::GetRadius() const
 	return radius_;
 }
 
+float Ball::GetVelocityAngle() const
+{
+	return 90.0f - float(direction_) * 60.0f;
+}
+
+Direction Ball::GetDirection() const
+{
+	return direction_;
+}
+
 CubeFace* Ball::GetOn() const
 {
 	return where_;
@@ -37,9 +48,22 @@ void Ball::SetOn(CubeFace* face)
 	where_ = face;
 }
 
+void Ball::SetDirection(Direction d)
+{
+	direction_ = d;
+}
+
 void Ball::ToNext()
 {
 	where_ = where_->GetNext();
+}
+
+void Ball::Turn()
+{
+	if (direction_ == Direction::LeftUp)
+		direction_ = Direction::RightUp;
+	else
+		direction_ = Direction::LeftUp;
 }
 
 void Ball::Move(Vec2 trans)

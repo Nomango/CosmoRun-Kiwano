@@ -56,12 +56,8 @@ private:
 
 MainStage::MainStage()
 {
-	background_ = new Background(color_, GetSize());
-	AddChild(background_);
-
-	game_layer_ = new GameLayer(color_, GetSize());
+	game_layer_ = new GameLayer(ColorEnum::Blue, GetSize());
 	game_layer_->InitGame();
-	game_layer_->SetPosition(GetSize() / 2);
 	AddChild(game_layer_);
 
 	// °´¼ü¼àÌı
@@ -69,12 +65,6 @@ MainStage::MainStage()
 
 	EventListenerPtr lis = new DragListener(Closure(this, &MainStage::Move));
 	AddListener(lis);
-}
-
-void MainStage::SetColor(ColorEnum color)
-{
-	background_->SetColor(color);
-	game_layer_->SetColor(color);
 }
 
 void MainStage::OnKeyDown(Event* evt)
@@ -89,20 +79,19 @@ void MainStage::OnKeyDown(Event* evt)
 
 	if (key_evt->code == KeyCode::Num1)
 	{
-		SetColor(ColorEnum::Blue);
+		game_layer_->SetColor(ColorEnum::Blue);
 	}
 	else if (key_evt->code == KeyCode::Num2)
 	{
-		SetColor(ColorEnum::Purple);
+		game_layer_->SetColor(ColorEnum::Purple);
 	}
 	else if (key_evt->code == KeyCode::Num3)
 	{
-		SetColor(ColorEnum::Gold);
+		game_layer_->SetColor(ColorEnum::Gold);
 	}
 }
 
 void MainStage::Move(Vec2 trans)
 {
-	background_->Move(trans);
 	game_layer_->Move(trans);
 }

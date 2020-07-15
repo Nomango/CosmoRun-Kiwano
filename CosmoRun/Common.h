@@ -25,12 +25,12 @@ enum class FaceType
 // 方块面方向
 enum class Direction
 {
-	LeftUp,
-	LeftDown,
+	Up,
 	RightUp,
 	RightDown,
-	Up,
 	Down,
+	LeftDown,
+	LeftUp
 };
 
 // 方块面描述
