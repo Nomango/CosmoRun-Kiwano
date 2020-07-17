@@ -80,7 +80,7 @@ void GameLayer::Move(Vec2 trans)
 {
 	background_->MoveTriangles(trans);
 	ball_->MoveParticles(trans);
-	cube_group_->Move(trans);
+	cube_group_->MoveBy(trans);
 }
 
 void GameLayer::OnUpdate(Duration dt)

@@ -102,7 +102,7 @@ void Ball::Turn()
 
 void Ball::MoveParticles(Vec2 trans)
 {
-	particles_->Move(trans);
+	particles_->MoveBy(trans);
 }
 
 void Ball::ResetParticles()
@@ -246,7 +246,7 @@ void Ball::AddParticle(Duration t, float pos_range_min, float pos_range_max)
 	rect->SetFillBrush(particle_brush_);
 	rect->SetPositionX(pos_radius * math::Cos(pos_angle));
 	rect->SetPositionY(pos_radius * math::Sin(pos_angle));
-	rect->Move(-particles_->GetPosition());
+	rect->MoveBy(-particles_->GetPosition());
 	rect->SetAnchor(0.5f, 0.5f);
 	rect->SetOpacity(0);
 	rect->AddAction(Tween::Group({ Tween::FadeIn(300_msec), Tween::FadeOut(t) }).RemoveTargetWhenDone());

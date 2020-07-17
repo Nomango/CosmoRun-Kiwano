@@ -93,7 +93,7 @@ void Background::SetColor(ColorEnum color)
 void Background::MoveTriangles(Vec2 trans)
 {
 	// 只移动动态层
-	dynamic_layer_->Move(trans);
+	dynamic_layer_->MoveBy(trans);
 }
 
 void Background::ResetTriangles()
@@ -161,6 +161,6 @@ void Background::SpawnTriangles(Task* task, Duration dt)
 	// 随机设置三角形的位置
 	t->SetPositionX(GetWidth() * math::Random(0.0f, 1.0f));
 	t->SetPositionY(GetHeight() * math::Random(0.0f, 1.0f));
-	t->Move(-dynamic_layer_->GetPosition());
+	t->MoveBy(-dynamic_layer_->GetPosition());
 	dynamic_layer_->AddChild(t);
 }
