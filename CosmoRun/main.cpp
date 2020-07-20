@@ -7,14 +7,20 @@ class DemoRunner
 public:
 	DemoRunner()
 	{
-		//Logger::GetInstance().ShowConsole(true);
-
 		Settings s;
 		s.window.title = "CosmoRun";
 		s.window.width = 800;
 		s.window.height = 600;
+
 #ifdef KGE_DEBUG
 		s.debug_mode = true;
+
+		// 输出日志到文件
+		auto provider = FileLogProvider::Create("log.txt", std::ios_base::app);
+		provider->SetLevel(LogLevel::Info);
+		Logger::GetInstance().AddProvider(provider);
+
+		KGE_LOG("-=-=-=-=-= Start new game =-=-=-=-=-");
 #endif
 		SetSettings(s);
 	}
@@ -40,6 +46,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 	}
 	catch (std::exception& e)
 	{
+		KGE_ERROR(e.what());
 		::MessageBoxA(nullptr, e.what(), "An exception has occurred!", MB_ICONERROR | MB_OK);
 	}
 	return 0;

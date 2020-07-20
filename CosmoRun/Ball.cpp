@@ -224,6 +224,7 @@ Direction Ball::GetNextDirection(FaceDesc curr, FaceDesc next) const
 		break;
 	}
 	// 执行到此处说明算法有问题
+	KGE_ERROR("curr:", curr, ", next:", next);
 	throw Exception("Internal algorithm error #2");
 	return Direction{};
 }

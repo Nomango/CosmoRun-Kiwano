@@ -50,6 +50,8 @@ struct FaceDesc
 			return direction < rhs.direction;
 		return type < rhs.type;
 	}
+
+	friend std::ostream& operator<< (std::ostream& out, const FaceDesc& desc);
 };
 
 // ·½¿éÃæÃ¶¾Ù

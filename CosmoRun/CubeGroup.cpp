@@ -3,21 +3,6 @@
 #define HIDE_CUBE_NUMBER	9		// 隐藏的方块数量
 #define PREPARE_CUBE_NUMBER	3		// 让玩家适应游戏速度的初始方块数量
 
-std::map<FaceType, String> type_map = {
-		{ FaceType::Top, "top   " },
-		{ FaceType::Left, "left  " },
-		{ FaceType::Right, "right " },
-};
-
-std::map<Direction, String> d_map = {
-	{ Direction::Up, "up" },
-	{ Direction::Down, "down" },
-	{ Direction::LeftDown, "left down" },
-	{ Direction::LeftUp, "left up" },
-	{ Direction::RightDown, "right down" },
-	{ Direction::RightUp, "right up" },
-};
-
 CubeGroup::CubeGroup(float side_length)
 	: side_length_(side_length)
 	, tail_(nullptr)
@@ -80,7 +65,7 @@ void CubeGroup::AddRandomFace()
 			KGE_LOG("====");
 			for (auto face : hide_faces_)
 			{
-				KGE_LOG(type_map[face->GetType()], d_map[face->GetDirection()]);
+				KGE_LOG(face->GetDesc());
 			}
 			KGE_LOG("====");
 			KGE_LOG();
@@ -101,7 +86,7 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 		this->AddChild(cube);
 	}
 
-	KGE_LOG("-new-", type_map[desc.type], d_map[desc.direction]);
+	KGE_LOG("-new-", desc);
 
 	// 创建新方块面，并设置为透明
 	auto face = cube->AddFace(desc);
@@ -147,7 +132,7 @@ void CubeGroup::RemoveTailFace()
 
 void CubeGroup::RemoveHeadFace()
 {
-	KGE_LOG("-remove- ", type_map[hide_faces_.back()->GetType()], d_map[hide_faces_.back()->GetDirection()]);
+	KGE_LOG("-remove- ", hide_faces_.back()->GetDesc());
 
 	auto head = hide_faces_.back();
 	cube_map_.RemoveCubeFaceInMap(head);
