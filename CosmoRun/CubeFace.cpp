@@ -38,9 +38,9 @@ bool CubeFace::IsIn(const std::initializer_list<FaceType>& list)
 void CubeFace::SetColor(ColorEnum color)
 {
 	// 淡入淡出式切换颜色
-	auto action = Tween::Group({
-		Tween::FadeOut(150_msec).DoneCallback([=](Actor*) { this->ResetBrush(color); }),
-		Tween::FadeIn(150_msec)
+	auto action = ActionGroup({
+		ActionFadeOut(150_msec).DoneCallback([=](Actor*) { this->ResetBrush(color); }),
+		ActionFadeIn(150_msec)
 	});
 
 	this->StopAllActions();
@@ -51,7 +51,7 @@ void CubeFace::Show()
 {
 	SetVisible(true);
 	SetOpacity(0);
-	AddAction(Tween::FadeIn(500_msec));
+	AddAction(ActionFadeIn(500_msec));
 }
 
 CubeFace* CubeFace::GetNext() const
@@ -84,29 +84,33 @@ void CubeFace::CreateVertices()
 	{
 	case FaceType::Top:
 		this->SetVertices({
-			Point(0, 0),
-			Point(-width, -height),
-			Point(0, -height * 2),
-			Point(width, -height),
+			Point(width, 0),
+			Point(width * 2, height),
+			Point(width, height * 2),
+			Point(0, height),
 		});
+		this->MoveTo(Point(0, -height));
 		break;
 	case FaceType::Left:
 		this->SetVertices({
 			Point(0, 0),
-			Point(0, side_length_),
-			Point(-width, height),
-			Point(-width, -height),
+			Point(width, height),
+			Point(width, height * 3),
+			Point(0, height * 2),
 		});
+		this->MoveTo(Point(-width / 2, height / 2));
 		break;
 	case FaceType::Right:
 		this->SetVertices({
-			Point(0, 0),
-			Point(0, side_length_),
-			Point(width, height),
-			Point(width, -height),
+			Point(width, 0),
+			Point(width, height * 2),
+			Point(0, height * 3),
+			Point(0, height),
 		});
+		this->MoveTo(Point(width / 2, height / 2));
 		break;
 	}
+	this->SetAnchor(0.5f, 0.5f);
 }
 
 void CubeFace::ResetBrush(ColorEnum color)
@@ -118,7 +122,7 @@ void CubeFace::ResetBrush(ColorEnum color)
 	this->SetStrokeBrush(stroke);
 
 	float stroke_width = side_length_ / 50;
-	this->SetStrokeStyle(StrokeStyle::Create(stroke_width));
+	this->SetStrokeStyle(new StrokeStyle(stroke_width));
 }
 
 BrushPtr CubeFace::GetFillBrush(ColorEnum color)
@@ -126,7 +130,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 	String id = strings::Format("cube_face_fill_brush_%d_%d_%d", int(color), int(desc_.type), int(desc_.direction));
 
 	// 查找缓存中是否有画刷
-	if (BrushPtr brush = ResourceCache::GetInstance().Get<Brush>(id))
+	if (BrushPtr brush = brush_cache_.Get<Brush>(id))
 	{
 		return brush;
 	}
@@ -137,13 +141,13 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 		switch (color)
 		{
 		case ColorEnum::Blue:
-			brush = Brush::Create(Color::Rgb(0, 160, 83));
+			brush = new Brush(Color::Rgb(0, 160, 83));
 			break;
 		case ColorEnum::Purple:
-			brush = Brush::Create(Color::Rgb(56, 134, 195));
+			brush = new Brush(Color::Rgb(56, 134, 195));
 			break;
 		case ColorEnum::Gold:
-			brush = Brush::Create(Color::Rgb(186, 109, 46));
+			brush = new Brush(Color::Rgb(186, 109, 46));
 			break;
 		}
 	}
@@ -152,13 +156,13 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 		switch (color)
 		{
 		case ColorEnum::Blue:
-			brush = Brush::Create(Color::Rgb(0, 121, 62));
+			brush = new Brush(Color::Rgb(0, 121, 62));
 			break;
 		case ColorEnum::Purple:
-			brush = Brush::Create(Color::Rgb(0, 91, 144));
+			brush = new Brush(Color::Rgb(0, 91, 144));
 			break;
 		case ColorEnum::Gold:
-			brush = Brush::Create(Color::Rgb(151, 88, 37));
+			brush = new Brush(Color::Rgb(151, 88, 37));
 			break;
 		}
 	}
@@ -178,7 +182,7 @@ BrushPtr CubeFace::GetFillBrush(ColorEnum color)
 		}
 	}
 
-	ResourceCache::GetInstance().AddObject(id, brush);
+	brush_cache_.AddObject(id, brush);
 	return brush;
 }
 
@@ -209,7 +213,7 @@ BrushPtr CubeFace::GetTopFillBrush(Color light, Color dark)
 	}
 
 	auto style = LinearGradientStyle(start, end, { GradientStop(0, light), GradientStop(1, dark) });
-	return Brush::Create(style);
+	return new Brush(style);
 }
 
 BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
@@ -217,7 +221,7 @@ BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
 	String id = strings::Format("cube_face_stroke_brush_%d_%d", int(color), int(desc_.type));
 
 	// 查找缓存中是否有画刷
-	if (BrushPtr brush = ResourceCache::GetInstance().Get<Brush>(id))
+	if (BrushPtr brush = brush_cache_.Get<Brush>(id))
 	{
 		return brush;
 	}
@@ -236,7 +240,7 @@ BrushPtr CubeFace::GetStrokeBrush(ColorEnum color)
 		break;
 	}
 
-	ResourceCache::GetInstance().AddObject(id, brush);
+	brush_cache_.AddObject(id, brush);
 	return brush;
 }
 
@@ -245,7 +249,7 @@ BrushPtr CubeFace::GetStrokeBrush(Color light, Color dark)
 	if (desc_.type == FaceType::Right)
 	{
 		// 右侧的面颜色较深
-		return Brush::Create(dark);
+		return new Brush(dark);
 	}
-	return Brush::Create(light);
+	return new Brush(light);
 }

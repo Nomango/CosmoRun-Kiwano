@@ -30,11 +30,11 @@ public:
 		this->SetScale(Vec2(0, 0));
 		this->SetAnchor(0.5f, 0.5f);
 
-		auto action = Tween::Group({
-			Tween::RotateTo(dt, angle_end),
-			Tween::ScaleTo(dt, scale_to, scale_to),
-			Tween::FadeOut(dt),
-			Tween::MoveBy(dt, Vec2(move_x, move_y)),
+		auto action = ActionGroup({
+			ActionRotateTo(dt, angle_end),
+			ActionScaleTo(dt, scale_to, scale_to),
+			ActionFadeOut(dt),
+			ActionMoveBy(dt, Vec2(move_x, move_y)),
 		}, true).RemoveTargetWhenDone();  // 动画结束时自动移除三角形
 		this->AddAction(action);
 	}
@@ -44,19 +44,19 @@ Background::Background(ColorEnum color, Size size)
 	: color_(color)
 {
 	// 背景色
-	bg_rect_ = RectActor::Create(size);
+	bg_rect_ = new RectActor(size);
 	AddChild(bg_rect_);
 
 	// 动态三角形图层
-	dynamic_layer_ = Actor::Create();
+	dynamic_layer_ = new Actor();
 	AddChild(dynamic_layer_);
 
 	// 背景阴影
-	bg_shadow_ = RectActor::Create(size);
+	bg_shadow_ = new RectActor(size);
 	AddChild(bg_shadow_);
 
 	// 添加任务：每隔130ms生成一个三角形
-	TaskPtr task = Task::Create(Closure(this, &Background::SpawnTriangles), 130_msec);
+	TaskPtr task = new Task(Closure(this, &Background::SpawnTriangles), 130_msec);
 	AddTask(task);
 
 	SetPosition(-size / 2);
@@ -81,9 +81,9 @@ void Background::SetColor(ColorEnum color)
 		color_ = color;
 
 		// 淡入淡出式切换背景色
-		auto action = Tween::Group({
-			Tween::FadeOut(150_msec).DoneCallback([=](Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); }),
-			Tween::FadeIn(150_msec)
+		auto action = ActionGroup({
+			ActionFadeOut(150_msec).DoneCallback([=](Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); }),
+			ActionFadeIn(150_msec)
 		});
 		bg_rect_->StopAllActions();
 		bg_rect_->AddAction(action);
@@ -98,7 +98,11 @@ void Background::MoveTriangles(Vec2 trans)
 
 void Background::ResetTriangles()
 {
-	dynamic_layer_->AddAction(Tween::MoveTo(1_sec, Point(0, 0)));
+	for (auto triangles : dynamic_layer_->GetAllChildren())
+	{
+		triangles->MoveBy(-dynamic_layer_->GetPosition());
+	}
+	dynamic_layer_->MoveTo(Point(0, 0));
 }
 
 BrushPtr Background::GetCurrentBrush()
@@ -129,7 +133,7 @@ BrushPtr Background::GetBackgroundBrush(Color top, Color bottom)
 			GradientStop(1, bottom),
 		}
 		);
-	BrushPtr brush = Brush::Create(style);
+	BrushPtr brush = new Brush(style);
 	return brush;
 }
 
@@ -146,7 +150,7 @@ BrushPtr Background::GetShadowBrush()
 			GradientStop(1.0f, Color::Rgba(Color::Black, 0.3f)),
 		}
 	);
-	return Brush::Create(style);
+	return new Brush(style);
 }
 
 void Background::SpawnTriangles(Task* task, Duration dt)
@@ -154,7 +158,7 @@ void Background::SpawnTriangles(Task* task, Duration dt)
 	// 创建三角形的画刷
 	if (!triangle_brush_)
 	{
-		triangle_brush_ = Brush::Create(Color(Color::White, 0.2f));
+		triangle_brush_ = new Brush(Color(Color::White, 0.2f));
 	}
 
 	TrianglePtr t = new Triangle(GetWidth() * 0.05f, triangle_brush_);

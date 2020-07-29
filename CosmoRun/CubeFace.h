@@ -48,4 +48,5 @@ private:
 	float side_length_;
 	CubeFace* next_ = nullptr;
 	Cube* cube_ = nullptr;
+	ResourceCache brush_cache_;
 };

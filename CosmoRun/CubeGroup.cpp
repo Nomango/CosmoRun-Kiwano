@@ -125,13 +125,17 @@ void CubeGroup::SetColor(ColorEnum color)
 
 void CubeGroup::RemoveTailFace()
 {
-	auto action = Tween::FadeOut(500_msec).DoneCallback(Closure(this, &CubeGroup::RemoveFace));
+	auto action = ActionScaleTo(300_msec, 0, 0);
+	action.DoneCallback(Closure(this, &CubeGroup::RemoveFace));
 	tail_->AddAction(action);
 	tail_ = tail_->GetNext();
 }
 
 void CubeGroup::RemoveHeadFace()
 {
+	if (hide_faces_.empty())
+		throw std::out_of_range("call RemoveHeadFace on empty list");
+
 	KGE_LOG("-remove- ", hide_faces_.back()->GetDesc());
 
 	auto head = hide_faces_.back();

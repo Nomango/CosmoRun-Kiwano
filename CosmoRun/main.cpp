@@ -16,7 +16,7 @@ public:
 		s.debug_mode = true;
 
 		// 输出日志到文件
-		auto provider = FileLogProvider::Create("log.txt", std::ios_base::app);
+		auto provider = new FileLogProvider("log.txt", std::ios_base::app);
 		provider->SetLevel(LogLevel::Info);
 		Logger::GetInstance().AddProvider(provider);
 

@@ -11,7 +11,7 @@ public:
 
 	float GetRadius() const;
 
-	float GetVelocityAngle() const;
+	Vec2 GetVelocityAngle() const;
 
 	Direction GetDirection() const;
 
@@ -27,6 +27,10 @@ public:
 
 	void Turn();
 
+	void Die();
+
+	void Reborn();
+
 	void MoveParticles(Vec2 trans);
 
 	void ResetParticles();
@@ -38,13 +42,12 @@ private:
 
 	void SpawnParticles(Task* task, Duration dt);
 
-	void AddParticle(Duration t, float pos_range_min, float pos_range_max);
-
 private:
 	float radius_;
 	float v_angle_;
 	Direction direction_;
 	CubeFace* where_ = nullptr;
+	ActorPtr body_;
 	ActorPtr particles_;
 	BrushPtr particle_brush_;
 };
