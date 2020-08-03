@@ -23,7 +23,7 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	this->AddChild(cube_group_);
 
 	// ´´½¨Ð¡Çò
-	ball_ = new Ball(side_length_ * 0.18f);
+	ball_ = new Ball(side_length_ * 0.2f);
 	this->AddChild(ball_);
 }
 

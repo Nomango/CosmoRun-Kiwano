@@ -34,8 +34,11 @@ void CubeGroup::InitCubes(int length)
 	KGE_LOG();
 }
 
-void CubeGroup::AddRandomFace()
+void CubeGroup::AddRandomFace(int depth)
 {
+	if (depth >= 10)
+		throw Exception("AddRandomFace failed");
+
 	// 获取随机的方块类型
 	auto choices = GetRandomChoices();
 	if (!choices.empty())
@@ -54,18 +57,18 @@ void CubeGroup::AddRandomFace()
 			RemoveHeadFace();
 			RemoveHeadFace();
 
-			AddRandomFace();
-			AddRandomFace();
-			AddRandomFace();
+			AddRandomFace(depth + 1);
+			AddRandomFace(depth + 1);
+			AddRandomFace(depth + 1);
 		}
 		else
 		{
 			// 数量小于5时仍然冲突，说明出现了算法异常
 			KGE_LOG();
 			KGE_LOG("====");
-			for (auto face : hide_faces_)
+			for (auto iter = hide_faces_.rbegin(); iter != hide_faces_.rend(); iter++)
 			{
-				KGE_LOG(face->GetDesc());
+				KGE_LOG((*iter)->GetDesc());
 			}
 			KGE_LOG("====");
 			KGE_LOG();
@@ -94,16 +97,16 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 
 	if (!hide_faces_.empty())
 	{
-		CubeFace* head = hide_faces_.back();
+		CubeFace* head = hide_faces_.front();
 		head->SetNext(face);
 	}
-	hide_faces_.push_back(face);
+	hide_faces_.push_front(face);
 
 	// 当隐藏的方块数量较多时，显示最后一个
 	if (hide_faces_.size() > HIDE_CUBE_NUMBER)
 	{
-		hide_faces_.front()->Show();
-		hide_faces_.pop_front();
+		hide_faces_.back()->Show();
+		hide_faces_.pop_back();
 	}
 	return face;
 }
@@ -136,18 +139,18 @@ void CubeGroup::RemoveHeadFace()
 	if (hide_faces_.empty())
 		throw std::out_of_range("call RemoveHeadFace on empty list");
 
-	KGE_LOG("-remove- ", hide_faces_.back()->GetDesc());
+	KGE_LOG("-remove- ", hide_faces_.front()->GetDesc());
 
-	auto head = hide_faces_.back();
+	auto head = hide_faces_.front();
 	cube_map_.RemoveCubeFaceInMap(head);
-	hide_faces_.pop_back();
+	hide_faces_.pop_front();
 }
 
 std::vector<FaceDesc> CubeGroup::GetRandomChoices()
 {
 	std::vector<FaceDesc> choices;
 
-	CubeFace* head = hide_faces_.back();
+	CubeFace* head = hide_faces_.front();
 	switch (head->GetType())
 	{
 	case FaceType::Top:
@@ -312,7 +315,7 @@ CubePos CubeGroup::GetNewCubePos(FaceDesc desc)
 	if (hide_faces_.empty())
 		return CubePos{ 0, 0, 0 };
 
-	CubeFace* head = hide_faces_.back();
+	CubeFace* head = hide_faces_.front();
 
 	// 计算相对位置
 	CubePos offset = { 0 };

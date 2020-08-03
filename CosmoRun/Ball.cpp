@@ -3,12 +3,22 @@
 Ball::Ball(float radius)
 	: radius_(radius)
 	, direction_(Direction::Up)
+	, particle_type_(1)
 {
 	CircleActorPtr ball1 = new CircleActor(radius);
-	CircleActorPtr ball2 = new CircleActor(radius * 0.8f);
-	ball1->SetFillColor(Color::Rgba(Color::LightBlue, 0.5f));
-	ball2->SetFillColor(Color::Rgba(Color::White, 1.0f));
 	ball1->SetAnchor(0.5f, 0.5f);
+
+	auto style = RadialGradientStyle(
+		Point(radius, radius),
+		Vec2(),
+		Vec2(radius, radius),
+		{ { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } }
+		);
+	BrushPtr ball1_brush = new Brush(style);
+	ball1->SetFillBrush(ball1_brush);
+
+	CircleActorPtr ball2 = new CircleActor(radius * 0.7f);
+	ball2->SetFillColor(Color::Rgba(Color::White, 1.0f));
 	ball2->SetAnchor(0.5f, 0.5f);
 
 	body_ = new Actor();
@@ -21,10 +31,10 @@ Ball::Ball(float radius)
 	particles_ = new Actor();
 	this->AddChild(particles_);
 
-	particle_brush_ = new Brush(Color::Rgba(Color::White, 0.9f));
+	particle_brush_ = new Brush(Color::White);
 
 	// 生成动态小方块粒子
-	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 50_msec);
+	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 100_msec);
 	AddTask(task);
 }
 
@@ -111,7 +121,7 @@ void Ball::Turn()
 void Ball::Die()
 {
 	body_->AddAction(ActionGroup({
-		ActionScaleTo(300_msec, 1.3f, 1.3f),
+		ActionScaleTo(300_msec, 1.4f, 1.4f),
 		ActionScaleTo(300_msec, 0, 0),
 		}));
 
@@ -261,18 +271,34 @@ Direction Ball::GetNextDirection(FaceDesc curr, FaceDesc next) const
 
 void Ball::SpawnParticles(Task* task, Duration dt)
 {
-	float side = math::Random(radius_ * 0.7f, radius_ * 1.5f);
-	float pos_radius = math::Random(0.0f, radius_ * 0.8f);
+	switch (particle_type_)
+	{
+	case 1:
+		SpawnParticles1();
+	default:
+		break;
+	}
+}
+
+void Ball::SpawnParticles1()
+{
+	float side = math::Random(radius_ * 0.7f, radius_ * 1.3f);
+	float pos_radius = math::Random(0.0f, radius_ * 0.5f);
 	float pos_angle = math::Random(0.0f, 360.0f);
 	Duration dur = math::Random(1000, 1500);
 
 	RectActorPtr rect = new RectActor(Size(side, side));
-	rect->SetFillBrush(particle_brush_);
 	rect->SetPositionX(pos_radius * math::Cos(pos_angle));
 	rect->SetPositionY(pos_radius * math::Sin(pos_angle));
-	rect->MoveBy(-particles_->GetPosition());
 	rect->SetAnchor(0.5f, 0.5f);
 	rect->AddAction(ActionFadeOut(dur).RemoveTargetWhenDone());
 	rect->AddAction(ActionRotateBy(1_sec, math::Random(-120.0f, 120.0f)).Loops(-1));
-	particles_->AddChild(rect);
+	rect->SetFillBrush(particle_brush_);
+	AddParticle(rect);
+}
+
+void Ball::AddParticle(ActorPtr particle)
+{
+	particle->MoveBy(-particles_->GetPosition());
+	particles_->AddChild(particle);
 }

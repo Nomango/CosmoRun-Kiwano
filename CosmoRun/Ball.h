@@ -42,12 +42,19 @@ private:
 
 	void SpawnParticles(Task* task, Duration dt);
 
+	void SpawnParticles1();
+
+	void AddParticle(ActorPtr particle);
+
 private:
 	float radius_;
 	float v_angle_;
 	Direction direction_;
 	CubeFace* where_ = nullptr;
 	ActorPtr body_;
+
+	// Á£×ÓÏà¹Ø
+	int particle_type_;
 	ActorPtr particles_;
 	BrushPtr particle_brush_;
 };

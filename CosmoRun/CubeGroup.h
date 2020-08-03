@@ -11,7 +11,7 @@ public:
 
     void InitCubes(int length);
 
-    void AddRandomFace();
+    void AddRandomFace(int depth = 1);
 
     CubeFace* AppendCubeFace(FaceDesc desc);
 
