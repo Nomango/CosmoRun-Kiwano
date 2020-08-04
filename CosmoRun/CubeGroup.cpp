@@ -18,18 +18,41 @@ void CubeGroup::InitCubes(int length)
 	this->RemoveAllChildren();
 
 	// 创建第一个方块
-	std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
-	int choice = math::Random(0, int(choices.size() - 1));
+	//std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
+	//int choice = math::Random(0, int(choices.size() - 1));
 
-	tail_ = AppendCubeFace({ FaceType::Top, choices[choice] });
+	//tail_ = AppendCubeFace({ FaceType::Top, choices[choice] });
 
-	// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
-	for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
-		AppendCubeFace({ FaceType::Top, choices[choice] });
+	//// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
+	//for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
+	//	AppendCubeFace({ FaceType::Top, choices[choice] });
 
-	// 随机生成后面的方块
-	for (int i = 0; i < length + HIDE_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
-		AddRandomFace();
+	//// 随机生成后面的方块
+	//for (int i = 0; i < length + HIDE_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
+	//	AddRandomFace();
+
+	tail_ = AppendCubeFace({ FaceType::Top, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Left, Direction::Down });
+	AppendCubeFace({ FaceType::Left, Direction::RightDown });
+	AppendCubeFace({ FaceType::Left, Direction::RightDown });
+	AppendCubeFace({ FaceType::Right, Direction::RightUp });
+	AppendCubeFace({ FaceType::Left, Direction::RightDown });
+	AppendCubeFace({ FaceType::Left, Direction::RightDown });
+	AppendCubeFace({ FaceType::Top, Direction::RightUp });
+	AppendCubeFace({ FaceType::Left, Direction::Up });
+	AppendCubeFace({ FaceType::Left, Direction::RightDown });
+	AppendCubeFace({ FaceType::Top, Direction::RightUp });
+	AppendCubeFace({ FaceType::Left, Direction::Up });
+	AppendCubeFace({ FaceType::Left, Direction::Up });
+	AppendCubeFace({ FaceType::Right, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Right, Direction::Up });
+	AppendCubeFace({ FaceType::Right, Direction::LeftDown });
+	AppendCubeFace({ FaceType::Left, Direction::LeftUp });
+	AppendCubeFace({ FaceType::Left, Direction::Down });
+	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
 
 	KGE_LOG();
 }
@@ -37,7 +60,11 @@ void CubeGroup::InitCubes(int length)
 void CubeGroup::AddRandomFace(int depth)
 {
 	if (depth >= 10)
+	{
+		// 递归过深，说明算法异常导致无法创建出新方块
+		DumpCubes();
 		throw Exception("AddRandomFace failed");
+	}
 
 	// 获取随机的方块类型
 	auto choices = GetRandomChoices();
@@ -52,27 +79,24 @@ void CubeGroup::AddRandomFace(int depth)
 	else
 	{
 		// 获取随机方块失败，需要删掉之前的方块重新生成
-		if (hide_faces_.size() >= 5)
+		int length = (int)hide_faces_.size();
+		if (length >= 5)
 		{
-			RemoveHeadFace();
-			RemoveHeadFace();
+			int rebuild = std::min(length - 5, depth);
+			for (int i = 0; i < rebuild; i++)
+			{
+				RemoveHeadFace();
+			}
 
-			AddRandomFace(depth + 1);
-			AddRandomFace(depth + 1);
-			AddRandomFace(depth + 1);
+			for (int i = 0; i < rebuild + 1; i++)
+			{
+				AddRandomFace(depth + 1);
+			}
 		}
 		else
 		{
 			// 数量小于5时仍然冲突，说明出现了算法异常
-			KGE_LOG();
-			KGE_LOG("====");
-			for (auto iter = hide_faces_.rbegin(); iter != hide_faces_.rend(); iter++)
-			{
-				KGE_LOG((*iter)->GetDesc());
-			}
-			KGE_LOG("====");
-			KGE_LOG();
-
+			DumpCubes();
 			throw Exception("Internal algorithm error #1");
 		}
 	}
@@ -395,4 +419,16 @@ CubePos CubeGroup::GetNewCubePos(FaceDesc desc)
 		pos[i] += offset[i];
 	}
 	return pos;
+}
+
+void CubeGroup::DumpCubes()
+{
+	KGE_LOG();
+	KGE_LOG("==== dump cubes ====");
+	for (auto iter = hide_faces_.rbegin(); iter != hide_faces_.rend(); iter++)
+	{
+		KGE_LOG((*iter)->GetDesc());
+	}
+	KGE_LOG("====================");
+	KGE_LOG();
 }

@@ -15,7 +15,7 @@ public:
 		s.window.height = 600;
 
 #ifdef KGE_DEBUG
-		s.debug_mode = true;
+		//s.debug_mode = true;
 
 		// 输出日志到文件
 		auto provider = new FileLogProvider("log.txt", std::ios_base::app);

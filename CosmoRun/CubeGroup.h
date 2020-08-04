@@ -30,6 +30,8 @@ private:
 
     CubePos GetNewCubePos(FaceDesc desc);
 
+    void DumpCubes();
+
 private:
     float side_length_;
     CubeFace* tail_;
