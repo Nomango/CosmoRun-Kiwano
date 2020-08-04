@@ -8,7 +8,8 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	: color_(color)
 	, speed_scale_(0.0f)
 	, score_(0)
-	, started_(false)
+	, best_score_(0)
+	, status_(GameStatus::Ready)
 {
 	SetPosition(size / 2);
 	side_length_ = size.x * 0.08f;
@@ -25,12 +26,17 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	// 创建小球
 	ball_ = new Ball(side_length_ * 0.2f);
 	this->AddChild(ball_);
+
+	// 创建游戏结束面板
+	gameover_panel_ = new GameOverPanel(size);
+	gameover_panel_->SetVisible(false);
+	this->AddChild(gameover_panel_);
 }
 
 void GameLayer::InitGame()
 {
 	// 初始变量
-	started_ = false;
+	status_ = GameStatus::Ready;
 	speed_scale_ = 0.7f;
 	score_ = 0;
 
@@ -45,15 +51,26 @@ void GameLayer::InitGame()
 void GameLayer::StartGame()
 {
 	KGE_LOG("Game start!");
-	started_ = true;
+	status_ = GameStatus::Running;
 }
 
 void GameLayer::GameOver()
 {
 	KGE_LOG("Game over!");
-	started_ = false;
+	status_ = GameStatus::Gameover;
+
+	bool is_best = false;
+	if (score_ > best_score_)
+	{
+		best_score_ = score_;
+		is_best = true;
+	}
+
+	// 更新得分
+	gameover_panel_->SetScore(score_, best_score_, is_best);
 
 	ball_->Die();
+	gameover_panel_->Show();
 }
 
 void GameLayer::Restart()
@@ -65,6 +82,8 @@ void GameLayer::Restart()
 	background_->ResetTriangles();
 	ball_->ResetParticles();
 	cube_group_->SetPosition(Point(0, side_length_ / 2));
+
+	gameover_panel_->Hide();
 }
 
 void GameLayer::SetColor(ColorEnum color)
@@ -87,20 +106,23 @@ void GameLayer::Move(Vec2 trans)
 
 void GameLayer::OnUpdate(Duration dt)
 {
+	if (status_ == GameStatus::Gameover)
+		return;
+
 	if (Input::GetInstance().WasPressed(KeyCode::Space)
 		|| Input::GetInstance().WasPressed(MouseButton::Left))
 	{
-		if (!started_)
+		if (status_ == GameStatus::Ready)
 		{
-			started_ = true;
+			StartGame();
 		}
-		else
+		else if (status_ == GameStatus::Running)
 		{
 			ball_->Turn();
 		}
 	}
 
-	if (!started_)
+	if (status_ != GameStatus::Running)
 		return;
 
 	// 沿小球的方向移动

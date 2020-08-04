@@ -1,73 +1,107 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
+    <Filter Include="include">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="resource">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="resource\font">
+      <UniqueIdentifier>{1339fbb0-0b98-4645-af26-c52142bacbe5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="MainStage.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Background.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="GameLayer.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="CubeFace.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Common.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Ball.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="CubeGroup.cpp">
-      <Filter>源文件</Filter>
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Lang.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverPanel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomText.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Background.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="GameLayer.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="CubeFace.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Ball.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="CubeGroup.h">
-      <Filter>头文件</Filter>
+      <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Lang.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverPanel.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomText.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CosmoRun.rc">
+      <Filter>resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resource\fonts\Gill-Sans-MT-Condensed.TTF">
+      <Filter>resource\font</Filter>
+    </Font>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

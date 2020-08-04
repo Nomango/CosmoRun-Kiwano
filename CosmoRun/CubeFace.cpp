@@ -191,28 +191,28 @@ BrushPtr CubeFace::GetTopFillBrush(Color light, Color dark)
 	float width = side_length_ * math::Cos(30.0f);
 	float height = side_length_ * math::Sin(30.0f);
 
-	Point start, end;
+	LinearGradientStyle style;
+	style.stops = { GradientStop(0, light), GradientStop(1, dark) };
+
 	switch (desc_.direction)
 	{
 	case Direction::LeftUp:
-		start = Point{ width / 2, height / 2 };
-		end = Point{ width *3 / 2, height * 3 / 2 };
+		style.begin = Point{ width / 2, height / 2 };
+		style.end = Point{ width *3 / 2, height * 3 / 2 };
 		break;
 	case Direction::LeftDown:
-		start = Point{ width / 2, height * 3 / 2 };
-		end = Point{ width * 3 / 2, height / 2 };
+		style.begin = Point{ width / 2, height * 3 / 2 };
+		style.end = Point{ width * 3 / 2, height / 2 };
 		break;
 	case Direction::RightUp:
-		start = Point{ width * 3 / 2, height / 2 };
-		end = Point{ width / 2, height * 3 / 2 };
+		style.begin = Point{ width * 3 / 2, height / 2 };
+		style.end = Point{ width / 2, height * 3 / 2 };
 		break;
 	case Direction::RightDown:
-		start = Point{ width * 3 / 2, height * 3 / 2 };
-		end = Point{ width / 2, height / 2 };
+		style.begin = Point{ width * 3 / 2, height * 3 / 2 };
+		style.end = Point{ width / 2, height / 2 };
 		break;
 	}
-
-	auto style = LinearGradientStyle(start, end, { GradientStop(0, light), GradientStop(1, dark) });
 	return new Brush(style);
 }
 

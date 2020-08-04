@@ -8,12 +8,10 @@ Ball::Ball(float radius)
 	CircleActorPtr ball1 = new CircleActor(radius);
 	ball1->SetAnchor(0.5f, 0.5f);
 
-	auto style = RadialGradientStyle(
-		Point(radius, radius),
-		Vec2(),
-		Vec2(radius, radius),
-		{ { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } }
-		);
+	RadialGradientStyle style;
+	style.center = Point(radius, radius);
+	style.radius = style.center;
+	style.stops = { { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } };
 	BrushPtr ball1_brush = new Brush(style);
 	ball1->SetFillBrush(ball1_brush);
 

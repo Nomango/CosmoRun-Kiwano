@@ -4,6 +4,7 @@
 #include "Ball.h"
 #include "CubeGroup.h"
 #include "Background.h"
+#include "GameOverPanel.h"
 
 KGE_DECLARE_SMART_PTR(GameLayer);
 
@@ -28,11 +29,26 @@ private:
 	void OnUpdate(Duration dt) override;
 
 private:
-	bool started_;
 	float side_length_;
 	float speed_scale_;
-	int score_;
 	ColorEnum color_;
+
+	enum class GameStatus
+	{
+		Ready,
+		Running,
+		Gameover,
+	};
+
+	GameStatus status_;
+
+	// 计分相关
+	int score_;
+	int best_score_;
+
+	// 结束面板
+	GameOverPanelPtr gameover_panel_;
+
 	BackgroundPtr background_;
 	BallPtr ball_;
 	CubeGroupPtr cube_group_;

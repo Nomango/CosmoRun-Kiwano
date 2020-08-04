@@ -1,4 +1,6 @@
 #include "MainStage.h"
+#include "Lang.h"
+#include "resource.h"
 
 KGE_DECLARE_SMART_PTR(DemoRunner);
 class DemoRunner
@@ -23,12 +25,28 @@ public:
 		KGE_LOG("-=-=-=-=-= Start new game =-=-=-=-=-");
 #endif
 		SetSettings(s);
+
+		// 对象创建失败时抛出
+		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());
 	}
 
 	void OnReady() override
 	{
+		// 加载资源
+		LoadResources();
+
 		MainStagePtr stage = new MainStage;
 		Director::GetInstance().EnterStage(stage);
+	}
+
+	void LoadResources()
+	{
+		FileSystem::GetInstance().AddSearchPath("resource/");
+
+		Font::Preload(Resource(IDR_FONT1, "TTF"));
+
+		// 加载多语言配置
+		Lang::GetInstance().Switch("en");
 	}
 };
 
