@@ -18,41 +18,18 @@ void CubeGroup::InitCubes(int length)
 	this->RemoveAllChildren();
 
 	// 创建第一个方块
-	//std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
-	//int choice = math::Random(0, int(choices.size() - 1));
+	std::vector<Direction> choices = { Direction::LeftUp, Direction::LeftDown, Direction::RightUp, Direction::RightDown };
+	int choice = math::Random(0, int(choices.size() - 1));
 
-	//tail_ = AppendCubeFace({ FaceType::Top, choices[choice] });
+	tail_ = AppendCubeFace({ FaceType::Top, choices[choice] });
 
-	//// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
-	//for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
-	//	AppendCubeFace({ FaceType::Top, choices[choice] });
+	// 创建几个相同类型的方块，让玩家在刚开始游戏时适应游戏速度
+	for (int i = 0; i < PREPARE_CUBE_NUMBER; i++)
+		AppendCubeFace({ FaceType::Top, choices[choice] });
 
-	//// 随机生成后面的方块
-	//for (int i = 0; i < length + HIDE_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
-	//	AddRandomFace();
-
-	tail_ = AppendCubeFace({ FaceType::Top, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Left, Direction::Down });
-	AppendCubeFace({ FaceType::Left, Direction::RightDown });
-	AppendCubeFace({ FaceType::Left, Direction::RightDown });
-	AppendCubeFace({ FaceType::Right, Direction::RightUp });
-	AppendCubeFace({ FaceType::Left, Direction::RightDown });
-	AppendCubeFace({ FaceType::Left, Direction::RightDown });
-	AppendCubeFace({ FaceType::Top, Direction::RightUp });
-	AppendCubeFace({ FaceType::Left, Direction::Up });
-	AppendCubeFace({ FaceType::Left, Direction::RightDown });
-	AppendCubeFace({ FaceType::Top, Direction::RightUp });
-	AppendCubeFace({ FaceType::Left, Direction::Up });
-	AppendCubeFace({ FaceType::Left, Direction::Up });
-	AppendCubeFace({ FaceType::Right, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Right, Direction::Up });
-	AppendCubeFace({ FaceType::Right, Direction::LeftDown });
-	AppendCubeFace({ FaceType::Left, Direction::LeftUp });
-	AppendCubeFace({ FaceType::Left, Direction::Down });
-	AppendCubeFace({ FaceType::Top, Direction::LeftDown });
+	// 随机生成后面的方块
+	for (int i = 0; i < length + HIDE_CUBE_NUMBER - PREPARE_CUBE_NUMBER; i++)
+		AddRandomFace();
 
 	KGE_LOG();
 }
