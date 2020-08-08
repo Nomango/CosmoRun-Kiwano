@@ -8,6 +8,19 @@ CubeFace::CubeFace(FaceType type, Direction d, float side_length)
 	CreateVertices();
 }
 
+CubeFace::~CubeFace()
+{
+	if (shadow_)
+	{
+		shadow_->RemoveFromParent();
+	}
+}
+
+ActorPtr CubeFace::GetShadow()
+{
+	return shadow_;
+}
+
 FaceType CubeFace::GetType() const
 {
 	return desc_.type;
@@ -52,6 +65,10 @@ void CubeFace::Show()
 	SetVisible(true);
 	SetOpacity(0);
 	AddAction(ActionFadeIn(500_msec));
+
+	shadow_->SetVisible(true);
+	shadow_->SetOpacity(0);
+	shadow_->AddAction(ActionFadeIn(500_msec));
 }
 
 CubeFace* CubeFace::GetNext() const
@@ -80,37 +97,90 @@ void CubeFace::CreateVertices()
 	float width = side_length_ * math::Cos(30.0f);
 	float height = side_length_ * math::Sin(30.0f);
 
+	Vector<Point> vertices;
 	switch (desc_.type)
 	{
 	case FaceType::Top:
-		this->SetVertices({
+		vertices = {
 			Point(width, 0),
 			Point(width * 2, height),
 			Point(width, height * 2),
 			Point(0, height),
-		});
+		};
 		this->MoveTo(Point(0, -height));
 		break;
 	case FaceType::Left:
-		this->SetVertices({
+		vertices = {
 			Point(0, 0),
 			Point(width, height),
 			Point(width, height * 3),
 			Point(0, height * 2),
-		});
+		};
 		this->MoveTo(Point(-width / 2, height / 2));
 		break;
 	case FaceType::Right:
-		this->SetVertices({
+		vertices = {
 			Point(width, 0),
 			Point(width, height * 2),
 			Point(0, height * 3),
 			Point(0, height),
-		});
+		};
 		this->MoveTo(Point(width / 2, height / 2));
 		break;
 	}
+	this->SetVertices(vertices);
 	this->SetAnchor(0.5f, 0.5f);
+
+	// ´´½¨ÒõÓ°
+	PolygonActorPtr shadow = new PolygonActor;
+	shadow->SetAnchor(0.5f, 0.5f);
+	shadow->SetFillColor(Color::Black);
+	shadow->SetVisible(false);
+
+	float shadow_offset = 5;
+	switch (desc_.type)
+	{
+	case FaceType::Top:
+		shadow->SetVertices({
+			Point(width, 0),
+			Point(width * 2, height),
+			Point(width * 2, height + shadow_offset),
+			Point(width, height * 2 + shadow_offset),
+			Point(0, height + shadow_offset),
+			Point(0, height),
+			});
+		break;
+	case FaceType::Left:
+	{
+		float offset_x = shadow_offset * math::Cos(30.0f);
+		float offset_y = shadow_offset * math::Sin(30.0f);
+		shadow->SetVertices({
+			Point(0, 0),
+			Point(offset_x, -offset_y),
+			Point(width + offset_x, height - offset_y),
+			Point(width + offset_x, height * 3 - offset_y),
+			Point(width, height * 3),
+			Point(0, height * 2),
+			});
+		break;
+	}
+	case FaceType::Right:
+	{
+		float offset_x = shadow_offset * math::Cos(30.0f);
+		float offset_y = shadow_offset * math::Sin(30.0f);
+		shadow->SetVertices({
+			Point(width, 0),
+			Point(width, height * 2),
+			Point(0, height * 3),
+			Point(-offset_x, height * 3 - offset_y),
+			Point(-offset_x, height - offset_y),
+			Point(width - offset_x,  -offset_y),
+			});
+		break;
+	}
+	}
+	shadow->SetSize(this->GetSize());
+	this->shadow_ = shadow;
 }
 
 void CubeFace::ResetBrush(ColorEnum color)

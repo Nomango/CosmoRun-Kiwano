@@ -1,5 +1,4 @@
 #include "GameOverPanel.h"
-#include "CustomText.h"
 #include "Lang.h"
 
 GameOverPanel::GameOverPanel(Size size)
@@ -26,8 +25,6 @@ GameOverPanel::GameOverPanel(Size size)
 	best_score_ = new CustomText(" ", 48, false);
 	best_score_->MoveTo(0, score_->GetPositionY() + score_->GetHeight());
 	this->AddChild(best_score_);
-
-	this->SetCascadeOpacityEnabled(true);
 }
 
 void GameOverPanel::SetScore(int score, int best_score, bool is_best)

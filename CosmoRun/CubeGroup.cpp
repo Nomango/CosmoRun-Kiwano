@@ -96,6 +96,11 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 	auto face = cube->AddFace(desc);
 	face->SetVisible(false);
 
+	// 添加方块面的阴影
+	ActorPtr shadow = face->GetShadow();
+	shadow->SetPosition(face->GetPosition() + cube->GetPosition());
+	this->AddChild(shadow, -1);
+
 	if (!hide_faces_.empty())
 	{
 		CubeFace* head = hide_faces_.front();
@@ -132,6 +137,10 @@ void CubeGroup::RemoveTailFace()
 	auto action = ActionScaleTo(300_msec, 0, 0);
 	action.DoneCallback(Closure(this, &CubeGroup::RemoveFace));
 	tail_->AddAction(action);
+
+	// 处理阴影
+	tail_->GetShadow()->AddAction(ActionScaleTo(300_msec, 0, 0));
+
 	tail_ = tail_->GetNext();
 }
 

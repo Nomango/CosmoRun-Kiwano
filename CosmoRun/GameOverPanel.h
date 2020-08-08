@@ -1,5 +1,6 @@
 #pragma once
 #include "Common.h"
+#include "CustomText.h"
 
 KGE_DECLARE_SMART_PTR(GameOverPanel);
 
@@ -15,6 +16,6 @@ public:
     void Hide();
 
 private:
-    TextActorPtr score_;
-    TextActorPtr best_score_;
+    CustomTextPtr score_;
+    CustomTextPtr best_score_;
 };

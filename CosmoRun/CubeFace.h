@@ -10,6 +10,10 @@ class CubeFace : public PolygonActor
 public:
 	CubeFace(FaceType type, Direction d, float side_length);
 
+	~CubeFace();
+
+	ActorPtr GetShadow();
+
 	FaceType GetType() const;
 
 	Direction GetDirection() const;
@@ -48,5 +52,6 @@ private:
 	float side_length_;
 	CubeFace* next_ = nullptr;
 	Cube* cube_ = nullptr;
+	ActorPtr shadow_;
 	ResourceCache brush_cache_;
 };
