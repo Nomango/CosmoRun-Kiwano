@@ -54,6 +54,9 @@
     <ClCompile Include="CustomText.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Buttons.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -90,6 +93,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="CustomText.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Buttons.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
