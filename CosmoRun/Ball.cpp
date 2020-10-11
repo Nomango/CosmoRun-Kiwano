@@ -118,9 +118,9 @@ void Ball::Turn()
 
 void Ball::Die()
 {
-	body_->AddAction(ActionGroup({
-		ActionScaleTo(300_msec, 1.4f, 1.4f),
-		ActionScaleTo(300_msec, 0, 0),
+	body_->StartAnimation(animation::Group({
+		animation::ScaleTo(300_msec, Vec2(1.4f, 1.4f)),
+		animation::ScaleTo(300_msec, Vec2(0, 0)),
 		}));
 
 	StopAllTasks();
@@ -129,9 +129,9 @@ void Ball::Die()
 void Ball::Reborn()
 {
 	body_->SetScale(0, 0);
-	body_->AddAction(ActionGroup({
-		ActionScaleTo(300_msec, 1.3f, 1.3f),
-		ActionScaleTo(300_msec, 1.0f, 1.0f),
+	body_->StartAnimation(animation::Group({
+		animation::ScaleTo(300_msec, Vec2(1.3f, 1.3f)),
+		animation::ScaleTo(300_msec, Vec2(1.0f, 1.0f)),
 		}));
 
 	StartAllTasks();
@@ -289,8 +289,7 @@ void Ball::SpawnParticles1()
 	rect->SetPositionX(pos_radius * math::Cos(pos_angle));
 	rect->SetPositionY(pos_radius * math::Sin(pos_angle));
 	rect->SetAnchor(0.5f, 0.5f);
-	rect->AddAction(ActionFadeOut(dur).RemoveTargetWhenDone());
-	rect->AddAction(ActionRotateBy(1_sec, math::Random(-120.0f, 120.0f)).Loops(-1));
+	rect->StartAnimation(animation::FadeOut(dur).RemoveTargetWhenDone());
 	rect->SetFillBrush(particle_brush_);
 	AddParticle(rect);
 }

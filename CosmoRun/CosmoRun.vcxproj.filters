@@ -16,6 +16,9 @@
     <Filter Include="resource\font">
       <UniqueIdentifier>{1339fbb0-0b98-4645-af26-c52142bacbe5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\lang">
+      <UniqueIdentifier>{0618a37b-ac6d-4f43-b83a-f5931847d102}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -98,6 +101,9 @@
     <ClInclude Include="Buttons.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CosmoRun.rc">
@@ -111,5 +117,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="resource\lang\en.ini">
+      <Filter>resource\lang</Filter>
+    </None>
   </ItemGroup>
 </Project>

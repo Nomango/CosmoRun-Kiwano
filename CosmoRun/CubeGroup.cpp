@@ -117,9 +117,9 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 	return face;
 }
 
-void CubeGroup::RemoveFace(Actor* face)
+void CubeGroup::RemoveFace(CubeFace* face)
 {
-	cube_map_.RemoveCubeFaceInMap((CubeFace*)face);
+	cube_map_.RemoveCubeFaceInMap(face);
 }
 
 CubeFace* CubeGroup::GetTail() const
@@ -134,12 +134,14 @@ void CubeGroup::SetColor(ColorEnum color)
 
 void CubeGroup::RemoveTailFace()
 {
-	auto action = ActionScaleTo(300_msec, 0, 0);
-	action.DoneCallback(Closure(this, &CubeGroup::RemoveFace));
-	tail_->AddAction(action);
+	auto action = animation::ScaleTo(300_msec, Vec2(0, 0));
+	// 动画结束后移除方块面
+	auto handler = AnimationEventHandler::HandleDone([=](Animation*, Actor* face) { this->RemoveFace((CubeFace*)face); });
+	action.Handler(handler);
+	tail_->StartAnimation(action);
 
 	// 处理阴影
-	tail_->GetShadow()->AddAction(ActionScaleTo(300_msec, 0, 0));
+	tail_->GetShadow()->StartAnimation(animation::ScaleTo(300_msec, Vec2(0, 0)));
 
 	tail_ = tail_->GetNext();
 }

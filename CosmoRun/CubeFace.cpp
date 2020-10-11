@@ -51,24 +51,25 @@ bool CubeFace::IsIn(const std::initializer_list<FaceType>& list)
 void CubeFace::SetColor(ColorEnum color)
 {
 	// 淡入淡出式切换颜色
-	auto action = ActionGroup({
-		ActionFadeOut(150_msec).DoneCallback([=](Actor*) { this->ResetBrush(color); }),
-		ActionFadeIn(150_msec)
+	auto switch_bg = AnimationEventHandler::HandleDone([=](Animation*, Actor*) { this->ResetBrush(color); });
+	auto action = animation::Group({
+		animation::FadeOut(150_msec).Handler(switch_bg),
+		animation::FadeIn(150_msec)
 	});
 
-	this->StopAllActions();
-	this->AddAction(action);
+	this->StopAllAnimations();
+	this->StartAnimation(action);
 }
 
 void CubeFace::Show()
 {
 	SetVisible(true);
 	SetOpacity(0);
-	AddAction(ActionFadeIn(500_msec));
+	StartAnimation(animation::FadeIn(500_msec));
 
 	shadow_->SetVisible(true);
 	shadow_->SetOpacity(0);
-	shadow_->AddAction(ActionFadeIn(500_msec));
+	shadow_->StartAnimation(animation::FadeIn(500_msec));
 }
 
 CubeFace* CubeFace::GetNext() const

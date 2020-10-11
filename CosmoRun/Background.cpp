@@ -30,13 +30,13 @@ public:
 		this->SetScale(Vec2(0, 0));
 		this->SetAnchor(0.5f, 0.5f);
 
-		auto action = ActionGroup({
-			ActionRotateTo(dt, angle_end),
-			ActionScaleTo(dt, scale_to, scale_to),
-			ActionFadeOut(dt),
-			ActionMoveBy(dt, Vec2(move_x, move_y)),
+		auto action = animation::Group({
+			animation::RotateTo(dt, angle_end),
+			animation::ScaleTo(dt, Vec2(scale_to, scale_to)),
+			animation::FadeOut(dt),
+			animation::MoveBy(dt, Vec2(move_x, move_y)),
 		}, true).RemoveTargetWhenDone();  // 动画结束时自动移除三角形
-		this->AddAction(action);
+		this->StartAnimation(action);
 	}
 };
 
@@ -81,12 +81,13 @@ void Background::SetColor(ColorEnum color)
 		color_ = color;
 
 		// 淡入淡出式切换背景色
-		auto action = ActionGroup({
-			ActionFadeOut(150_msec).DoneCallback([=](Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); }),
-			ActionFadeIn(150_msec)
+		auto switch_bg = AnimationEventHandler::HandleDone([=](Animation*, Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); });
+		auto action = animation::Group({
+			animation::FadeOut(150_msec).Handler(switch_bg),
+			animation::FadeIn(150_msec)
 		});
-		bg_rect_->StopAllActions();
-		bg_rect_->AddAction(action);
+		bg_rect_->StopAllAnimations();
+		bg_rect_->StartAnimation(action);
 	}
 }
 

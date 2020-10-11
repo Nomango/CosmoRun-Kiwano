@@ -162,6 +162,7 @@
     <ClInclude Include="CubeFace.h" />
     <ClInclude Include="CubeGroup.h" />
     <ClInclude Include="CustomText.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="GameLayer.h" />
     <ClInclude Include="GameOverPanel.h" />
     <ClInclude Include="Lang.h" />
@@ -176,17 +177,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="resource\lang\en.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Kiwano.redist.1.1.74\build\native\Kiwano.redist.targets" Condition="Exists('..\packages\Kiwano.redist.1.1.74\build\native\Kiwano.redist.targets')" />
-    <Import Project="..\packages\Kiwano.1.1.74\build\native\Kiwano.targets" Condition="Exists('..\packages\Kiwano.1.1.74\build\native\Kiwano.targets')" />
+    <Import Project="..\packages\Kiwano.redist.1.1.85\build\native\Kiwano.redist.targets" Condition="Exists('..\packages\Kiwano.redist.1.1.85\build\native\Kiwano.redist.targets')" />
+    <Import Project="..\packages\Kiwano.1.1.85\build\native\Kiwano.targets" Condition="Exists('..\packages\Kiwano.1.1.85\build\native\Kiwano.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Kiwano.redist.1.1.74\build\native\Kiwano.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Kiwano.redist.1.1.74\build\native\Kiwano.redist.targets'))" />
-    <Error Condition="!Exists('..\packages\Kiwano.1.1.74\build\native\Kiwano.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Kiwano.1.1.74\build\native\Kiwano.targets'))" />
+    <Error Condition="!Exists('..\packages\Kiwano.redist.1.1.85\build\native\Kiwano.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Kiwano.redist.1.1.85\build\native\Kiwano.redist.targets'))" />
+    <Error Condition="!Exists('..\packages\Kiwano.1.1.85\build\native\Kiwano.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Kiwano.1.1.85\build\native\Kiwano.targets'))" />
   </Target>
 </Project>

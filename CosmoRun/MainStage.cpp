@@ -8,20 +8,9 @@ public:
 
 	DragListener(Func func) : func_(func), is_dragging_(false)
 	{
-		SetCallback(Closure(this, &DragListener::Handle));
 	}
 
-	bool ShouldHandle(Event* evt) const override
-	{
-		if (evt->IsType<MouseDownEvent>()
-			|| evt->IsType<MouseUpEvent>()
-			|| evt->IsType<MouseMoveEvent>())
-			return true;
-		return false;
-	}
-
-private:
-	void Handle(Event* evt)
+	void Handle(Event* evt) override
 	{
 		if (evt->IsType<MouseDownEvent>())
 		{

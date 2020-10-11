@@ -27,6 +27,12 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	ball_ = new Ball(side_length_ * 0.2f);
 	this->AddChild(ball_);
 
+	// 创建开始按钮
+	play_button_ = new PlayButton(side_length_);
+	play_button_->SetPosition(0, side_length_ * 1.5f);
+	play_button_->SetCallback(Closure(this, &GameLayer::StartGame));
+	this->AddChild(play_button_);
+
 	// 创建游戏结束面板
 	gameover_panel_ = new GameOverPanel(size);
 	gameover_panel_->SetVisible(false);
@@ -52,6 +58,7 @@ void GameLayer::StartGame()
 {
 	KGE_LOG("Game start!");
 	status_ = GameStatus::Running;
+	play_button_->Hide();
 }
 
 void GameLayer::GameOver()
@@ -83,6 +90,7 @@ void GameLayer::Restart()
 	ball_->ResetParticles();
 	cube_group_->SetPosition(Point(0, side_length_ / 2));
 
+	play_button_->Show();
 	gameover_panel_->Hide();
 }
 
@@ -109,14 +117,17 @@ void GameLayer::OnUpdate(Duration dt)
 	if (status_ == GameStatus::Gameover)
 		return;
 
-	if (Input::GetInstance().WasPressed(KeyCode::Space)
-		|| Input::GetInstance().WasPressed(MouseButton::Left))
+	if (status_ == GameStatus::Ready)
 	{
-		if (status_ == GameStatus::Ready)
+		if (Input::GetInstance().WasPressed(KeyCode::Space))
 		{
 			StartGame();
 		}
-		else if (status_ == GameStatus::Running)
+	}
+	else if (status_ == GameStatus::Running)
+	{
+		if (Input::GetInstance().WasPressed(KeyCode::Space)
+			|| Input::GetInstance().WasPressed(MouseButton::Left))
 		{
 			ball_->Turn();
 		}
@@ -127,7 +138,7 @@ void GameLayer::OnUpdate(Duration dt)
 
 	// 沿小球的方向移动
 	Vec2 v_angle = ball_->GetVelocityAngle();
-	Vec2 v = v_angle * MAX_SPEED_PER_SEC * speed_scale_ * dt.Seconds();
+	Vec2 v = v_angle * MAX_SPEED_PER_SEC * speed_scale_ * dt.GetSeconds();
 	Move(v);
 
 	// 判断小球是否出界

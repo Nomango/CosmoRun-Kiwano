@@ -1,5 +1,6 @@
 #pragma once
 #include "Common.h"
+#include "Buttons.h"
 #include "Cube.h"
 #include "Ball.h"
 #include "CubeGroup.h"
@@ -48,6 +49,8 @@ private:
 
 	// Ω· ¯√Ê∞Â
 	GameOverPanelPtr gameover_panel_;
+
+	RefPtr<PlayButton> play_button_;
 
 	BackgroundPtr background_;
 	BallPtr ball_;

@@ -1,9 +1,9 @@
 #include "CustomText.h"
+#include "Font.h"
 
 CustomText::CustomText(const String& text, float size, bool bold)
 {
-	uint32_t weight = bold ? FontWeight::Bold : FontWeight::Normal;
-	FontPtr font = new Font("Gill Sans MT", size, weight, FontPosture::Normal, FontStretch::Condensed);
+	FontPtr font = GillSansFont(size, bold);
 
 	this->SetFillColor(Color::White);
 	this->SetFont(font);

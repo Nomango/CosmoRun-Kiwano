@@ -44,10 +44,10 @@ void GameOverPanel::Show()
 {
 	this->SetOpacity(0);
 	this->SetVisible(true);
-	this->AddAction(ActionFadeIn(500_msec).Delay(600_msec));
+	this->StartAnimation(animation::FadeIn(500_msec).Delay(600_msec));
 }
 
 void GameOverPanel::Hide()
 {
-	this->AddAction(ActionFadeOut(500_msec));
+	this->StartAnimation(animation::FadeOut(500_msec));
 }
