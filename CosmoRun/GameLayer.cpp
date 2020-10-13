@@ -37,6 +37,12 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	gameover_panel_ = new GameOverPanel(size);
 	gameover_panel_->SetVisible(false);
 	this->AddChild(gameover_panel_);
+
+	// 创建重新开始按钮
+	RefPtr<RetryButton> retry_btn = new RetryButton(side_length_);
+	retry_btn->SetCallback(Closure(this, &GameLayer::Restart));
+	retry_btn->SetPosition(0, size.y / 2 * 0.7f);
+	gameover_panel_->AddChild(retry_btn);
 }
 
 void GameLayer::InitGame()

@@ -60,12 +60,6 @@ void MainStage::OnKeyDown(Event* evt)
 {
 	auto key_evt = evt->SafeCast<KeyDownEvent>();
 
-	// 空格键开始游戏
-	if (key_evt->code == KeyCode::R)
-	{
-		game_layer_->Restart();
-	}
-
 	if (key_evt->code == KeyCode::Num1)
 	{
 		game_layer_->SetColor(ColorEnum::Blue);

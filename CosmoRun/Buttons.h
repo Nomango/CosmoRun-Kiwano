@@ -43,3 +43,19 @@ public:
 
 	void DrawButtonText(CanvasRenderContextPtr ctx, Status status) override;
 };
+
+class HexagonButton : public CanvasButton
+{
+public:
+	HexagonButton(float side_length);
+
+	void DrawBackground(CanvasRenderContextPtr ctx, Status status) override;
+};
+
+class RetryButton : public HexagonButton
+{
+public:
+	RetryButton(float side_length);
+
+	void DrawButtonText(CanvasRenderContextPtr ctx, Status status) override;
+};

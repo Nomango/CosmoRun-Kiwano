@@ -118,3 +118,64 @@ void PlayButton::DrawButtonText(CanvasRenderContextPtr ctx, Status status)
 	Point pos((GetSize() - layout->GetSize()) / 2);
 	ctx->DrawTextLayout(layout, pos);
 }
+
+HexagonButton::HexagonButton(float side_length)
+	: CanvasButton(side_length, 1.0f)
+{
+}
+
+void HexagonButton::DrawBackground(CanvasRenderContextPtr ctx, Status status)
+{
+	Color inner_color, outter_color;
+	switch (status)
+	{
+	case Status::Normal:
+		inner_color = Color::Rgb(0, 136, 215);
+		outter_color = Color::Rgb(0, 161, 255);
+		break;
+	case Status::Hover:
+		inner_color = Color::Rgb(0, 146, 225);
+		outter_color = Color::Rgb(0, 181, 255);
+		break;
+	case Status::Pressed:
+		inner_color = Color::Rgb(0, 116, 195);
+		outter_color = Color::Rgb(0, 141, 235);
+		break;
+	}
+
+	float w = GetWidth();
+	float h = GetHeight();
+
+	ShapePtr outter_polygon = Shape::CreatePolygon({
+		Point(0, h / 2),
+		Point(h / 2, 0),
+		Point(w - h / 2, 0),
+		Point(w, h / 2),
+		Point(w - h / 2, h),
+		Point(h / 2, h),
+		});
+	ctx->SetFillColor(outter_color);
+	ctx->FillShape(outter_polygon);
+
+	float gap = h * 0.1f;
+	ShapePtr inner_polygon = Shape::CreatePolygon({
+		Point(gap, h / 2),
+		Point(h / 2, gap),
+		Point(w - h / 2, gap),
+		Point(w - gap, h / 2),
+		Point(w - h / 2, h - gap),
+		Point(h / 2, h - gap),
+		});
+	ctx->SetFillColor(inner_color);
+	ctx->FillShape(inner_polygon);
+}
+
+RetryButton::RetryButton(float side_length)
+	: HexagonButton(side_length)
+{
+	Redraw();
+}
+
+void RetryButton::DrawButtonText(CanvasRenderContextPtr ctx, Status status)
+{
+}
