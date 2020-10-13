@@ -1,10 +1,10 @@
 #pragma once
 #include "Common.h"
 
-class CanvasButton : public Canvas
+class HexagonButton : public PolygonActor
 {
 public:
-	CanvasButton(float side_length, float width);
+	HexagonButton(float side_length, float width);
 
 	void Hide();
 
@@ -20,13 +20,11 @@ protected:
 		Pressed,
 	};
 
-	void Redraw();
-
-	virtual void DrawBackground(CanvasRenderContextPtr ctx, Status status) = 0;
-
-	virtual void DrawButtonText(CanvasRenderContextPtr ctx, Status status) = 0;
+	virtual void OnStatusChanged(Status status) = 0;
 
 	void OnButtonEvent(Button* btn, Button::Event evt);
+
+	Vector<Point> GetHexagonVertices(float width, float side, Point offset);
 
 private:
 	Status status_;
@@ -34,28 +32,27 @@ private:
 	Function<void()> click_;
 };
 
-class PlayButton : public CanvasButton
+class PlayButton : public HexagonButton
 {
 public:
 	PlayButton(float side_length);
 
-	void DrawBackground(CanvasRenderContextPtr ctx, Status status) override;
-
-	void DrawButtonText(CanvasRenderContextPtr ctx, Status status) override;
+	void OnStatusChanged(Status status) override;
 };
 
-class HexagonButton : public CanvasButton
+class SpecialHexButton : public HexagonButton
 {
 public:
-	HexagonButton(float side_length);
+	SpecialHexButton(float side_length);
 
-	void DrawBackground(CanvasRenderContextPtr ctx, Status status) override;
+	void OnStatusChanged(Status status) override;
+
+private:
+	PolygonActorPtr inner_polygon_;
 };
 
-class RetryButton : public HexagonButton
+class TryAgainButton : public SpecialHexButton
 {
 public:
-	RetryButton(float side_length);
-
-	void DrawButtonText(CanvasRenderContextPtr ctx, Status status) override;
+	TryAgainButton(float side_length);
 };

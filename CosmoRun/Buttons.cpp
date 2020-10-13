@@ -1,48 +1,37 @@
 #include "Buttons.h"
+#include "CustomText.h"
 #include "Lang.h"
-#include "Font.h"
 
-CanvasButton::CanvasButton(float side_length, float width)
+HexagonButton::HexagonButton(float side_length, float width)
 	: status_(Status::Normal)
 {
-	Size size(side_length * (1 + width), side_length);
-	ResizeAndClear(size);
-
 	SetAnchor(0.5f, 0.5f);
+	SetSize(Size(side_length * (1 + width), side_length));
 
-	button_ = new Button(Closure(this, &CanvasButton::OnButtonEvent));
+	SetVertices(GetHexagonVertices(width, side_length, GetSize() / 2));
+
+	button_ = new Button(Closure(this, &HexagonButton::OnButtonEvent));
 	AddComponent(button_);
 }
 
-void CanvasButton::Hide()
+void HexagonButton::Hide()
 {
 	StartAnimation(animation::FadeOut(150_msec));
 	button_->SetEnabled(false);
 }
 
-void CanvasButton::Show()
+void HexagonButton::Show()
 {
 	StartAnimation(animation::FadeIn(300_msec));
 	button_->SetEnabled(true);
 }
 
-void CanvasButton::SetCallback(Function<void()> click)
+void HexagonButton::SetCallback(Function<void()> click)
 {
 	click_ = click;
 }
 
-void CanvasButton::Redraw()
-{
-	auto ctx = GetContext2D();
-
-	ctx->BeginDraw();
-	ctx->Clear();
-	DrawBackground(ctx, status_);
-	DrawButtonText(ctx, status_);
-	ctx->EndDraw();
-}
-
-void CanvasButton::OnButtonEvent(Button* btn, Button::Event evt)
+void HexagonButton::OnButtonEvent(Button* btn, Button::Event evt)
 {
 	switch (evt)
 	{
@@ -65,66 +54,70 @@ void CanvasButton::OnButtonEvent(Button* btn, Button::Event evt)
 		}
 		break;
 	}
-	Redraw();
+	OnStatusChanged(status_);
+}
+
+Vector<Point> HexagonButton::GetHexagonVertices(float width, float side, Point offset)
+{
+	float w = side * width;
+	float h = side;
+	Vector<Point> vertices = {
+		Point(-w / 2 - h / 2, 0),
+		Point(-w / 2, -h / 2),
+		Point(w / 2, -h / 2),
+		Point(w / 2 + h / 2, 0),
+		Point(w / 2, h / 2),
+		Point(-w / 2, h / 2),
+	};
+	for (auto& v : vertices)
+		v += offset;
+	return vertices;
 }
 
 PlayButton::PlayButton(float side_length)
-	: CanvasButton(side_length, 2.0f)
+	: HexagonButton(side_length, 2.0f)
 {
-	Redraw();
+	// ÎÄ×Ö
+	CustomTextPtr text = new CustomText(Lang::Get("main", "play"), 48, true);
+	text->SetAnchor(0.5f, 0.5f);
+	text->SetPosition(this->GetSize() / 2);
+	AddChild(text);
 
 	// Ö´ÐÐ¶¯»­
 	auto action = animation::ScaleBy(1_sec, Vec2(0.15f, 0.15f));
 	auto group = animation::Group({ action, action.Reverse() }).Loops(-1);
 	StartAnimation(group);
+
+	OnStatusChanged(Status::Normal);
 }
 
-void PlayButton::DrawBackground(CanvasRenderContextPtr ctx, Status status)
+void PlayButton::OnStatusChanged(Status status)
 {
 	switch (status)
 	{
 	case Status::Normal:
-		ctx->SetFillColor(Color::Rgba(0, 171, 255, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 171, 255, 0.3f));
 		break;
 	case Status::Hover:
-		ctx->SetFillColor(Color::Rgba(0, 141, 225, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 141, 225, 0.3f));
 		break;
 	case Status::Pressed:
-		ctx->SetFillColor(Color::Rgba(0, 80, 175, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 80, 175, 0.3f));
 		break;
 	}
-
-	float w = GetWidth();
-	float h = GetHeight();
-
-	ShapePtr polygon = Shape::CreatePolygon({
-		Point(0, h / 2),
-		Point(h / 2, 0),
-		Point(w - h / 2, 0),
-		Point(w, h / 2),
-		Point(w - h / 2, h),
-		Point(h / 2, h),
-	});
-	ctx->FillShape(polygon);
 }
 
-void PlayButton::DrawButtonText(CanvasRenderContextPtr ctx, Status status)
+SpecialHexButton::SpecialHexButton(float side_length)
+	: HexagonButton(side_length, 1.0f)
 {
-	TextStyle style(GillSansFont(48, true));
-	style.fill_brush = new Brush(Color::White);
+	inner_polygon_ = new PolygonActor;
+	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, side_length * 0.85f, GetSize() / 2));
+	AddChild(inner_polygon_);
 
-	TextLayoutPtr layout = new TextLayout(Lang::Get("main", "play"), style);
-
-	Point pos((GetSize() - layout->GetSize()) / 2);
-	ctx->DrawTextLayout(layout, pos);
+	OnStatusChanged(Status::Normal);
 }
 
-HexagonButton::HexagonButton(float side_length)
-	: CanvasButton(side_length, 1.0f)
-{
-}
-
-void HexagonButton::DrawBackground(CanvasRenderContextPtr ctx, Status status)
+void SpecialHexButton::OnStatusChanged(Status status)
 {
 	Color inner_color, outter_color;
 	switch (status)
@@ -142,40 +135,11 @@ void HexagonButton::DrawBackground(CanvasRenderContextPtr ctx, Status status)
 		outter_color = Color::Rgb(0, 141, 235);
 		break;
 	}
-
-	float w = GetWidth();
-	float h = GetHeight();
-
-	ShapePtr outter_polygon = Shape::CreatePolygon({
-		Point(0, h / 2),
-		Point(h / 2, 0),
-		Point(w - h / 2, 0),
-		Point(w, h / 2),
-		Point(w - h / 2, h),
-		Point(h / 2, h),
-		});
-	ctx->SetFillColor(outter_color);
-	ctx->FillShape(outter_polygon);
-
-	float gap = h * 0.1f;
-	ShapePtr inner_polygon = Shape::CreatePolygon({
-		Point(gap, h / 2),
-		Point(h / 2, gap),
-		Point(w - h / 2, gap),
-		Point(w - gap, h / 2),
-		Point(w - h / 2, h - gap),
-		Point(h / 2, h - gap),
-		});
-	ctx->SetFillColor(inner_color);
-	ctx->FillShape(inner_polygon);
+	inner_polygon_->SetFillColor(inner_color);
+	this->SetFillColor(outter_color);
 }
 
-RetryButton::RetryButton(float side_length)
-	: HexagonButton(side_length)
-{
-	Redraw();
-}
-
-void RetryButton::DrawButtonText(CanvasRenderContextPtr ctx, Status status)
+TryAgainButton::TryAgainButton(float side_length)
+	: SpecialHexButton(side_length)
 {
 }
