@@ -5,14 +5,16 @@ KGE_DECLARE_SMART_PTR(Triangle);
 class Triangle : public PolygonActor
 {
 public:
-	Triangle(float side_length, BrushPtr brush)
+	Triangle(BrushPtr brush)
 	{
+		float unit = Config::Unit();
+
 		// 设置三角形的三个顶点
-		float h = side_length * math::Sin(60.f);
+		float h = unit * math::Sin(60.f);
 		SetVertices({
 			Point(),
-			Point(side_length, 0),
-			Point(side_length * 0.5f, h),
+			Point(unit, 0),
+			Point(unit * 0.5f, h),
 		});
 
 		// 设置填充颜色
@@ -23,8 +25,8 @@ public:
 		float angle_start = math::Random(-180.0f, 180.0f);
 		float angle_end = math::Random(-480.0f, 480.0f);
 		float scale_to = math::Random(1.6f, 2.2f);
-		float move_x = math::Random(-2 * side_length, 2 * side_length);
-		float move_y = math::Random(-2 * side_length, 2 * side_length);
+		float move_x = math::Random(-2 * unit, 2 * unit);
+		float move_y = math::Random(-2 * unit, 2 * unit);
 
 		this->SetRotation(angle_start);
 		this->SetScale(Vec2(0, 0));
@@ -40,8 +42,7 @@ public:
 	}
 };
 
-Background::Background(ColorEnum color, Size size)
-	: color_(color)
+Background::Background(Size size)
 {
 	// 背景色
 	bg_rect_ = new RectActor(size);
@@ -76,19 +77,14 @@ void Background::Resize(Size size)
 
 void Background::SetColor(ColorEnum color)
 {
-	if (color_ != color)
-	{
-		color_ = color;
-
-		// 淡入淡出式切换背景色
-		auto switch_bg = AnimationEventHandler::HandleDone([=](Animation*, Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); });
-		auto action = animation::Group({
-			animation::FadeOut(150_msec).Handler(switch_bg),
-			animation::FadeIn(150_msec)
-		});
-		bg_rect_->StopAllAnimations();
-		bg_rect_->StartAnimation(action);
-	}
+	// 淡入淡出式切换背景色
+	auto switch_bg = AnimationEventHandler::HandleDone([=](Animation*, Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); });
+	auto action = animation::Group({
+		animation::FadeOut(150_msec).Handler(switch_bg),
+		animation::FadeIn(150_msec)
+	});
+	bg_rect_->StopAllAnimations();
+	bg_rect_->StartAnimation(action);
 }
 
 void Background::MoveTriangles(Vec2 trans)
@@ -108,7 +104,8 @@ void Background::ResetTriangles()
 
 BrushPtr Background::GetCurrentBrush()
 {
-	switch (color_)
+	ColorEnum color = Config::Color();
+	switch (color)
 	{
 	case ColorEnum::Blue:
 		return GetBackgroundBrush(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
@@ -162,7 +159,7 @@ void Background::SpawnTriangles(Task* task, Duration dt)
 		triangle_brush_ = new Brush(Color(Color::White, 0.2f));
 	}
 
-	TrianglePtr t = new Triangle(GetWidth() * 0.05f, triangle_brush_);
+	TrianglePtr t = new Triangle(triangle_brush_);
 	// 随机设置三角形的位置
 	t->SetPositionX(GetWidth() * math::Random(0.0f, 1.0f));
 	t->SetPositionY(GetHeight() * math::Random(0.0f, 1.0f));

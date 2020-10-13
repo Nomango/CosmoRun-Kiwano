@@ -1,15 +1,14 @@
 #include "Cube.h"
 
-Cube::Cube(const CubePos& pos, float side_length)
+Cube::Cube(const CubePos& pos)
 	: pos_{ pos }
-	, color_{}
-	, side_length_(side_length)
 {
+	float unit = Config::Unit();
 	// 根据xyz坐标计算方块位置
-	float width = side_length * math::Cos(30.0f);
-	float height = side_length * math::Sin(30.0f);
+	float width = unit * math::Cos(30.0f);
+	float height = unit * math::Sin(30.0f);
 	this->SetPositionX(pos[0] * width - pos[1] * width);
-	this->SetPositionY(pos[0] * height + pos[1] * height - pos[2] * side_length);
+	this->SetPositionY(pos[0] * height + pos[1] * height - pos[2] * unit);
 }
 
 const CubePos& Cube::GetPos() const
@@ -41,9 +40,10 @@ CubeFace* Cube::GetFace(FaceType type) const
 
 CubeFace* Cube::AddFace(FaceDesc desc)
 {
-	CubeFacePtr face = new CubeFace(desc.type, desc.direction, side_length_);
+	ColorEnum color = Config::Color();
+	CubeFacePtr face = new CubeFace(desc.type, desc.direction);
 	face->SetCube(this);
-	face->SetColor(color_);
+	face->SetColor(color);
 
 	this->AddChild(face);
 
@@ -53,14 +53,9 @@ CubeFace* Cube::AddFace(FaceDesc desc)
 
 void Cube::SetColor(ColorEnum color)
 {
-	if (color_ != color)
+	for (auto face : faces_)
 	{
-		color_ = color;
-
-		for (auto face : faces_)
-		{
-			face->SetColor(color);
-		}
+		face->SetColor(color);
 	}
 }
 
@@ -78,9 +73,9 @@ void Cube::RemoveFace(Actor* face)
 	}
 }
 
-CubePtr CubeMap::CreateCube(const CubePos& pos, float side_length)
+CubePtr CubeMap::CreateCube(const CubePos& pos)
 {
-	CubePtr cube = new Cube(pos, side_length);
+	CubePtr cube = new Cube(pos);
 
 	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.insert(std::make_pair(key, cube.Get()));

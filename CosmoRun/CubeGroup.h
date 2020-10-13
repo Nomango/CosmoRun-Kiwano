@@ -7,7 +7,7 @@ class CubeGroup
     : public Actor
 {
 public:
-    CubeGroup(float side_length);
+    CubeGroup();
 
     void InitCubes(int length);
 
@@ -33,7 +33,6 @@ private:
     void DumpCubes();
 
 private:
-    float side_length_;
     CubeFace* tail_;
     CubeMap cube_map_;
     std::list<CubeFace*> hide_faces_;

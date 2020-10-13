@@ -27,6 +27,8 @@ public:
 #endif
 		SetSettings(s);
 
+		Config::SetWindowSize(800, 600);
+
 		// 对象创建失败时抛出
 		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());
 	}

@@ -2,13 +2,16 @@
 #include "Common.h"
 #include "CubeFace.h"
 
+// ·½¿é×ø±ê
+typedef std::array<int, 3> CubePos;
+
 KGE_DECLARE_SMART_PTR(Cube);
 
 class Cube
     : public Actor
 {
 public:
-    Cube(const CubePos& pos, float side_length);
+    Cube(const CubePos& pos);
 
     const CubePos& GetPos() const;
 
@@ -25,8 +28,6 @@ public:
     void RemoveFace(Actor* face);
 
 private:
-    float side_length_;
-    ColorEnum color_;
     CubePos pos_;
     std::vector<CubeFace*> faces_;
 };
@@ -34,7 +35,7 @@ private:
 class CubeMap
 {
 public:
-    CubePtr CreateCube(const CubePos& pos, float side_length);
+    CubePtr CreateCube(const CubePos& pos);
 
     Cube* GetCubeFromMap(const CubePos& pos);
 

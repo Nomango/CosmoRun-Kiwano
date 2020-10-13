@@ -12,7 +12,7 @@ KGE_DECLARE_SMART_PTR(GameLayer);
 class GameLayer : public Actor
 {
 public:
-	GameLayer(ColorEnum color, Size size);
+	GameLayer(Size size);
 
 	void InitGame();
 
@@ -30,10 +30,6 @@ private:
 	void OnUpdate(Duration dt) override;
 
 private:
-	float side_length_;
-	float speed_scale_;
-	ColorEnum color_;
-
 	enum class GameStatus
 	{
 		Ready,
@@ -46,11 +42,13 @@ private:
 	// 计分相关
 	int score_;
 	int best_score_;
+	float speed_scale_;
 
 	// 结束面板
 	GameOverPanelPtr gameover_panel_;
 
 	RefPtr<PlayButton> play_button_;
+	RefPtr<TryAgainButton> try_again_button_;
 
 	BackgroundPtr background_;
 	BallPtr ball_;

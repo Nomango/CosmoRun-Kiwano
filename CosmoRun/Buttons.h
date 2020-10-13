@@ -4,11 +4,15 @@
 class HexagonButton : public PolygonActor
 {
 public:
-	HexagonButton(float side_length, float width);
+	HexagonButton(float width);
 
 	void Hide();
 
 	void Show();
+
+	void Enable();
+
+	void Disable();
 
 	void SetCallback(Function<void()> click);
 
@@ -35,7 +39,7 @@ private:
 class PlayButton : public HexagonButton
 {
 public:
-	PlayButton(float side_length);
+	PlayButton();
 
 	void OnStatusChanged(Status status) override;
 };
@@ -43,7 +47,7 @@ public:
 class SpecialHexButton : public HexagonButton
 {
 public:
-	SpecialHexButton(float side_length);
+	SpecialHexButton();
 
 	void OnStatusChanged(Status status) override;
 
@@ -54,5 +58,5 @@ private:
 class TryAgainButton : public SpecialHexButton
 {
 public:
-	TryAgainButton(float side_length);
+	TryAgainButton();
 };

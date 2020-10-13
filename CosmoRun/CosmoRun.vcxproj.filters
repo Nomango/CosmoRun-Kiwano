@@ -68,9 +68,6 @@
     <ClInclude Include="Background.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="GameLayer.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -102,6 +99,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

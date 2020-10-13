@@ -2,13 +2,15 @@
 #include "CustomText.h"
 #include "Lang.h"
 
-HexagonButton::HexagonButton(float side_length, float width)
+HexagonButton::HexagonButton(float width)
 	: status_(Status::Normal)
 {
-	SetAnchor(0.5f, 0.5f);
-	SetSize(Size(side_length * (1 + width), side_length));
+	float unit = Config::Unit();
 
-	SetVertices(GetHexagonVertices(width, side_length, GetSize() / 2));
+	SetAnchor(0.5f, 0.5f);
+	SetSize(Size(unit * (1 + width), unit));
+
+	SetVertices(GetHexagonVertices(width, unit, GetSize() / 2));
 
 	button_ = new Button(Closure(this, &HexagonButton::OnButtonEvent));
 	AddComponent(button_);
@@ -17,13 +19,23 @@ HexagonButton::HexagonButton(float side_length, float width)
 void HexagonButton::Hide()
 {
 	StartAnimation(animation::FadeOut(150_msec));
-	button_->SetEnabled(false);
+	Disable();
 }
 
 void HexagonButton::Show()
 {
 	StartAnimation(animation::FadeIn(300_msec));
+	Enable();
+}
+
+void HexagonButton::Enable()
+{
 	button_->SetEnabled(true);
+}
+
+void HexagonButton::Disable()
+{
+	button_->SetEnabled(false);
 }
 
 void HexagonButton::SetCallback(Function<void()> click)
@@ -74,8 +86,8 @@ Vector<Point> HexagonButton::GetHexagonVertices(float width, float side, Point o
 	return vertices;
 }
 
-PlayButton::PlayButton(float side_length)
-	: HexagonButton(side_length, 2.0f)
+PlayButton::PlayButton()
+	: HexagonButton(2.0f)
 {
 	// ÎÄ×Ö
 	CustomTextPtr text = new CustomText(Lang::Get("main", "play"), 48, true);
@@ -96,22 +108,24 @@ void PlayButton::OnStatusChanged(Status status)
 	switch (status)
 	{
 	case Status::Normal:
-		this->SetFillColor(Color::Rgba(0, 171, 255, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 171, 255, 0.5f));
 		break;
 	case Status::Hover:
-		this->SetFillColor(Color::Rgba(0, 141, 225, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 141, 225, 0.5f));
 		break;
 	case Status::Pressed:
-		this->SetFillColor(Color::Rgba(0, 80, 175, 0.3f));
+		this->SetFillColor(Color::Rgba(0, 80, 175, 0.5f));
 		break;
 	}
 }
 
-SpecialHexButton::SpecialHexButton(float side_length)
-	: HexagonButton(side_length, 1.0f)
+SpecialHexButton::SpecialHexButton()
+	: HexagonButton(1.0f)
 {
+	float size = GetHeight();
+
 	inner_polygon_ = new PolygonActor;
-	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, side_length * 0.85f, GetSize() / 2));
+	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, size * 0.85f, GetSize() / 2));
 	AddChild(inner_polygon_);
 
 	OnStatusChanged(Status::Normal);
@@ -139,7 +153,7 @@ void SpecialHexButton::OnStatusChanged(Status status)
 	this->SetFillColor(outter_color);
 }
 
-TryAgainButton::TryAgainButton(float side_length)
-	: SpecialHexButton(side_length)
+TryAgainButton::TryAgainButton()
+	: SpecialHexButton()
 {
 }

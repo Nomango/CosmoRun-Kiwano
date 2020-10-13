@@ -6,7 +6,7 @@ KGE_DECLARE_SMART_PTR(Background);
 class Background : public Actor
 {
 public:
-	Background(ColorEnum color, Size size);
+	Background(Size size);
 
 	void Resize(Size size);
 
@@ -26,7 +26,6 @@ private:
 	void SpawnTriangles(Task* task, Duration dt);
 
 private:
-	ColorEnum color_;
 	RectActorPtr bg_rect_;
 	RectActorPtr bg_shadow_;
 	ActorPtr dynamic_layer_;

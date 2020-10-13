@@ -3,9 +3,8 @@
 #define HIDE_CUBE_NUMBER	9		// 隐藏的方块数量
 #define PREPARE_CUBE_NUMBER	3		// 让玩家适应游戏速度的初始方块数量
 
-CubeGroup::CubeGroup(float side_length)
-	: side_length_(side_length)
-	, tail_(nullptr)
+CubeGroup::CubeGroup()
+	: tail_(nullptr)
 {
 }
 
@@ -86,7 +85,7 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 	CubePtr cube = cube_map_.GetCubeFromMap(pos);
 	if (!cube)
 	{
-		cube = cube_map_.CreateCube(pos, side_length_);
+		cube = cube_map_.CreateCube(pos);
 		this->AddChild(cube);
 	}
 

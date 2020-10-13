@@ -4,32 +4,32 @@
 #define MAX_SPEED_PER_SEC	220.0f	// 最大速度（每秒)
 #define MAX_SPEED_SCORE		300		// 得分300分时游戏速度达到最大
 
-GameLayer::GameLayer(ColorEnum color, Size size)
-	: color_(color)
-	, speed_scale_(0.0f)
+GameLayer::GameLayer(Size size)
+	: speed_scale_(0.0f)
 	, score_(0)
 	, best_score_(0)
 	, status_(GameStatus::Ready)
 {
 	SetPosition(size / 2);
-	side_length_ = size.x * 0.08f;
+
+	float unit = Config::Unit();
 
 	// 创建背景
-	background_ = new Background(color_, size);
+	background_ = new Background(size);
 	AddChild(background_);
 
 	// 创建方块层
-	cube_group_ = new CubeGroup(side_length_);
-	cube_group_->SetPosition(0, side_length_ / 2);
+	cube_group_ = new CubeGroup;
+	cube_group_->SetPosition(0, unit / 2);
 	this->AddChild(cube_group_);
 
 	// 创建小球
-	ball_ = new Ball(side_length_ * 0.2f);
+	ball_ = new Ball(unit * 0.2f);
 	this->AddChild(ball_);
 
 	// 创建开始按钮
-	play_button_ = new PlayButton(side_length_);
-	play_button_->SetPosition(0, side_length_ * 1.5f);
+	play_button_ = new PlayButton;
+	play_button_->SetPosition(0, unit * 1.5f);
 	play_button_->SetCallback(Closure(this, &GameLayer::StartGame));
 	this->AddChild(play_button_);
 
@@ -39,10 +39,11 @@ GameLayer::GameLayer(ColorEnum color, Size size)
 	this->AddChild(gameover_panel_);
 
 	// 创建重新开始按钮
-	RefPtr<TryAgainButton> try_again_btn = new TryAgainButton(side_length_);
-	try_again_btn->SetCallback(Closure(this, &GameLayer::Restart));
-	try_again_btn->SetPosition(0, size.y / 2 * 0.7f);
-	gameover_panel_->AddChild(try_again_btn);
+	try_again_button_ = new TryAgainButton;
+	try_again_button_->SetCallback(Closure(this, &GameLayer::Restart));
+	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
+	try_again_button_->Disable();
+	gameover_panel_->AddChild(try_again_button_);
 }
 
 void GameLayer::InitGame()
@@ -84,6 +85,7 @@ void GameLayer::GameOver()
 
 	ball_->Die();
 	gameover_panel_->Show();
+	try_again_button_->Enable();
 }
 
 void GameLayer::Restart()
@@ -91,24 +93,21 @@ void GameLayer::Restart()
 	KGE_LOG("Game restart!");
 	InitGame();
 
+	float unit = Config::Unit();
 	// 用一个动画回到初始位置
 	background_->ResetTriangles();
 	ball_->ResetParticles();
-	cube_group_->SetPosition(Point(0, side_length_ / 2));
+	cube_group_->SetPosition(Point(0, unit / 2));
 
 	play_button_->Show();
 	gameover_panel_->Hide();
+	try_again_button_->Disable();
 }
 
 void GameLayer::SetColor(ColorEnum color)
 {
-	if (color_ != color)
-	{
-		color_ = color;
-
-		cube_group_->SetColor(color);
-		background_->SetColor(color);
-	}
+	cube_group_->SetColor(color);
+	background_->SetColor(color);
 }
 
 void GameLayer::Move(Vec2 trans)
