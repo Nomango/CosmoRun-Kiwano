@@ -30,9 +30,6 @@
     <ClCompile Include="Background.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="GameLayer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="CubeFace.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -66,9 +63,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Background.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="GameLayer.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="CubeFace.h">
@@ -116,9 +110,9 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="resource\lang\en.ini">
       <Filter>resource\lang</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
