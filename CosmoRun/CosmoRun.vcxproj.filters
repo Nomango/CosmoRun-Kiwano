@@ -92,9 +92,6 @@
     <ClInclude Include="Buttons.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="Common.h">
       <Filter>include</Filter>
     </ClInclude>

@@ -1,37 +1,42 @@
 #include "Lang.h"
 
-String Lang::GetText(const String& key1, const String& key2)
+namespace
 {
-	String key = key1 + "-" + key2;
-	if (!text_map_.count(key))
-	{
+	Lang::Type global_current_lang = Lang::Type::EN;
+	ConfigIni global_lang_ini;
+}
+
+String Lang::Get(const String& section, const String& key)
+{
+	if (!global_lang_ini.HasKey(section, key))
 		throw RuntimeError("Language key \"" + key + "\" not found!");
+	return global_lang_ini.GetString(section, key);
+}
+
+void Lang::Switch(Type type)
+{
+	String lang_file;
+	switch (type)
+	{
+	case Lang::Type::EN:
+		lang_file = "en";
+		break;
+	case Lang::Type::CN:
+		lang_file = "zh-cn";
+		break;
 	}
-	return text_map_.at(key);
-}
-
-void Lang::SetText(const String& key1, const String& key2, const String& text)
-{
-	String key = key1 + "-" + key2;
-	text_map_.insert(std::make_pair(key, text));
-}
-
-void Lang::Switch(const String& lang)
-{
-	String lang_file = "lang/" + lang + ".ini";
+	lang_file = "lang/" + lang_file + ".ini";
 	String fullpath = FileSystem::GetInstance().GetFullPathForFile(lang_file);
 	if (fullpath.empty())
 		throw RuntimeError("Language configuration not found!");
 
-	ConfigIni ini;
-	if (ini.Load(fullpath))
-	{
-		for (auto section : ini.GetSectionMap())
-		{
-			for (auto kv : section.second)
-			{
-				SetText(section.first, kv.first, kv.second);
-			}
-		}
-	}
+	if (!global_lang_ini.Load(fullpath))
+		throw RuntimeError("Language configuration load failed!");
+
+	global_current_lang = type;
+}
+
+Lang::Type Lang::Current()
+{
+	return global_current_lang;
 }

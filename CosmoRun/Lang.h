@@ -1,22 +1,18 @@
 #pragma once
 #include "Common.h"
 
-class Lang : public Singleton<Lang>
+class Lang
 {
-	friend Singleton<Lang>;
-
 public:
-	static inline String Get(const String& key1, const String& key2)
+	enum class Type
 	{
-		return Lang::GetInstance().GetText(key1, key2);
-	}
+		EN,
+		CN,
+	};
 
-	String GetText(const String& key1, const String& key2);
+	static String Get(const String& section, const String& key);
 
-	void SetText(const String& key1, const String& key2, const String& text);
+	static void Switch(Type type);
 
-	void Switch(const String& lang);
-
-private:
-	Map<String, String> text_map_;
+	static Type Current();
 };

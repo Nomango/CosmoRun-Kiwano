@@ -11,12 +11,12 @@ public:
 	{
 		Settings s;
 		s.window.title = "CosmoRun";
-		s.window.width = 800;
-		s.window.height = 600;
-		s.window.resizable = true;
+		s.window.width = 1000;
+		s.window.height = 800;
+		s.window.resizable = false;
 
 #ifdef KGE_DEBUG
-		//s.debug_mode = true;
+		s.debug_mode = true;
 
 		// 输出日志到文件
 		auto provider = new FileLogProvider("log.txt", std::ios_base::app);
@@ -27,7 +27,7 @@ public:
 #endif
 		SetSettings(s);
 
-		Config::SetWindowSize(800, 600);
+		Config::SetWindowSize(s.window.width, s.window.height);
 
 		// 对象创建失败时抛出
 		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());
@@ -49,7 +49,7 @@ public:
 		Font::Preload(Resource(IDR_FONT1, "TTF"));
 
 		// 加载多语言配置
-		Lang::GetInstance().Switch("en");
+		Lang::Switch(Lang::Type::EN);
 	}
 };
 

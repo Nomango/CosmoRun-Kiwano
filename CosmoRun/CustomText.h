@@ -10,6 +10,8 @@ public:
 
 	void SetText(const String& text);
 
+	FontPtr GetFont(float size, bool bold) const;
+
 private:
 	TextActorPtr shadow_;
 };
