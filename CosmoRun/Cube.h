@@ -7,8 +7,7 @@ typedef std::array<int, 3> CubePos;
 
 KGE_DECLARE_SMART_PTR(Cube);
 
-class Cube
-    : public Actor
+class Cube : public Actor , public SizeSensor
 {
 public:
     Cube(const CubePos& pos);
@@ -24,6 +23,8 @@ public:
     CubeFace* AddFace(FaceDesc desc, BrushCreator* brush_creator);
 
     void RemoveFace(Actor* face);
+
+    void OnUnitChanged(float unit) override;
 
 private:
     CubePos pos_;

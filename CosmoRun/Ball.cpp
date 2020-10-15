@@ -1,30 +1,12 @@
 #include "Ball.h"
 
-Ball::Ball(float radius)
-	: radius_(radius)
+Ball::Ball()
+	: radius_(0)
 	, direction_(Direction::Up)
-	, particle_type_(1)
+	, particle_type_(0)
 {
-	CircleActorPtr ball1 = new CircleActor(radius);
-	ball1->SetAnchor(0.5f, 0.5f);
-
-	RadialGradientStyle style;
-	style.center = Point(radius, radius);
-	style.radius = style.center;
-	style.stops = { { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } };
-	BrushPtr ball1_brush = new Brush(style);
-	ball1->SetFillBrush(ball1_brush);
-
-	CircleActorPtr ball2 = new CircleActor(radius * 0.7f);
-	ball2->SetFillColor(Color::Rgba(Color::White, 1.0f));
-	ball2->SetAnchor(0.5f, 0.5f);
-
 	body_ = new Actor();
-	body_->AddChild(ball1);
-	body_->AddChild(ball2);
-
 	this->AddChild(body_, 1);
-	this->SetSize(Size(radius * 2, radius * 2));
 
 	particles_ = new Actor();
 	this->AddChild(particles_);
@@ -34,6 +16,10 @@ Ball::Ball(float radius)
 	// 生成动态小方块粒子
 	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 100_msec);
 	AddTask(task);
+
+	RandomParticleType();
+
+	OnUnitChanged(Config::Unit());
 }
 
 float Ball::GetRadius() const
@@ -61,6 +47,30 @@ bool Ball::IsSafe() const
 {
 	auto center = GetStage()->GetSize() / 2;
 	return where_->ContainsPoint(center);
+}
+
+void Ball::SetRadius(float radius)
+{
+	radius_ = radius;
+
+	CircleActorPtr ball1 = new CircleActor(radius);
+	ball1->SetAnchor(0.5f, 0.5f);
+
+	RadialGradientStyle style;
+	style.center = Point(radius, radius);
+	style.radius = style.center;
+	style.stops = { { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } };
+	BrushPtr ball1_brush = new Brush(style);
+	ball1->SetFillBrush(ball1_brush);
+
+	CircleActorPtr ball2 = new CircleActor(radius * 0.7f);
+	ball2->SetFillColor(Color::Rgba(Color::White, 1.0f));
+	ball2->SetAnchor(0.5f, 0.5f);
+
+	body_->RemoveAllChildren();
+	body_->AddChild(ball1);
+	body_->AddChild(ball2);
+	this->SetSize(Size(radius * 2, radius * 2));
 }
 
 void Ball::SetOn(CubeFace* face)
@@ -135,6 +145,8 @@ void Ball::Reborn()
 		}));
 
 	StartAllTasks();
+
+	RandomParticleType();
 }
 
 void Ball::MoveParticles(Vec2 trans)
@@ -146,6 +158,11 @@ void Ball::ResetParticles()
 {
 	particles_->MoveTo(Point(0, 0));
 	Reborn();
+}
+
+void Ball::OnUnitChanged(float unit)
+{
+	SetRadius(unit * 0.2f);
 }
 
 bool Ball::IsDirectionSame(FaceDesc curr, FaceDesc next) const
@@ -267,35 +284,52 @@ Direction Ball::GetNextDirection(FaceDesc curr, FaceDesc next) const
 	return Direction{};
 }
 
+void Ball::RandomParticleType()
+{
+	particle_type_ = math::Random(1, 2);
+}
+
 void Ball::SpawnParticles(Task* task, Duration dt)
 {
+	ActorPtr particle;
 	switch (particle_type_)
 	{
 	case 1:
-		SpawnParticles1();
-	default:
+	{
+		float side = math::Random(radius_ * 0.4f, radius_ * 0.7f);
+		CircleActorPtr circle = new CircleActor(side);
+		circle->SetAnchor(0.5f, 0.5f);
+		circle->SetFillBrush(particle_brush_);
+		particle = circle;
 		break;
 	}
-}
-
-void Ball::SpawnParticles1()
-{
-	float side = math::Random(radius_ * 0.7f, radius_ * 1.3f);
-	float pos_radius = math::Random(0.0f, radius_ * 0.5f);
-	float pos_angle = math::Random(0.0f, 360.0f);
-	Duration dur = math::Random(1000, 1500);
-
-	RectActorPtr rect = new RectActor(Size(side, side));
-	rect->SetPositionX(pos_radius * math::Cos(pos_angle));
-	rect->SetPositionY(pos_radius * math::Sin(pos_angle));
-	rect->SetAnchor(0.5f, 0.5f);
-	rect->StartAnimation(animation::FadeOut(dur).RemoveTargetWhenDone());
-	rect->SetFillBrush(particle_brush_);
-	AddParticle(rect);
+	case 2:
+	{
+		float side = math::Random(radius_ * 0.7f, radius_ * 1.3f);
+		RectActorPtr rect = new RectActor(Size(side, side));
+		rect->SetAnchor(0.5f, 0.5f);
+		rect->SetFillBrush(particle_brush_);
+		particle = rect;
+		break;
+	}
+	}
+	AddParticle(particle);
 }
 
 void Ball::AddParticle(ActorPtr particle)
 {
+	// 粒子动画
+	float pos_radius = math::Random(0.0f, radius_ * 0.5f);
+	float pos_angle = math::Random(0.0f, 360.0f);
+	Duration dur = 1500_msec;
+
+	particle->SetPositionX(pos_radius * math::Cos(pos_angle));
+	particle->SetPositionY(pos_radius * math::Sin(pos_angle));
+	particle->SetRotation(math::Random(0.0f, 360.f));
+	particle->StartAnimation(animation::FadeOut(dur).RemoveTargetWhenDone());
+	particle->StartAnimation(animation::RotateBy(dur, math::Random(30.0f, 60.0f) * math::Sign(math::Random(-1.0f, 1.0f))));
+	particle->StartAnimation(animation::ScaleTo(dur, Vec2(0.3f, 0.3f)));
+
 	particle->MoveBy(-particles_->GetPosition());
 	particles_->AddChild(particle);
 }

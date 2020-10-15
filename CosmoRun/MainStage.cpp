@@ -13,55 +13,54 @@ MainStage::MainStage()
 	float unit = Config::Unit();
 	Size size = GetSize();
 
-	ActorPtr wrapper = new Actor;
-	wrapper->SetPosition(size / 2);
-	this->AddChild(wrapper);
+	wrapper_ = new Actor;
+	this->AddChild(wrapper_);
 
 	// 创建背景
 	background_ = new Background(size);
-	wrapper->AddChild(background_);
+	wrapper_->AddChild(background_);
 
 	// 创建方块层
 	cube_group_ = new CubeGroup;
-	cube_group_->SetPosition(0, unit / 2);
-	wrapper->AddChild(cube_group_);
+	wrapper_->AddChild(cube_group_);
 
 	// 创建小球
-	ball_ = new Ball(unit * 0.2f);
-	wrapper->AddChild(ball_);
+	ball_ = new Ball;
+	wrapper_->AddChild(ball_);
 
 	// 创建开始按钮
 	play_button_ = new PlayButton;
-	play_button_->SetPosition(0, size.y / 2 - unit * 2);
 	play_button_->SetCallback(Closure(this, &MainStage::StartGame));
-	wrapper->AddChild(play_button_);
+	wrapper_->AddChild(play_button_);
 
 	// 创建游戏结束面板
 	gameover_panel_ = new GameOverPanel(size);
 	gameover_panel_->SetVisible(false);
-	wrapper->AddChild(gameover_panel_);
+	wrapper_->AddChild(gameover_panel_);
 
 	// 创建重新开始按钮
 	try_again_button_ = new TryAgainButton;
 	try_again_button_->SetCallback(Closure(this, &MainStage::Restart));
-	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
 	try_again_button_->Disable();
 	gameover_panel_->AddChild(try_again_button_);
 
 	// 初始化游戏
 	InitGame();
 
+	// 重置元素位置
+	Resize(size);
+
 	// 窗口大小变化监听
-	AddListener<WindowResizedEvent>([](Event* evt) {
+	AddListener<WindowResizedEvent>([=](Event* evt) {
 		auto win_evt = evt->Cast<WindowResizedEvent>();
-		Config::SetWindowSize(win_evt->width, win_evt->height);
+		this->Resize(Size(float(win_evt->width), float(win_evt->height)));
 	});
 
 	// 每隔15秒改变一次颜色
 	AddTask([=](Task*, Duration) { this->SetColor(Config::RandomColor()); }, 15_sec, -1);
 
 #ifdef KGE_DEBUG
-	// 下面时调试时使用的一些工具
+	// 下面是调试时使用的一些工具
 
 	// 按键监听
 	AddListener<KeyDownEvent>(Closure(this, &MainStage::OnKeyDown));
@@ -148,6 +147,22 @@ void MainStage::SetColor(ColorEnum color)
 	Config::Color(color);
 	cube_group_->SetColor(color);
 	background_->SetColor(color);
+}
+
+void MainStage::Resize(Size size)
+{
+	Config::SetWindowSize(size);
+	this->SetSize(size);
+
+	float unit = Config::Unit();
+
+	background_->Resize(size);
+	gameover_panel_->Resize(size);
+
+	wrapper_->SetPosition(size / 2);
+	cube_group_->SetPosition(0, unit / 2);
+	play_button_->SetPosition(0, size.y / 2 - unit * 2);
+	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
 }
 
 void MainStage::OnKeyDown(Event* evt)

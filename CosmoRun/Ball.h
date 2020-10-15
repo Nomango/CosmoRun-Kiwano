@@ -4,10 +4,10 @@
 
 KGE_DECLARE_SMART_PTR(Ball);
 
-class Ball : public Actor
+class Ball : public Actor, public SizeSensor
 {
 public:
-	Ball(float radius);
+	Ball();
 
 	float GetRadius() const;
 
@@ -18,6 +18,8 @@ public:
 	CubeFace* GetOn() const;
 
 	bool IsSafe() const;
+
+	void SetRadius(float radius);
 
 	void SetOn(CubeFace* face);
 
@@ -35,14 +37,16 @@ public:
 
 	void ResetParticles();
 
+	void OnUnitChanged(float unit) override;
+
 private:
 	bool IsDirectionSame(FaceDesc curr, FaceDesc next) const;
 
 	Direction GetNextDirection(FaceDesc curr, FaceDesc next) const;
 
-	void SpawnParticles(Task* task, Duration dt);
+	void RandomParticleType();
 
-	void SpawnParticles1();
+	void SpawnParticles(Task* task, Duration dt);
 
 	void AddParticle(ActorPtr particle);
 

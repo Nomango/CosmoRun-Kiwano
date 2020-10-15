@@ -99,7 +99,6 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 
 	// 添加方块面的阴影
 	ActorPtr shadow = face->GetShadow();
-	shadow->SetPosition(face->GetPosition() + cube->GetPosition());
 	this->AddChild(shadow, -1);
 
 	if (!hide_faces_.empty())

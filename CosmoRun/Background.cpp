@@ -61,13 +61,13 @@ Background::Background(Size size)
 	TaskPtr task = new Task(Closure(this, &Background::SpawnTriangles), 130_msec);
 	AddTask(task);
 
-	SetPosition(-size / 2);
 	Resize(size);
 }
 
 void Background::Resize(Size size)
 {
 	SetSize(size);
+	SetPosition(-size / 2);
 
 	// 重置当前画刷样式
 	current_style_ = GetBrushStyle(Config::Color());

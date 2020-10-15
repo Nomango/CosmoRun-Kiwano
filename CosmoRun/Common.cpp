@@ -50,9 +50,12 @@ float Config::NormalizeUnit()
 	return global_unit_length / 64;
 }
 
-void Config::SetWindowSize(uint32_t width, uint32_t height)
+void Config::SetWindowSize(Size size)
 {
-	global_unit_length = float(width) * 0.08f;
+	global_unit_length = std::min(std::max(size.x * 0.08f, 60.0f), 120.0f);
+	KGE_NOTICE("Unit length changed to ", global_unit_length);
+
+	SizeSensor::Notify(global_unit_length);
 }
 
 ColorEnum Config::Color()
@@ -70,4 +73,24 @@ ColorEnum Config::RandomColor()
 	if (global_color == ColorEnum(-1))
 		return ColorEnum(math::Random(0, 2));
 	return ColorEnum((int(global_color) + math::Random(1, 2)) % 3);
+}
+
+Set<SizeSensor*> SizeSensor::sensors_;
+
+SizeSensor::SizeSensor()
+{
+	sensors_.insert(this);
+}
+
+SizeSensor::~SizeSensor()
+{
+	sensors_.erase(this);
+}
+
+void SizeSensor::Notify(float unit)
+{
+	for (auto sensor : sensors_)
+	{
+		sensor->OnUnitChanged(unit);
+	}
 }

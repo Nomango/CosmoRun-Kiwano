@@ -13,7 +13,7 @@ public:
 		s.window.title = "CosmoRun";
 		s.window.width = 800;
 		s.window.height = 600;
-		s.window.resizable = false;
+		s.window.resizable = true;
 
 #ifdef KGE_DEBUG
 		s.debug_mode = true;
@@ -28,7 +28,7 @@ public:
 		SetSettings(s);
 
 		Config::Color(Config::RandomColor());
-		Config::SetWindowSize(s.window.width, s.window.height);
+		Config::SetWindowSize(Size(s.window.width, s.window.height));
 
 		// 对象创建失败时抛出
 		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());
@@ -38,6 +38,9 @@ public:
 	{
 		// 加载资源
 		LoadResources();
+
+		// 设置窗口最小大小
+		GetWindow()->SetMinimumSize(600, 400);
 
 		MainStagePtr stage = new MainStage;
 		Director::GetInstance().EnterStage(stage);

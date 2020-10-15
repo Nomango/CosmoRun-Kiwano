@@ -3,12 +3,7 @@
 Cube::Cube(const CubePos& pos)
 	: pos_{ pos }
 {
-	float unit = Config::Unit();
-	// 根据xyz坐标计算方块位置
-	float width = unit * math::Cos(30.0f);
-	float height = unit * math::Sin(30.0f);
-	this->SetPositionX(pos[0] * width - pos[1] * width);
-	this->SetPositionY(pos[0] * height + pos[1] * height - pos[2] * unit);
+	OnUnitChanged(Config::Unit());
 }
 
 const CubePos& Cube::GetPos() const
@@ -41,8 +36,7 @@ CubeFace* Cube::GetFace(FaceType type) const
 CubeFace* Cube::AddFace(FaceDesc desc, BrushCreator* brush_creator)
 {
 	ColorEnum color = Config::Color();
-	CubeFacePtr face = new CubeFace(desc.type, desc.direction, brush_creator);
-	face->SetCube(this);
+	CubeFacePtr face = new CubeFace(this, desc.type, desc.direction, brush_creator);
 
 	this->AddChild(face);
 
@@ -61,6 +55,20 @@ void Cube::RemoveFace(Actor* face)
 		}
 		else
 			++iter;
+	}
+}
+
+void Cube::OnUnitChanged(float unit)
+{
+	// 根据xyz坐标计算方块位置
+	float width = unit * math::Cos(30.0f);
+	float height = unit * math::Sin(30.0f);
+	this->SetPositionX(pos_[0] * width - pos_[1] * width);
+	this->SetPositionY(pos_[0] * height + pos_[1] * height - pos_[2] * unit);
+
+	for (auto face : faces_)
+	{
+		face->Recreate(unit);
 	}
 }
 

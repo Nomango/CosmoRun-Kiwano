@@ -3,28 +3,28 @@
 
 GameOverPanel::GameOverPanel(Size size)
 {
-	FontPtr font = new Font("Gill Sans MT", 83, FontWeight::Bold);
-
 	// 创建背景
-	RectActorPtr bg = new RectActor(size);
-	bg->SetAnchor(0.5f, 0.5f);
-	bg->SetFillColor(Color::Rgba(40, 40, 40, 0.6f));
-	this->AddChild(bg);
+	bg_ = new RectActor(size);
+	bg_->SetAnchor(0.5f, 0.5f);
+	bg_->SetFillColor(Color::Rgba(40, 40, 40, 0.6f));
+	this->AddChild(bg_);
 
 	// 创建游戏结束标题文字
-	TextActorPtr title = new CustomText(Lang::Get("gameover", "title"), 60, false);
-	title->MoveBy(0, -size.y / 2 * 0.7f);
-	this->AddChild(title);
+	title_ = new CustomText(Lang::Get("gameover", "title"), 60, false);
+	title_->MoveBy(0, -size.y / 2 * 0.7f);
+	this->AddChild(title_);
 
 	// 创建得分文字
 	score_ = new CustomText(" ", 60, false);
-	score_->MoveTo(0, title->GetPositionY() + title->GetHeight());
+	score_->MoveTo(0, title_->GetPositionY() + title_->GetHeight());
 	this->AddChild(score_);
 
 	// 创建最高分文字
 	best_score_ = new CustomText(" ", 48, false);
 	best_score_->MoveTo(0, score_->GetPositionY() + score_->GetHeight());
 	this->AddChild(best_score_);
+
+	Resize(size);
 }
 
 void GameOverPanel::SetScore(int score, int best_score, bool is_best)
@@ -50,4 +50,12 @@ void GameOverPanel::Show()
 void GameOverPanel::Hide()
 {
 	this->StartAnimation(animation::FadeOut(500_msec));
+}
+
+void GameOverPanel::Resize(Size size)
+{
+	bg_->SetRectSize(size);
+	title_->MoveTo(0, -size.y / 2 * 0.7f);
+	score_->MoveTo(0, title_->GetPositionY() + title_->GetHeight());
+	best_score_->MoveTo(0, score_->GetPositionY() + score_->GetHeight());
 }

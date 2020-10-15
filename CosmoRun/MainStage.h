@@ -26,6 +26,8 @@ public:
 
 	void SetColor(ColorEnum color);
 
+	void Resize(Size size);
+
 	void OnKeyDown(Event* evt);
 
 	void OnUpdate(Duration dt) override;
@@ -44,6 +46,8 @@ private:
 	int score_;
 	int best_score_;
 	float speed_scale_;
+
+	ActorPtr wrapper_;
 
 	// Ω· ¯√Ê∞Â
 	GameOverPanelPtr gameover_panel_;

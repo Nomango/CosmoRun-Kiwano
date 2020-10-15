@@ -75,11 +75,27 @@ struct Config
 
 	static float NormalizeUnit();
 
-	static void SetWindowSize(uint32_t width, uint32_t height);
+	static void SetWindowSize(Size size);
 
 	static ColorEnum Color();
 
 	static void Color(ColorEnum color);
 
 	static ColorEnum RandomColor();
+};
+
+// 窗口大小变化接收器
+class SizeSensor
+{
+public:
+	SizeSensor();
+
+	virtual ~SizeSensor();
+
+	virtual void OnUnitChanged(float unit) = 0;
+
+	static void Notify(float unit);
+
+private:
+	static Set<SizeSensor*> sensors_;
 };

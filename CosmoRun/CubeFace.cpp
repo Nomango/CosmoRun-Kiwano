@@ -1,21 +1,18 @@
 #include "CubeFace.h"
 #include "Cube.h"
 
-CubeFace::CubeFace(FaceType type, Direction d, BrushCreator* brush_creator)
-	: desc_{ type, d }
+CubeFace::CubeFace(Cube* cube, FaceType type, Direction d, BrushCreator* brush_creator)
+	: cube_(cube)
+	, desc_{ type, d }
 	, brush_creator_(brush_creator)
 {
-	CreateVertices();
-
 	BrushPtr fill = brush_creator_->GetFillBrush(desc_);
 	BrushPtr stroke = brush_creator_->GetStrokeBrush(desc_.type);
 
 	this->SetFillBrush(fill);
 	this->SetStrokeBrush(stroke);
 
-	float unit = Config::Unit();
-	float stroke_width = unit / 50;
-	this->SetStrokeStyle(new StrokeStyle(stroke_width));
+	Recreate(Config::Unit());
 }
 
 CubeFace::~CubeFace()
@@ -84,9 +81,15 @@ Cube* CubeFace::GetCube() const
 	return cube_;
 }
 
-void CubeFace::SetCube(Cube* cube)
+void CubeFace::Recreate(float unit)
 {
-	cube_ = cube;
+	CreateVertices();
+	CreateShadow();
+
+	float stroke_width = unit / 50;
+	this->SetStrokeStyle(new StrokeStyle(stroke_width));
+
+	shadow_->SetPosition(this->GetPosition() + cube_->GetPosition());
 }
 
 void CubeFace::CreateVertices()
@@ -129,18 +132,29 @@ void CubeFace::CreateVertices()
 	}
 	this->SetVertices(vertices);
 	this->SetAnchor(0.5f, 0.5f);
+}
+
+void CubeFace::CreateShadow()
+{
+	float unit = Config::Unit();
+	// 根据面类型生成顶点
+	float width = unit * math::Cos(30.0f);
+	float height = unit * math::Sin(30.0f);
 
 	// 创建阴影
-	PolygonActorPtr shadow = new PolygonActor;
-	shadow->SetAnchor(0.5f, 0.5f);
-	shadow->SetFillColor(Color::Black);
-	shadow->SetVisible(false);
+	if (!shadow_)
+	{
+		shadow_ = new PolygonActor;
+		shadow_->SetAnchor(0.5f, 0.5f);
+		shadow_->SetFillColor(Color::Black);
+		shadow_->SetVisible(false);
+	}
 
-	float shadow_offset = 5;
+	float shadow_offset = 5 * Config::NormalizeUnit();
 	switch (desc_.type)
 	{
 	case FaceType::Top:
-		shadow->SetVertices({
+		shadow_->SetVertices({
 			Point(width, 0),
 			Point(width * 2, height),
 			Point(width * 2, height + shadow_offset),
@@ -153,7 +167,7 @@ void CubeFace::CreateVertices()
 	{
 		float offset_x = shadow_offset * math::Cos(30.0f);
 		float offset_y = shadow_offset * math::Sin(30.0f);
-		shadow->SetVertices({
+		shadow_->SetVertices({
 			Point(0, 0),
 			Point(offset_x, -offset_y),
 			Point(width + offset_x, height - offset_y),
@@ -167,7 +181,7 @@ void CubeFace::CreateVertices()
 	{
 		float offset_x = shadow_offset * math::Cos(30.0f);
 		float offset_y = shadow_offset * math::Sin(30.0f);
-		shadow->SetVertices({
+		shadow_->SetVertices({
 			Point(width, 0),
 			Point(width, height * 2),
 			Point(0, height * 3),
@@ -178,6 +192,5 @@ void CubeFace::CreateVertices()
 		break;
 	}
 	}
-	shadow->SetSize(this->GetSize());
-	this->shadow_ = shadow;
+	shadow_->SetSize(this->GetSize());
 }

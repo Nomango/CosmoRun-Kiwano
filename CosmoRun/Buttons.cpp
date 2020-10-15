@@ -1,16 +1,11 @@
 #include "Buttons.h"
-#include "CustomText.h"
 #include "Lang.h"
 
 HexagonButton::HexagonButton(float width)
 	: status_(Status::Normal)
+	, width_(width)
 {
-	float unit = Config::Unit();
-
 	SetAnchor(0.5f, 0.5f);
-	SetSize(Size(unit * (1 + width), unit));
-
-	SetVertices(GetHexagonVertices(width, unit, GetSize() / 2));
 
 	button_ = new Button(Closure(this, &HexagonButton::OnButtonEvent));
 	AddComponent(button_);
@@ -41,6 +36,12 @@ void HexagonButton::Disable()
 void HexagonButton::SetCallback(Function<void()> click)
 {
 	click_ = click;
+}
+
+void HexagonButton::OnUnitChanged(float unit)
+{
+	SetSize(Size(unit * (1 + width_), unit));
+	SetVertices(GetHexagonVertices(width_, unit, GetSize() / 2));
 }
 
 void HexagonButton::OnButtonEvent(Button* btn, Button::Event evt)
@@ -90,10 +91,9 @@ PlayButton::PlayButton()
 	: HexagonButton(2.0f)
 {
 	// ÎÄ×Ö
-	CustomTextPtr text = new CustomText(Lang::Get("main", "play"), 48, true);
-	text->SetAnchor(0.5f, 0.5f);
-	text->SetPosition(this->GetSize() / 2);
-	AddChild(text);
+	text_ = new CustomText(Lang::Get("main", "play"), 48, true);
+	text_->SetAnchor(0.5f, 0.5f);
+	AddChild(text_);
 
 	// Ö´ÐÐ¶¯»­
 	auto action = animation::ScaleBy(1_sec, Vec2(0.15f, 0.15f));
@@ -101,6 +101,7 @@ PlayButton::PlayButton()
 	StartAnimation(group);
 
 	OnStatusChanged(Status::Normal);
+	OnUnitChanged(Config::Unit());
 }
 
 void PlayButton::OnStatusChanged(Status status)
@@ -119,13 +120,16 @@ void PlayButton::OnStatusChanged(Status status)
 	}
 }
 
+void PlayButton::OnUnitChanged(float unit)
+{
+	HexagonButton::OnUnitChanged(unit);
+	text_->SetPosition(this->GetSize() / 2);
+}
+
 SpecialHexButton::SpecialHexButton()
 	: HexagonButton(1.0f)
 {
-	float size = GetHeight();
-
 	inner_polygon_ = new PolygonActor;
-	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, size * 0.85f, GetSize() / 2));
 	AddChild(inner_polygon_);
 
 	OnStatusChanged(Status::Normal);
@@ -153,7 +157,16 @@ void SpecialHexButton::OnStatusChanged(Status status)
 	this->SetFillColor(outter_color);
 }
 
+void SpecialHexButton::OnUnitChanged(float unit)
+{
+	HexagonButton::OnUnitChanged(unit);
+
+	float size = GetHeight();
+	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, size * 0.85f, GetSize() / 2));
+}
+
 TryAgainButton::TryAgainButton()
 	: SpecialHexButton()
 {
+	OnUnitChanged(Config::Unit());
 }

@@ -1,7 +1,7 @@
 #pragma once
-#include "Common.h"
+#include "CustomText.h"
 
-class HexagonButton : public PolygonActor
+class HexagonButton : public PolygonActor, public SizeSensor
 {
 public:
 	HexagonButton(float width);
@@ -15,6 +15,8 @@ public:
 	void Disable();
 
 	void SetCallback(Function<void()> click);
+
+	void OnUnitChanged(float unit) override;
 
 protected:
 	enum class Status
@@ -31,6 +33,7 @@ protected:
 	Vector<Point> GetHexagonVertices(float width, float side, Point offset);
 
 private:
+	float width_;
 	Status status_;
 	ButtonPtr button_;
 	Function<void()> click_;
@@ -42,6 +45,11 @@ public:
 	PlayButton();
 
 	void OnStatusChanged(Status status) override;
+
+	void OnUnitChanged(float unit) override;
+
+private:
+	CustomTextPtr text_;
 };
 
 class SpecialHexButton : public HexagonButton
@@ -50,6 +58,8 @@ public:
 	SpecialHexButton();
 
 	void OnStatusChanged(Status status) override;
+
+	void OnUnitChanged(float unit) override;
 
 private:
 	PolygonActorPtr inner_polygon_;

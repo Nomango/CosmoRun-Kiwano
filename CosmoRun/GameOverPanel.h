@@ -15,7 +15,11 @@ public:
 
     void Hide();
 
+    void Resize(Size size);
+
 private:
+    RectActorPtr bg_;
+    CustomTextPtr title_;
     CustomTextPtr score_;
     CustomTextPtr best_score_;
 };
