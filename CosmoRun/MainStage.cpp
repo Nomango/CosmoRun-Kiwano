@@ -32,7 +32,7 @@ MainStage::MainStage()
 
 	// 创建开始按钮
 	play_button_ = new PlayButton;
-	play_button_->SetPosition(0, unit * 1.5f);
+	play_button_->SetPosition(0, size.y / 2 - unit * 2);
 	play_button_->SetCallback(Closure(this, &MainStage::StartGame));
 	wrapper->AddChild(play_button_);
 
@@ -56,6 +56,9 @@ MainStage::MainStage()
 		auto win_evt = evt->Cast<WindowResizedEvent>();
 		Config::SetWindowSize(win_evt->width, win_evt->height);
 	});
+
+	// 每隔15秒改变一次颜色
+	AddTask([=](Task*, Duration) { this->SetColor(Config::RandomColor()); }, 15_sec, -1);
 
 #ifdef KGE_DEBUG
 	// 下面时调试时使用的一些工具
@@ -142,6 +145,7 @@ void MainStage::Restart()
 
 void MainStage::SetColor(ColorEnum color)
 {
+	Config::Color(color);
 	cube_group_->SetColor(color);
 	background_->SetColor(color);
 }
@@ -157,18 +161,19 @@ void MainStage::OnKeyDown(Event* evt)
 
 	if (key_evt->code == KeyCode::Num1)
 	{
-		Config::Color(ColorEnum::Blue);
 		SetColor(ColorEnum::Blue);
 	}
 	else if (key_evt->code == KeyCode::Num2)
 	{
-		Config::Color(ColorEnum::Purple);
 		SetColor(ColorEnum::Purple);
 	}
 	else if (key_evt->code == KeyCode::Num3)
 	{
-		Config::Color(ColorEnum::Gold);
 		SetColor(ColorEnum::Gold);
+	}
+	else if (key_evt->code == KeyCode::Num4)
+	{
+		SetColor(Config::RandomColor());
 	}
 }
 

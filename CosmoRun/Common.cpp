@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& out, const FaceDesc& desc)
 namespace
 {
 	float global_unit_length = 0.0f;
-	ColorEnum global_color = ColorEnum::Blue;
+	ColorEnum global_color = ColorEnum(-1);
 }
 
 float Config::Unit()
@@ -63,4 +63,11 @@ ColorEnum Config::Color()
 void Config::Color(ColorEnum color)
 {
 	global_color = color;
+}
+
+ColorEnum Config::RandomColor()
+{
+	if (global_color == ColorEnum(-1))
+		return ColorEnum(math::Random(0, 2));
+	return ColorEnum((int(global_color) + math::Random(1, 2)) % 3);
 }

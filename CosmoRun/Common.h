@@ -80,4 +80,6 @@ struct Config
 	static ColorEnum Color();
 
 	static void Color(ColorEnum color);
+
+	static ColorEnum RandomColor();
 };

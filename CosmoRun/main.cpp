@@ -27,6 +27,7 @@ public:
 #endif
 		SetSettings(s);
 
+		Config::Color(Config::RandomColor());
 		Config::SetWindowSize(s.window.width, s.window.height);
 
 		// 对象创建失败时抛出
