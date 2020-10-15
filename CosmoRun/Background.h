@@ -17,9 +17,7 @@ public:
 	void ResetTriangles();
 
 private:
-	BrushPtr GetCurrentBrush();
-
-	BrushPtr GetBackgroundBrush(Color top, Color bottom);
+	LinearGradientStyle GetBrushStyle(ColorEnum color);
 
 	BrushPtr GetShadowBrush();
 
@@ -30,4 +28,6 @@ private:
 	RectActorPtr bg_shadow_;
 	ActorPtr dynamic_layer_;
 	BrushPtr triangle_brush_;
+
+	LinearGradientStyle current_style_;
 };

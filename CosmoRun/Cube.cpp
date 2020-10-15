@@ -38,25 +38,16 @@ CubeFace* Cube::GetFace(FaceType type) const
 	return nullptr;
 }
 
-CubeFace* Cube::AddFace(FaceDesc desc)
+CubeFace* Cube::AddFace(FaceDesc desc, BrushCreator* brush_creator)
 {
 	ColorEnum color = Config::Color();
-	CubeFacePtr face = new CubeFace(desc.type, desc.direction);
+	CubeFacePtr face = new CubeFace(desc.type, desc.direction, brush_creator);
 	face->SetCube(this);
-	face->SetColor(color);
 
 	this->AddChild(face);
 
 	faces_.push_back(face.Get());
 	return face.Get();
-}
-
-void Cube::SetColor(ColorEnum color)
-{
-	for (auto face : faces_)
-	{
-		face->SetColor(color);
-	}
 }
 
 void Cube::RemoveFace(Actor* face)
@@ -199,14 +190,6 @@ bool CubeMap::IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head)
 		}
 	}
 	return false;
-}
-
-void CubeMap::SetColor(ColorEnum color)
-{
-	for (auto pair : cube_map_)
-	{
-		pair.second->SetColor(color);
-	}
 }
 
 void CubeMap::Clear()

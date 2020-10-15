@@ -39,7 +39,7 @@ FontPtr CustomText::GetFont(float size, bool bold) const
 		font_name = "Microsoft YaHei UI Light";
 		break;
 	}
-	size = size * Config::Unit() / 64;
+	size = size * Config::NormalizeUnit();
 	uint32_t weight = bold ? FontWeight::Bold : FontWeight::Normal;
 	FontPtr font = new Font(font_name, size, weight, FontPosture::Normal, FontStretch::Condensed);
 	return font;

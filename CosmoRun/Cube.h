@@ -21,9 +21,7 @@ public:
 
     CubeFace* GetFace(FaceType type) const;
 
-    CubeFace* AddFace(FaceDesc desc);
-
-    void SetColor(ColorEnum color);
+    CubeFace* AddFace(FaceDesc desc, BrushCreator* brush_creator);
 
     void RemoveFace(Actor* face);
 
@@ -44,8 +42,6 @@ public:
     void RemoveCubeFaceInMap(CubeFace* face);
 
     bool IsCollidedWith(const CubePos& pos, FaceDesc desc, CubeFace* head);
-
-    void SetColor(ColorEnum color);
 
     void Clear();
 

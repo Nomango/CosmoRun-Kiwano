@@ -33,7 +33,9 @@ private:
     void DumpCubes();
 
 private:
+    ColorEnum color_;
     CubeFace* tail_;
     CubeMap cube_map_;
     std::list<CubeFace*> hide_faces_;
+    BrushCreator brush_creator_;
 };

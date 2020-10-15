@@ -204,8 +204,9 @@ void MainStage::OnUpdate(Duration dt)
 		return;
 
 	// 沿小球的方向移动
+	float unit = Config::NormalizeUnit();
 	Vec2 v_angle = ball_->GetVelocityAngle();
-	Vec2 v = v_angle * MAX_SPEED_PER_SEC * speed_scale_ * dt.GetSeconds();
+	Vec2 v = v_angle * MAX_SPEED_PER_SEC * unit * speed_scale_ * dt.GetSeconds();
 	Move(v);
 
 	// 判断小球是否出界

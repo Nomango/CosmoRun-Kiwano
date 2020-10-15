@@ -11,8 +11,8 @@ public:
 	{
 		Settings s;
 		s.window.title = "CosmoRun";
-		s.window.width = 1000;
-		s.window.height = 800;
+		s.window.width = 800;
+		s.window.height = 600;
 		s.window.resizable = false;
 
 #ifdef KGE_DEBUG

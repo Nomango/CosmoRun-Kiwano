@@ -57,6 +57,9 @@
     <ClCompile Include="Buttons.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="BrushCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -93,6 +96,15 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpolator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushAnimation.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="BrushCreator.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

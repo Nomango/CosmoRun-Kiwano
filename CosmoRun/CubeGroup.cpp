@@ -5,7 +5,9 @@
 
 CubeGroup::CubeGroup()
 	: tail_(nullptr)
+	, color_(Config::Color())
 {
+	brush_creator_.Init();
 }
 
 void CubeGroup::InitCubes(int length)
@@ -92,7 +94,7 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 	KGE_LOG("-new-", desc);
 
 	// 创建新方块面，并设置为透明
-	auto face = cube->AddFace(desc);
+	auto face = cube->AddFace(desc, &brush_creator_);
 	face->SetVisible(false);
 
 	// 添加方块面的阴影
@@ -128,7 +130,16 @@ CubeFace* CubeGroup::GetTail() const
 
 void CubeGroup::SetColor(ColorEnum color)
 {
-	cube_map_.SetColor(color);
+	if (color_ != color)
+	{
+		this->StopAllAnimations();
+		auto list = brush_creator_.CreateColorAnimation(1000_msec, color_, color);
+		for (auto animation : list)
+		{
+			this->StartAnimation(animation);
+		}
+		color_ = color;
+	}
 }
 
 void CubeGroup::RemoveTailFace()

@@ -1,4 +1,5 @@
 #include "Background.h"
+#include "BrushAnimation.h"
 
 KGE_DECLARE_SMART_PTR(Triangle);
 
@@ -68,8 +69,13 @@ void Background::Resize(Size size)
 {
 	SetSize(size);
 
+	// 重置当前画刷样式
+	current_style_ = GetBrushStyle(Config::Color());
+	// 重置画刷
+	BrushPtr brush = new Brush(current_style_);
+
 	bg_rect_->SetRectSize(size);
-	bg_rect_->SetFillBrush(GetCurrentBrush());
+	bg_rect_->SetFillBrush(brush);
 
 	bg_shadow_->SetRectSize(size);
 	bg_shadow_->SetFillBrush(GetShadowBrush());
@@ -77,14 +83,13 @@ void Background::Resize(Size size)
 
 void Background::SetColor(ColorEnum color)
 {
-	// 淡入淡出式切换背景色
-	auto switch_bg = AnimationEventHandler::HandleDone([=](Animation*, Actor*) { this->bg_rect_->SetFillBrush(GetCurrentBrush()); });
-	auto action = animation::Group({
-		animation::FadeOut(150_msec).Handler(switch_bg),
-		animation::FadeIn(150_msec)
-	});
+	// 画刷变化动画
+	auto new_style = GetBrushStyle(color);
+	AnimationPtr animation = new BrushStyleAnimation(1000_msec, bg_rect_->GetFillBrush(), current_style_, new_style);
+	current_style_ = new_style;
+
 	bg_rect_->StopAllAnimations();
-	bg_rect_->StartAnimation(action);
+	bg_rect_->StartAnimation(animation);
 }
 
 void Background::MoveTriangles(Vec2 trans)
@@ -102,37 +107,33 @@ void Background::ResetTriangles()
 	dynamic_layer_->MoveTo(Point(0, 0));
 }
 
-BrushPtr Background::GetCurrentBrush()
+LinearGradientStyle Background::GetBrushStyle(ColorEnum color)
 {
-	ColorEnum color = Config::Color();
-	switch (color)
+	auto GetBrushStyle = [=](Color top, Color bottom)
 	{
-	case ColorEnum::Blue:
-		return GetBackgroundBrush(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
-	case ColorEnum::Purple:
-		return GetBackgroundBrush(Color::Rgb(118, 40, 78), Color::Rgb(45, 31, 66));
-	case ColorEnum::Gold:
-		return GetBackgroundBrush(Color::Rgb(7, 35, 82), Color::Rgb(55, 26, 19));
-	default:
-		break;
-	}
-	return BrushPtr();
-}
-
-BrushPtr Background::GetBackgroundBrush(Color top, Color bottom)
-{
-	// 背景画刷，梯度渐变色
-	float height = this->GetHeight();
-	LinearGradientStyle style = LinearGradientStyle(
-		Point{ 0, 0 },
-		Point{ 0, height },
+		// 梯度渐变色
+		float height = this->GetHeight();
+		LinearGradientStyle style = LinearGradientStyle(
+			Point{ 0, 0 },
+			Point{ 0, height },
 		{
 			GradientStop(0, top),
 			GradientStop(1, bottom),
 		}
 		);
-	BrushPtr brush = new Brush(style);
-	return brush;
+		return style;
+	};
+
+	switch (color)
+	{
+	case ColorEnum::Blue:
+		return GetBrushStyle(Color::Rgb(8, 39, 110), Color::Rgb(6, 37, 38));
+	case ColorEnum::Purple:
+		return GetBrushStyle(Color::Rgb(118, 40, 78), Color::Rgb(45, 31, 66));
+	case ColorEnum::Gold:
+		return GetBrushStyle(Color::Rgb(7, 35, 82), Color::Rgb(55, 26, 19));
+	}
+	return LinearGradientStyle();
 }
 
 BrushPtr Background::GetShadowBrush()
@@ -147,7 +148,7 @@ BrushPtr Background::GetShadowBrush()
 			GradientStop(0.8f, Color::Rgba(Color::Black, 0.0f)),
 			GradientStop(1.0f, Color::Rgba(Color::Black, 0.3f)),
 		}
-	);
+		);
 	return new Brush(style);
 }
 
