@@ -72,8 +72,7 @@ MainStage::MainStage()
 	// 每隔15秒改变一次颜色
 	AddTask([=](Task*, Duration) { this->SetColor(Config::RandomColor()); }, 15_sec, -1);
 
-	// 游戏背景音乐
-	music_.PlayBackground();
+	Resize(size);
 
 #ifdef KGE_DEBUG
 	// 下面是调试时使用的一些工具
@@ -141,10 +140,10 @@ void MainStage::GameOver()
 	score_board_->SetScore(score_, best_score_, is_best);
 
 	// 播放死亡声音
-	music_.PlayDie();
+	Music::GetInstance().PlayDie();
 
 	// 调小声音
-	this->StartAnimation(music_.LowVolume());
+	this->StartAnimation(Music::GetInstance().LowVolume());
 
 	ball_->Die();
 	score_board_->Show();
@@ -185,7 +184,7 @@ void MainStage::Restart()
 	}, 1000_msec, 1);
 
 	// 调大声音
-	this->StartAnimation(music_.HighVolume());
+	this->StartAnimation(Music::GetInstance().HighVolume());
 }
 
 void MainStage::SetColor(ColorEnum color)
@@ -240,6 +239,12 @@ void MainStage::OnKeyDown(Event* evt)
 	{
 		SetColor(Config::RandomColor());
 	}
+}
+
+void MainStage::OnEnter()
+{
+	// 游戏背景音乐
+	Music::GetInstance().PlayBackground();
 }
 
 void MainStage::Move(Vec2 trans)

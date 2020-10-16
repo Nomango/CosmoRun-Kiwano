@@ -9,8 +9,6 @@
 #include "ScoreBoard.h"
 #include "Music.h"
 
-KGE_DECLARE_SMART_PTR(MainStage);
-
 class MainStage : public Stage
 {
 public:
@@ -31,6 +29,8 @@ public:
 	void Resize(Size size);
 
 	void OnKeyDown(Event* evt);
+
+	void OnEnter() override;
 
 	void OnUpdate(Duration dt) override;
 
@@ -61,6 +61,4 @@ private:
 	RefPtr<PlayButton> play_button_;
 	RefPtr<TryAgainButton> try_again_button_;
 	ScoreBoardPtr score_board_;
-
-	Music music_;
 };

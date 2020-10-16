@@ -1,10 +1,12 @@
 #pragma once
 #include "Common.h"
 
-class Music
+class Music : public Singleton<Music>
 {
 public:
-	Music();
+	void Load();
+
+	void Destroy();
 
 	void PlayBackground();
 

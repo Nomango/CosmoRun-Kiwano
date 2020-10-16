@@ -1,10 +1,17 @@
 #include "Music.h"
 #include "resource.h"
 
-Music::Music()
+void Music::Load()
 {
 	bg_id_ = player_.Load(Resource(IDR_MP31, "MP3"));
 	die_id_ = player_.Load(Resource(IDR_MP32, "MP3"));
+}
+
+void Music::Destroy()
+{
+	bg_id_ = 0;
+	die_id_ = 0;
+	player_.ClearCache();
 }
 
 void Music::PlayBackground()

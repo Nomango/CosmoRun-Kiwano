@@ -1,5 +1,5 @@
-#include "MainStage.h"
-#include "Lang.h"
+#include "SplashStage.h"
+#include "Music.h"
 #include "resource.h"
 
 KGE_DECLARE_SMART_PTR(DemoRunner);
@@ -40,24 +40,17 @@ public:
 
 	void OnReady() override
 	{
-		// 加载资源
-		LoadResources();
-
 		// 设置窗口最小大小
 		GetWindow()->SetMinimumSize(600, 400);
 
-		MainStagePtr stage = new MainStage;
-		Director::GetInstance().EnterStage(stage);
+		StagePtr stage = new SplashStage;
+		TransitionPtr transition = new FadeTransition(1500_msec);
+		Director::GetInstance().EnterStage(stage, transition);
 	}
 
-	void LoadResources()
+	void OnDestroy() override
 	{
-		FileSystem::GetInstance().AddSearchPath("resource/");
-
-		Font::Preload(Resource(IDR_FONT1, "TTF"));
-
-		// 加载多语言配置
-		Lang::Switch(Lang::Type::EN);
+		Music::GetInstance().Destroy();
 	}
 };
 

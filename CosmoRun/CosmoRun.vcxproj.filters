@@ -66,6 +66,9 @@
     <ClCompile Include="Music.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="SplashStage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -116,6 +119,9 @@
     <ClInclude Include="Music.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="SplashStage.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CosmoRun.rc">
@@ -135,6 +141,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resource\favicon.ico">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="resource\logo.png">
       <Filter>resource</Filter>
     </Image>
   </ItemGroup>

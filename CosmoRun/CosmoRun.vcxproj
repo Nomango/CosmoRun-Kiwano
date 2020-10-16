@@ -153,6 +153,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainStage.cpp" />
     <ClCompile Include="Music.cpp" />
+    <ClCompile Include="SplashStage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Background.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="MainStage.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Music.h" />
+    <ClInclude Include="SplashStage.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CosmoRun.rc" />
@@ -184,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resource\favicon.ico" />
+    <Image Include="resource\logo.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resource\music\bg.mp3" />
