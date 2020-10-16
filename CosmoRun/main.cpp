@@ -14,6 +14,7 @@ public:
 		s.window.width = 800;
 		s.window.height = 600;
 		s.window.resizable = true;
+		s.window.icon = Icon(IDI_ICON1);
 
 #ifdef KGE_DEBUG
 		s.debug_mode = true;
@@ -29,6 +30,9 @@ public:
 
 		Config::Color(Config::RandomColor());
 		Config::SetWindowSize(Size(s.window.width, s.window.height));
+
+		// 使用音频模块
+		Application::GetInstance().Use(AudioModule::GetInstance());
 
 		// 对象创建失败时抛出
 		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());

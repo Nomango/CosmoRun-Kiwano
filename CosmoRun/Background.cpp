@@ -8,7 +8,7 @@ class Triangle : public PolygonActor
 public:
 	Triangle(BrushPtr brush)
 	{
-		float unit = Config::Unit();
+		float unit = Config::Unit() * 0.8f;
 
 		// 设置三角形的三个顶点
 		float h = unit * math::Sin(60.f);
@@ -102,7 +102,7 @@ void Background::ResetTriangles()
 {
 	for (auto triangles : dynamic_layer_->GetAllChildren())
 	{
-		triangles->MoveBy(-dynamic_layer_->GetPosition());
+		triangles->MoveBy(dynamic_layer_->GetPosition());
 	}
 	dynamic_layer_->MoveTo(Point(0, 0));
 }

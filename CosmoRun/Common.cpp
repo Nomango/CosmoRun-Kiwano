@@ -53,7 +53,7 @@ float Config::NormalizeUnit()
 void Config::SetWindowSize(Size size)
 {
 	global_unit_length = std::min(std::max(size.x * 0.08f, 60.0f), 120.0f);
-	KGE_NOTICE("Unit length changed to ", global_unit_length);
+	KGE_NOTICE("Unit length changed to", global_unit_length);
 
 	SizeSensor::Notify(global_unit_length);
 }

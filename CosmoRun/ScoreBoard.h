@@ -2,12 +2,12 @@
 #include "Common.h"
 #include "CustomText.h"
 
-KGE_DECLARE_SMART_PTR(GameOverPanel);
+KGE_DECLARE_SMART_PTR(ScoreBoard);
 
-class GameOverPanel : public Actor
+class ScoreBoard : public Actor
 {
 public:
-    GameOverPanel(Size size);
+    ScoreBoard(Size size);
 
     void SetScore(int score, int best_score, bool is_best);
 

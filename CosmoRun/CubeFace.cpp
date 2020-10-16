@@ -58,12 +58,22 @@ bool CubeFace::IsIn(const std::initializer_list<FaceType>& list)
 void CubeFace::Show()
 {
 	SetVisible(true);
-	SetOpacity(0);
-	StartAnimation(animation::FadeIn(500_msec));
+	SetScale(0, 0);
+	StartAnimation(animation::ScaleTo(300_msec, Vec2(1, 1)));
 
 	shadow_->SetVisible(true);
-	shadow_->SetOpacity(0);
-	shadow_->StartAnimation(animation::FadeIn(500_msec));
+	shadow_->SetScale(0, 0);
+	shadow_->StartAnimation(animation::ScaleTo(300_msec, Vec2(1, 1)));
+}
+
+void CubeFace::Hide(AnimationEventHandlerPtr handler)
+{
+	auto action = animation::ScaleTo(300_msec, Vec2(0, 0));
+	action.Handler(handler);
+	StartAnimation(action);
+
+	// ´¦ÀíÒõÓ°
+	GetShadow()->StartAnimation(animation::ScaleTo(300_msec, Vec2(0, 0)));
 }
 
 CubeFace* CubeFace::GetNext() const

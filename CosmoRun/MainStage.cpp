@@ -1,7 +1,9 @@
 #include "MainStage.h"
+#include "Lang.h"
+#include "resource.h"
 
 #define MAX_CUBE_NUMBER		12		// 方块数量
-#define MAX_SPEED_PER_SEC	220.0f	// 最大速度（每秒)
+#define MAX_SPEED_PER_SEC	260.0f	// 最大速度（每秒)
 #define MAX_SPEED_SCORE		300		// 得分300分时游戏速度达到最大
 
 MainStage::MainStage()
@@ -28,27 +30,38 @@ MainStage::MainStage()
 	ball_ = new Ball;
 	wrapper_->AddChild(ball_);
 
+	// 创建标题
+	title_ = new CustomText(Lang::Get("main", "title"), 120);
+	wrapper_->AddChild(title_);
+
 	// 创建开始按钮
 	play_button_ = new PlayButton;
 	play_button_->SetCallback(Closure(this, &MainStage::StartGame));
 	wrapper_->AddChild(play_button_);
 
-	// 创建游戏结束面板
-	gameover_panel_ = new GameOverPanel(size);
-	gameover_panel_->SetVisible(false);
-	wrapper_->AddChild(gameover_panel_);
+	// 创建计分文字
+	score_text_ = new CustomText(" ", 48);
+	score_text_->SetOpacity(0);
+	wrapper_->AddChild(score_text_);
+
+	// 创建最高分文字
+	best_score_text_ = new CustomText(" ", 48);
+	best_score_text_->SetOpacity(0);
+	wrapper_->AddChild(best_score_text_);
+
+	// 创建计分面板
+	score_board_ = new ScoreBoard(size);
+	score_board_->SetVisible(false);
+	wrapper_->AddChild(score_board_);
 
 	// 创建重新开始按钮
 	try_again_button_ = new TryAgainButton;
 	try_again_button_->SetCallback(Closure(this, &MainStage::Restart));
 	try_again_button_->Disable();
-	gameover_panel_->AddChild(try_again_button_);
+	score_board_->AddChild(try_again_button_);
 
 	// 初始化游戏
 	InitGame();
-
-	// 重置元素位置
-	Resize(size);
 
 	// 窗口大小变化监听
 	AddListener<WindowResizedEvent>([=](Event* evt) {
@@ -58,6 +71,9 @@ MainStage::MainStage()
 
 	// 每隔15秒改变一次颜色
 	AddTask([=](Task*, Duration) { this->SetColor(Config::RandomColor()); }, 15_sec, -1);
+
+	// 游戏背景音乐
+	music_.PlayBackground();
 
 #ifdef KGE_DEBUG
 	// 下面是调试时使用的一些工具
@@ -104,6 +120,9 @@ void MainStage::StartGame()
 	KGE_LOG("Game start!");
 	status_ = GameStatus::Running;
 	play_button_->Hide();
+	title_->StartAnimation(animation::FadeOut(300_msec));
+	best_score_text_->StartAnimation(animation::FadeOut(300_msec));
+	score_text_->StartAnimation(animation::FadeIn(300_msec).Delay(300_msec));
 }
 
 void MainStage::GameOver()
@@ -119,27 +138,54 @@ void MainStage::GameOver()
 	}
 
 	// 更新得分
-	gameover_panel_->SetScore(score_, best_score_, is_best);
+	score_board_->SetScore(score_, best_score_, is_best);
+
+	// 播放死亡声音
+	music_.PlayDie();
+
+	// 调小声音
+	this->StartAnimation(music_.LowVolume());
 
 	ball_->Die();
-	gameover_panel_->Show();
-	try_again_button_->Enable();
+	score_board_->Show();
+	score_text_->StartAnimation(animation::FadeOut(300_msec));
+
+	AddTask([=](Task*, Duration) {
+		try_again_button_->Enable();
+	}, 1500_msec, 1);
 }
 
 void MainStage::Restart()
 {
 	KGE_LOG("Game restart!");
-	InitGame();
+	status_ = GameStatus::Restarting;
+	score_text_->SetText(" ");
+	best_score_text_->SetText(Lang::Get("gameover", "best_score") + " " + std::to_string(best_score_));
 
-	float unit = Config::Unit();
-	// 用一个动画回到初始位置
-	background_->ResetTriangles();
-	ball_->ResetParticles();
-	cube_group_->SetPosition(Point(0, unit / 2));
-
-	play_button_->Show();
-	gameover_panel_->Hide();
+	// 动画1：隐藏所有方块
+	cube_group_->HideAllCubes();
+	score_board_->Hide();
 	try_again_button_->Disable();
+
+	// 动画2：显示新的方块
+	AddTask([=](Task*, Duration) {
+		InitGame();
+		float unit = Config::Unit();
+		cube_group_->SetPosition(Point(0, unit / 2));
+	}, 500_msec, 1);
+
+	// 动画3：显示主界面
+	AddTask([=](Task*, Duration) {
+		background_->ResetTriangles();
+		ball_->ResetParticles();
+		play_button_->Show();
+		title_->StartAnimation(animation::FadeIn(300_msec));
+		best_score_text_->StartAnimation(animation::FadeIn(300_msec));
+		status_ = GameStatus::Ready;
+	}, 1000_msec, 1);
+
+	// 调大声音
+	this->StartAnimation(music_.HighVolume());
 }
 
 void MainStage::SetColor(ColorEnum color)
@@ -155,11 +201,15 @@ void MainStage::Resize(Size size)
 	this->SetSize(size);
 
 	float unit = Config::Unit();
+	float normal = Config::NormalizeUnit();
 
 	background_->Resize(size);
-	gameover_panel_->Resize(size);
+	score_board_->Resize(size);
 
 	wrapper_->SetPosition(size / 2);
+	title_->SetPosition(0, unit * 2 - size.y / 2);
+	score_text_->SetPosition(0, unit - size.y / 2);
+	best_score_text_->SetPosition(0, -unit);
 	cube_group_->SetPosition(0, unit / 2);
 	play_button_->SetPosition(0, size.y / 2 - unit * 2);
 	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
@@ -201,23 +251,22 @@ void MainStage::Move(Vec2 trans)
 
 void MainStage::OnUpdate(Duration dt)
 {
-	if (status_ == GameStatus::Gameover)
-		return;
-
-	if (status_ == GameStatus::Ready)
+	bool space_pressed = Input::GetInstance().WasPressed(KeyCode::Space);
+	bool mouse_pressed = Input::GetInstance().WasPressed(MouseButton::Left);
+	if (status_ == GameStatus::Ready && space_pressed)
 	{
-		if (Input::GetInstance().WasPressed(KeyCode::Space))
-		{
-			StartGame();
-		}
+		StartGame();
 	}
 	else if (status_ == GameStatus::Running)
 	{
-		if (Input::GetInstance().WasPressed(KeyCode::Space)
-			|| Input::GetInstance().WasPressed(MouseButton::Left))
+		if (space_pressed || mouse_pressed)
 		{
 			ball_->Turn();
 		}
+	}
+	else if (status_ == GameStatus::Gameover && space_pressed)
+	{
+		Restart();
 	}
 
 	if (status_ != GameStatus::Running)
@@ -238,24 +287,23 @@ void MainStage::OnUpdate(Duration dt)
 		if (!ball_->IsSafe())
 		{
 			this->GameOver();
+			return;
 		}
-		else
+		// 加分
+		score_++;
+		score_text_->SetText(std::to_string(score_));
+
+		// 调整游戏速度
+		speed_scale_ = std::min(1.0f, float(score_) / float(MAX_SPEED_SCORE));
+		speed_scale_ = 0.7f + speed_scale_ * 0.3f;
+
+		// 生成新方块面
+		cube_group_->AddRandomFace();
+
+		// 移除尾方块面
+		if (current_face != cube_group_->GetTail())
 		{
-			// 加分
-			score_++;
-
-			// 调整游戏速度
-			speed_scale_ = std::min(1.0f, float(score_) / float(MAX_SPEED_SCORE));
-			speed_scale_ = 0.7f + speed_scale_ * 0.3f;
-
-			// 生成新方块面
-			cube_group_->AddRandomFace();
-
-			// 移除尾方块面
-			if (current_face != cube_group_->GetTail())
-			{
-				cube_group_->RemoveTailFace();
-			}
+			cube_group_->RemoveTailFace();
 		}
 	}
 }

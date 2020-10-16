@@ -15,6 +15,8 @@ public:
 
     CubeFace* AppendCubeFace(FaceDesc desc);
 
+    void HideAllCubes();
+
     void RemoveFace(CubeFace* face);
 
     void RemoveTailFace();

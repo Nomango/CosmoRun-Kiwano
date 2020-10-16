@@ -1,9 +1,8 @@
 #include "CustomText.h"
 #include "Lang.h"
 
-CustomText::CustomText(const String& text, float size, bool bold)
+CustomText::CustomText(const String& text, float size)
 	: font_size_(size)
-	, bold_(bold)
 {
 	this->SetFillColor(Color::White);
 	this->SetAnchor(0.5f, 0.5f);
@@ -26,7 +25,7 @@ void CustomText::SetText(const String& text)
 	}
 }
 
-FontPtr CustomText::GetFont(float size, bool bold) const
+FontPtr CustomText::GetFont(float size) const
 {
 	String font_name;
 	switch (Lang::Current())
@@ -38,8 +37,7 @@ FontPtr CustomText::GetFont(float size, bool bold) const
 		font_name = "Microsoft YaHei UI Light";
 		break;
 	}
-	uint32_t weight = bold ? FontWeight::Bold : FontWeight::Normal;
-	FontPtr font = new Font(font_name, size, weight, FontPosture::Normal, FontStretch::Condensed);
+	FontPtr font = new Font(font_name, size, FontWeight::Bold, FontPosture::Normal, FontStretch::Condensed);
 	return font;
 }
 
@@ -47,8 +45,8 @@ void CustomText::OnUnitChanged(float)
 {
 	float unit = Config::NormalizeUnit();
 
-	FontPtr font = GetFont(font_size_ * unit, bold_);
+	FontPtr font = GetFont(font_size_ * unit);
 	this->SetFont(font);
 	shadow_->SetFont(font);
-	shadow_->MoveTo(0, 5 * unit);
+	shadow_->MoveTo(font_size_ / 20 * unit, font_size_ / 20 * unit);
 }

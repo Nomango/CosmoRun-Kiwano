@@ -24,6 +24,8 @@ public:
 
 	void Show();
 
+	void Hide(AnimationEventHandlerPtr handler);
+
 	CubeFace* GetNext() const;
 
 	void SetNext(CubeFace* face);

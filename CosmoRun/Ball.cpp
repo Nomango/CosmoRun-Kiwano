@@ -129,8 +129,8 @@ void Ball::Turn()
 void Ball::Die()
 {
 	body_->StartAnimation(animation::Group({
-		animation::ScaleTo(300_msec, Vec2(1.4f, 1.4f)),
-		animation::ScaleTo(300_msec, Vec2(0, 0)),
+		animation::ScaleTo(400_msec, Vec2(1.4f, 1.4f)),
+		animation::ScaleTo(400_msec, Vec2(0, 0)),
 		}));
 
 	StopAllTasks();
@@ -140,8 +140,8 @@ void Ball::Reborn()
 {
 	body_->SetScale(0, 0);
 	body_->StartAnimation(animation::Group({
-		animation::ScaleTo(300_msec, Vec2(1.3f, 1.3f)),
-		animation::ScaleTo(300_msec, Vec2(1.0f, 1.0f)),
+		animation::ScaleTo(400_msec, Vec2(1.3f, 1.3f)),
+		animation::ScaleTo(400_msec, Vec2(1.0f, 1.0f)),
 		}));
 
 	StartAllTasks();

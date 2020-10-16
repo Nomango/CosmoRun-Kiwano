@@ -52,6 +52,26 @@ END
 
 IDR_FONT1               TTF                     "resource\\fonts\\Gill-Sans-MT-Condensed.TTF"
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON                    "resource\\favicon.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// MP3
+//
+
+IDR_MP31                MP3                     "resource\\music\\bg.mp3"
+
+IDR_MP32                MP3                     "resource\\music\\die.mp3"
+
 #endif    // 中文(简体，中国) resources
 /////////////////////////////////////////////////////////////////////////////
 

@@ -32,7 +32,7 @@ protected:
 
 	Vector<Point> GetHexagonVertices(float width, float side, Point offset);
 
-private:
+protected:
 	float width_;
 	Status status_;
 	ButtonPtr button_;
@@ -55,7 +55,9 @@ private:
 class SpecialHexButton : public HexagonButton
 {
 public:
-	SpecialHexButton();
+	SpecialHexButton(float width);
+
+	void ClearChildren();
 
 	void OnStatusChanged(Status status) override;
 
@@ -69,4 +71,6 @@ class TryAgainButton : public SpecialHexButton
 {
 public:
 	TryAgainButton();
+
+	void OnUnitChanged(float unit) override;
 };

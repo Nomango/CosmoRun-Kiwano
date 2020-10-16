@@ -6,16 +6,15 @@ KGE_DECLARE_SMART_PTR(CustomText);
 class CustomText : public TextActor, public SizeSensor
 {
 public:
-	CustomText(const String& text, float size, bool bold);
+	CustomText(const String& text, float size);
 
 	void SetText(const String& text);
 
-	FontPtr GetFont(float size, bool bold) const;
+	FontPtr GetFont(float size) const;
 
 	void OnUnitChanged(float unit) override;
 
 private:
-	bool bold_;
 	float font_size_;
 	TextActorPtr shadow_;
 };

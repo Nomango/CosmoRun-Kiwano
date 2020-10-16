@@ -1,11 +1,13 @@
 #pragma once
 #include "Common.h"
+#include "CustomText.h"
 #include "Buttons.h"
 #include "Cube.h"
 #include "Ball.h"
 #include "CubeGroup.h"
 #include "Background.h"
-#include "GameOverPanel.h"
+#include "ScoreBoard.h"
+#include "Music.h"
 
 KGE_DECLARE_SMART_PTR(MainStage);
 
@@ -38,24 +40,27 @@ private:
 		Ready,
 		Running,
 		Gameover,
+		Restarting,
 	};
-
-	GameStatus status_;
 
 	// 计分相关
 	int score_;
 	int best_score_;
+
+	// 状态相关
 	float speed_scale_;
+	GameStatus status_;
 
 	ActorPtr wrapper_;
-
-	// 结束面板
-	GameOverPanelPtr gameover_panel_;
-
-	RefPtr<PlayButton> play_button_;
-	RefPtr<TryAgainButton> try_again_button_;
-
 	BackgroundPtr background_;
+	CustomTextPtr title_;
 	BallPtr ball_;
 	CubeGroupPtr cube_group_;
+	CustomTextPtr score_text_;
+	CustomTextPtr best_score_text_;
+	RefPtr<PlayButton> play_button_;
+	RefPtr<TryAgainButton> try_again_button_;
+	ScoreBoardPtr score_board_;
+
+	Music music_;
 };

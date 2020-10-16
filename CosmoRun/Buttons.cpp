@@ -91,7 +91,7 @@ PlayButton::PlayButton()
 	: HexagonButton(2.0f)
 {
 	// ÎÄ×Ö
-	text_ = new CustomText(Lang::Get("main", "play"), 48, true);
+	text_ = new CustomText(Lang::Get("main", "play"), 48);
 	text_->SetAnchor(0.5f, 0.5f);
 	AddChild(text_);
 
@@ -126,13 +126,19 @@ void PlayButton::OnUnitChanged(float unit)
 	text_->SetPosition(this->GetSize() / 2);
 }
 
-SpecialHexButton::SpecialHexButton()
-	: HexagonButton(1.0f)
+SpecialHexButton::SpecialHexButton(float width)
+	: HexagonButton(width)
 {
 	inner_polygon_ = new PolygonActor;
 	AddChild(inner_polygon_);
 
 	OnStatusChanged(Status::Normal);
+}
+
+void SpecialHexButton::ClearChildren()
+{
+	this->RemoveAllChildren();
+	this->AddChild(inner_polygon_);
 }
 
 void SpecialHexButton::OnStatusChanged(Status status)
@@ -162,11 +168,52 @@ void SpecialHexButton::OnUnitChanged(float unit)
 	HexagonButton::OnUnitChanged(unit);
 
 	float size = GetHeight();
-	inner_polygon_->SetVertices(GetHexagonVertices(1.0f, size * 0.85f, GetSize() / 2));
+	inner_polygon_->SetVertices(GetHexagonVertices(width_, size * 0.85f, GetSize() / 2));
 }
 
 TryAgainButton::TryAgainButton()
-	: SpecialHexButton()
+	: SpecialHexButton(3.5f)
 {
 	OnUnitChanged(Config::Unit());
+}
+
+void TryAgainButton::OnUnitChanged(float unit)
+{
+	SpecialHexButton::OnUnitChanged(unit);
+
+	this->ClearChildren();
+
+	float stroke_width = unit / 12;
+	float radius = unit / 5;
+	StrokeStylePtr stroke = new StrokeStyle(stroke_width);
+
+	ShapeMaker maker;
+	maker.BeginPath(Point(radius, radius * 2));
+	maker.AddArc(Point(radius * 2, radius), Size(radius, radius), 270, true, false);
+	maker.EndPath();
+	ShapeActorPtr arc = new ShapeActor(maker.GetShape());
+	arc->SetStrokeColor(Color::White);
+	arc->SetStrokeStyle(stroke);
+	arc->SetAnchor(0.5f, 0.5f);
+	arc->SetPosition(this->GetWidth() - unit / 2 - radius * 2, this->GetHeight() / 2);
+	this->AddChild(arc);
+
+	RectActorPtr rect1 = new RectActor(Size(stroke_width * 3, stroke_width));
+	rect1->SetFillColor(Color::White);
+	rect1->SetAnchor(1.0f, 0.5f);
+	rect1->SetPosition(radius * 2 + stroke_width / 2, radius);
+	rect1->SetRotation(15);
+	arc->AddChild(rect1);
+
+	RectActorPtr rect2 = new RectActor(Size(stroke_width * 3, stroke_width));
+	rect2->SetFillColor(Color::White);
+	rect2->SetAnchor(1.0f, 0.5f);
+	rect2->SetPosition(radius * 2, radius + stroke_width / 2);
+	rect2->SetRotation(105);
+	arc->AddChild(rect2);
+
+	CustomTextPtr text = new CustomText(Lang::Get("gameover", "tryagain"), 48);
+	text->SetAnchor(0, 0.5f);
+	text->SetPosition(unit / 4 * 3, this->GetHeight() / 2);
+	AddChild(text);
 }

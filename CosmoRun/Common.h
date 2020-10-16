@@ -1,7 +1,9 @@
 #pragma once
 #include <kiwano/kiwano.h>
+#include <kiwano-audio/kiwano-audio.h>
 
 using namespace kiwano;
+using namespace kiwano::audio;
 
 // ÑÕÉ«Ä£Ê½
 enum class ColorEnum
