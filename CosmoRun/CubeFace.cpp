@@ -164,15 +164,24 @@ void CubeFace::CreateShadow()
 	switch (desc_.type)
 	{
 	case FaceType::Top:
+	{
+		float shadow_height = height * 1.5f;
 		shadow_->SetVertices({
 			Point(width, 0),
 			Point(width * 2, height),
 			Point(width * 2, height + shadow_offset),
-			Point(width, height * 2 + shadow_offset),
+
+			Point(width * (2 - 0.3f), height + shadow_offset + shadow_height * 0.3f),
+			Point(width * (2 - 0.8f), height + shadow_offset + shadow_height * 0.9f),
+			Point(width, height + shadow_offset + shadow_height),
+			Point(width * 0.8f, height + shadow_offset + shadow_height * 0.9f),
+			Point(width * 0.3f, height + shadow_offset + shadow_height * 0.3f),
+
 			Point(0, height + shadow_offset),
 			Point(0, height),
 			});
 		break;
+	}
 	case FaceType::Left:
 	{
 		float offset_x = shadow_offset * math::Cos(30.0f);

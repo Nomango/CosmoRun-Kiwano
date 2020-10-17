@@ -1,5 +1,6 @@
 #include "Buttons.h"
 #include "Lang.h"
+#include "Music.h"
 
 HexagonButton::HexagonButton(float width)
 	: status_(Status::Normal)
@@ -64,6 +65,7 @@ void HexagonButton::OnButtonEvent(Button* btn, Button::Event evt)
 		if (click_)
 		{
 			click_();
+			Music::GetInstance().PlayClick();
 		}
 		break;
 	}

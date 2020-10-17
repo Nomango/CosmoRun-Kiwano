@@ -95,7 +95,7 @@ void Background::SetColor(ColorEnum color)
 void Background::MoveTriangles(Vec2 trans)
 {
 	// Ö»ÒÆ¶¯¶¯Ì¬²ã
-	dynamic_layer_->MoveBy(trans);
+	dynamic_layer_->MoveBy(trans / 2);
 }
 
 void Background::ResetTriangles()

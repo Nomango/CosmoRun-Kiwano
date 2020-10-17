@@ -5,6 +5,7 @@ void Music::Load()
 {
 	bg_id_ = player_.Load(Resource(IDR_MP31, "MP3"));
 	die_id_ = player_.Load(Resource(IDR_MP32, "MP3"));
+	click_id_ = player_.Load(Resource(IDR_MP33, "MP3"));
 }
 
 void Music::Destroy()
@@ -22,6 +23,11 @@ void Music::PlayBackground()
 void Music::PlayDie()
 {
 	player_.Play(die_id_);
+}
+
+void Music::PlayClick()
+{
+	player_.Play(click_id_);
 }
 
 AnimationPtr Music::LowVolume()

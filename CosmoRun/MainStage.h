@@ -1,5 +1,5 @@
 #pragma once
-#include "AutoResizeStage.h"
+#include "BaseStage.h"
 #include "CustomText.h"
 #include "Buttons.h"
 #include "Cube.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "AutoResizeStage.h"
+#include "BaseStage.h"
 
 class SplashStage : public BaseStage
 {

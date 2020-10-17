@@ -72,6 +72,8 @@ IDR_MP31                MP3                     "resource\\music\\bg.mp3"
 
 IDR_MP32                MP3                     "resource\\music\\die.mp3"
 
+IDR_MP33                MP3                     "resource\\music\\click.mp3"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -160,5 +160,8 @@
     <Media Include="resource\music\die.mp3">
       <Filter>resource\music</Filter>
     </Media>
+    <Media Include="resource\music\click.mp3">
+      <Filter>resource\music</Filter>
+    </Media>
   </ItemGroup>
 </Project>

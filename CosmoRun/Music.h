@@ -12,6 +12,8 @@ public:
 
 	void PlayDie();
 
+	void PlayClick();
+
 	AnimationPtr LowVolume();
 
 	AnimationPtr HighVolume();
@@ -19,5 +21,6 @@ public:
 private:
 	size_t bg_id_ = 0;
 	size_t die_id_ = 0;
+	size_t click_id_ = 0;
 	SoundPlayer player_;
 };

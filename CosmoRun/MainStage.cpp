@@ -235,6 +235,7 @@ void MainStage::OnUpdate(Duration dt)
 	if (status_ == GameStatus::Ready && space_pressed)
 	{
 		StartGame();
+		Music::GetInstance().PlayClick();
 	}
 	else if (status_ == GameStatus::Running)
 	{
@@ -246,6 +247,7 @@ void MainStage::OnUpdate(Duration dt)
 	else if (status_ == GameStatus::Gameover && space_pressed)
 	{
 		Restart();
+		Music::GetInstance().PlayClick();
 	}
 
 	if (status_ != GameStatus::Running)
