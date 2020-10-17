@@ -54,6 +54,10 @@ void ScoreBoard::Hide()
 void ScoreBoard::Resize(Size size)
 {
 	bg_->SetRectSize(size);
+
+	title_->OnUnitChanged(Config::Unit());
+	score_->OnUnitChanged(Config::Unit());
+
 	title_->MoveTo(0, -size.y / 2 * 0.7f);
 	score_->MoveTo(0, title_->GetPositionY() + title_->GetHeight());
 	best_score_->MoveTo(0, score_->GetPositionY() + score_->GetHeight());
