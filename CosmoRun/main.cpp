@@ -69,7 +69,6 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 	catch (std::exception& e)
 	{
 		KGE_ERROR(e.what());
-		::MessageBoxA(nullptr, e.what(), "An exception has occurred!", MB_ICONERROR | MB_OK);
 	}
 	return 0;
 }

@@ -69,6 +69,9 @@
     <ClCompile Include="SplashStage.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="BaseStage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainStage.h">
@@ -120,6 +123,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="SplashStage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseStage.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

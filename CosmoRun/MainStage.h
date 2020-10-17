@@ -1,5 +1,5 @@
 #pragma once
-#include "Common.h"
+#include "AutoResizeStage.h"
 #include "CustomText.h"
 #include "Buttons.h"
 #include "Cube.h"
@@ -9,7 +9,7 @@
 #include "ScoreBoard.h"
 #include "Music.h"
 
-class MainStage : public Stage
+class MainStage : public BaseStage
 {
 public:
 	MainStage();
@@ -26,13 +26,13 @@ public:
 
 	void SetColor(ColorEnum color);
 
-	void Resize(Size size);
-
 	void OnKeyDown(Event* evt);
 
 	void OnEnter() override;
 
 	void OnUpdate(Duration dt) override;
+
+	void OnUnitChanged(float unit) override;
 
 private:
 	enum class GameStatus

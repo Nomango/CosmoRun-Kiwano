@@ -1,4 +1,5 @@
 #include "Lang.h"
+#include "resource.h"
 
 namespace
 {
@@ -15,22 +16,24 @@ String Lang::Get(const String& section, const String& key)
 
 void Lang::Switch(Type type)
 {
-	String lang_file;
+	Resource lang_res;
 	switch (type)
 	{
 	case Lang::Type::EN:
-		lang_file = "en";
+		lang_res = Resource(IDR_INI_EN, "INI");
 		break;
 	case Lang::Type::CN:
-		lang_file = "zh-cn";
+		lang_res = Resource(IDR_INI_EN, "INI");  // TODO: 支持中文
 		break;
 	}
-	lang_file = "lang/" + lang_file + ".ini";
-	String fullpath = FileSystem::GetInstance().GetFullPathForFile(lang_file);
-	if (fullpath.empty())
-		throw RuntimeError("Language configuration not found!");
 
-	if (!global_lang_ini.Load(fullpath))
+	BinaryData data = lang_res.GetData();
+	if (!data.IsValid())
+		throw RuntimeError("Language configuration is invalid!");
+
+	StringStream ss;
+	ss.write((char*)data.buffer, (std::streamsize)data.size);
+	if (!global_lang_ini.Load(ss))
 		throw RuntimeError("Language configuration load failed!");
 
 	global_current_lang = type;

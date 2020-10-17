@@ -63,16 +63,10 @@ MainStage::MainStage()
 	// 初始化游戏
 	InitGame();
 
-	// 窗口大小变化监听
-	AddListener<WindowResizedEvent>([=](Event* evt) {
-		auto win_evt = evt->Cast<WindowResizedEvent>();
-		this->Resize(Size(float(win_evt->width), float(win_evt->height)));
-	});
-
 	// 每隔15秒改变一次颜色
 	AddTask([=](Task*, Duration) { this->SetColor(Config::RandomColor()); }, 15_sec, -1);
 
-	Resize(size);
+	OnUnitChanged(Config::Unit());
 
 #ifdef KGE_DEBUG
 	// 下面是调试时使用的一些工具
@@ -194,26 +188,6 @@ void MainStage::SetColor(ColorEnum color)
 	background_->SetColor(color);
 }
 
-void MainStage::Resize(Size size)
-{
-	Config::SetWindowSize(size);
-	this->SetSize(size);
-
-	float unit = Config::Unit();
-	float normal = Config::NormalizeUnit();
-
-	background_->Resize(size);
-	score_board_->Resize(size);
-
-	wrapper_->SetPosition(size / 2);
-	title_->SetPosition(0, unit * 2 - size.y / 2);
-	score_text_->SetPosition(0, unit - size.y / 2);
-	best_score_text_->SetPosition(0, -unit);
-	cube_group_->SetPosition(0, unit / 2);
-	play_button_->SetPosition(0, size.y / 2 - unit * 2);
-	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
-}
-
 void MainStage::OnKeyDown(Event* evt)
 {
 	auto key_evt = evt->Cast<KeyDownEvent>();
@@ -311,4 +285,20 @@ void MainStage::OnUpdate(Duration dt)
 			cube_group_->RemoveTailFace();
 		}
 	}
+}
+
+void MainStage::OnUnitChanged(float unit)
+{
+	Size size = GetSize();
+
+	background_->Resize(size);
+	score_board_->Resize(size);
+
+	wrapper_->SetPosition(size / 2);
+	title_->SetPosition(0, unit * 2 - size.y / 2);
+	score_text_->SetPosition(0, unit - size.y / 2);
+	best_score_text_->SetPosition(0, -unit);
+	cube_group_->SetPosition(0, unit / 2);
+	play_button_->SetPosition(0, size.y / 2 - unit * 2);
+	try_again_button_->SetPosition(0, size.y / 2 * 0.7f);
 }
