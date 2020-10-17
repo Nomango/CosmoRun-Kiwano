@@ -84,6 +84,10 @@ struct Config
 	static void Color(ColorEnum color);
 
 	static ColorEnum RandomColor();
+
+	static int ReadBestScore();
+
+	static void SaveBestScore(int best_score);
 };
 
 // 窗口大小变化接收器

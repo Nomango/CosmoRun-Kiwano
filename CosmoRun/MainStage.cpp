@@ -49,6 +49,13 @@ MainStage::MainStage()
 	best_score_text_->SetOpacity(0);
 	wrapper_->AddChild(best_score_text_);
 
+	best_score_ = Config::ReadBestScore();
+	if (best_score_ > 0)
+	{
+		SetBestScore(best_score_);
+		best_score_text_->SetOpacity(1);
+	}
+
 	// 创建计分面板
 	score_board_ = new ScoreBoard(size);
 	score_board_->SetVisible(false);
@@ -126,8 +133,9 @@ void MainStage::GameOver()
 	bool is_best = false;
 	if (score_ > best_score_)
 	{
-		best_score_ = score_;
 		is_best = true;
+		SetBestScore(score_);
+		Config::SaveBestScore(best_score_);
 	}
 
 	// 更新得分
@@ -153,7 +161,6 @@ void MainStage::Restart()
 	KGE_LOG("Game restart!");
 	status_ = GameStatus::Restarting;
 	score_text_->SetText(" ");
-	best_score_text_->SetText(Lang::Get("gameover", "best_score") + " " + std::to_string(best_score_));
 
 	// 动画1：隐藏所有方块
 	cube_group_->HideAllCubes();
@@ -179,6 +186,12 @@ void MainStage::Restart()
 
 	// 调大声音
 	this->StartAnimation(Music::GetInstance().HighVolume());
+}
+
+void MainStage::SetBestScore(int best_score)
+{
+	best_score_ = best_score;
+	best_score_text_->SetText(Lang::Get("gameover", "best_score") + " " + std::to_string(best_score_));
 }
 
 void MainStage::SetColor(ColorEnum color)

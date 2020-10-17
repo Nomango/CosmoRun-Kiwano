@@ -22,6 +22,8 @@ public:
 
 	void Restart();
 
+	void SetBestScore(int best_score);
+
 	void Move(Vec2 trans);
 
 	void SetColor(ColorEnum color);

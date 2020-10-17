@@ -38,6 +38,26 @@ namespace
 {
 	float global_unit_length = 0.0f;
 	ColorEnum global_color = ColorEnum(-1);
+
+	String GetConfigFile()
+	{
+		char temp_path[MAX_PATH];
+		if (GetTempPathA(MAX_PATH, temp_path) == 0)
+			return {};
+
+		String dir_path = String(temp_path) + "cosmorun-kiwano\\";
+		if (!FileSystem::GetInstance().IsFileExists(dir_path))
+		{
+			if (!CreateDirectoryA(dir_path.c_str(), nullptr))
+			{
+				KGE_ERROR("Create config file failed! err code:", GetLastError());
+			}
+		}
+
+		String file_name = dir_path + "config.ini";
+		KGE_NOTICE("Config file name:", file_name);
+		return file_name;
+	}
 }
 
 float Config::Unit()
@@ -73,6 +93,40 @@ ColorEnum Config::RandomColor()
 	if (global_color == ColorEnum(-1))
 		return ColorEnum(math::Random(0, 2));
 	return ColorEnum((int(global_color) + math::Random(1, 2)) % 3);
+}
+
+int Config::ReadBestScore()
+{
+	String file = GetConfigFile();
+	std::ifstream ifs(file);
+	if (!ifs.is_open())
+		return 0;
+
+	ConfigIni ini;
+	if (!ini.Load(ifs))
+		return 0;
+	if (ini.HasKey("user_data", "best_score"))
+		return ini.GetInt("user_data", "best_score");
+	return 0;
+}
+
+void Config::SaveBestScore(int best_score)
+{
+	String file = GetConfigFile();
+	ConfigIni ini;
+
+	std::ifstream ifs(file);
+	if (ifs.is_open())
+	{
+		ini.Load(ifs);
+	}
+
+	std::ofstream ofs(file);
+	if (ofs.is_open())
+	{
+		ini.SetInt("user_data", "best_score", best_score);
+		ini.Save(ofs);
+	}
 }
 
 Set<SizeSensor*> SizeSensor::sensors_;

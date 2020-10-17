@@ -14,7 +14,7 @@ Ball::Ball()
 	particle_brush_ = new Brush(Color::White);
 
 	// 生成动态小方块粒子
-	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 50_msec);
+	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 80_msec);
 	AddTask(task);
 
 	RandomParticleType();
