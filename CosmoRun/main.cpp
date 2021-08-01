@@ -17,6 +17,7 @@ public:
 		s.window.icon = Icon(IDI_ICON1);
 
 #ifdef KGE_DEBUG
+		// Debug 模式下会打开控制台，并输出日志到文件中
 		s.debug_mode = true;
 
 		// 输出日志到文件
