@@ -53,14 +53,14 @@ private:
 	float speed_scale_;
 	GameStatus status_;
 
-	ActorPtr wrapper_;
-	BackgroundPtr background_;
-	CustomTextPtr title_;
-	BallPtr ball_;
-	CubeGroupPtr cube_group_;
-	CustomTextPtr score_text_;
-	CustomTextPtr best_score_text_;
+	RefPtr<Actor> wrapper_;
+	RefPtr<Background> background_;
+	RefPtr<CustomText> title_;
+	RefPtr<Ball> ball_;
+	RefPtr<CubeGroup> cube_group_;
+	RefPtr<CustomText> score_text_;
+	RefPtr<CustomText> best_score_text_;
 	RefPtr<PlayButton> play_button_;
 	RefPtr<TryAgainButton> try_again_button_;
-	ScoreBoardPtr score_board_;
+	RefPtr<ScoreBoard> score_board_;
 };

@@ -24,15 +24,15 @@ void BrushCreator::Init()
 		(void)GetStrokeBrush(type);
 }
 
-BrushPtr BrushCreator::GetFillBrush(FaceDesc desc)
+RefPtr<Brush> BrushCreator::GetFillBrush(FaceDesc desc)
 {
 	String id = strings::Format("fill_brush_%d_%d", int(desc.type), int(desc.direction));
 
 	// 查找缓存中是否有画刷
-	if (BrushPtr brush = brush_cache_.Get<Brush>(id))
+	if (RefPtr<Brush> brush = brush_cache_.Get<Brush>(id))
 		return brush;
 
-	BrushPtr brush;
+	RefPtr<Brush> brush;
 	auto color = Config::Color();
 	if (desc.type == FaceType::Left)
 	{
@@ -50,46 +50,46 @@ BrushPtr BrushCreator::GetFillBrush(FaceDesc desc)
 	return brush;
 }
 
-BrushPtr BrushCreator::GetStrokeBrush(FaceType type)
+RefPtr<Brush> BrushCreator::GetStrokeBrush(FaceType type)
 {
 	String id = strings::Format("stroke_brush_%d", int(type));
 
 	// 查找缓存中是否有画刷
-	if (BrushPtr brush = brush_cache_.Get<Brush>(id))
+	if (RefPtr<Brush> brush = brush_cache_.Get<Brush>(id))
 		return brush;
 
 	auto color = Config::Color();
-	BrushPtr brush = new Brush(GetStrokeColor(color, type));
+	RefPtr<Brush> brush = new Brush(GetStrokeColor(color, type));
 	brush_cache_.AddObject(id, brush);
 	return brush;
 }
 
-List<AnimationPtr> BrushCreator::CreateColorAnimation(Duration dur, ColorEnum old_color, ColorEnum new_color)
+List<RefPtr<Animation>> BrushCreator::CreateColorAnimation(Duration dur, ColorEnum old_color, ColorEnum new_color)
 {
-	List<AnimationPtr> list;
+	List<RefPtr<Animation>> list;
 	for (auto& desc : { Face::Top_LeftDown, Face::Top_LeftUp, Face::Top_RightDown, Face::Top_RightUp })
 	{
 		auto old_style = GetTopFaceStyle(old_color, desc.direction);
 		auto new_style = GetTopFaceStyle(new_color, desc.direction);
-		AnimationPtr animation = new BrushStyleAnimation(dur, GetFillBrush(desc), old_style, new_style);
+		RefPtr<Animation> animation = new BrushStyleAnimation(dur, GetFillBrush(desc), old_style, new_style);
 		list.push_back(animation);
 	}
 
 	for (auto& desc : { Face::Left_Up, Face::Left_Down, Face::Left_LeftUp, Face::Left_RightDown })
 	{
-		AnimationPtr animation = new BrushAnimation(dur, GetFillBrush(desc), GetLeftFaceColor(old_color), GetLeftFaceColor(new_color));
+		RefPtr<Animation> animation = new BrushAnimation(dur, GetFillBrush(desc), GetLeftFaceColor(old_color), GetLeftFaceColor(new_color));
 		list.push_back(animation);
 	}
 
 	for (auto& desc : { Face::Right_Up, Face::Right_Down, Face::Right_LeftDown, Face::Right_RightUp })
 	{
-		AnimationPtr animation = new BrushAnimation(dur, GetFillBrush(desc), GetRightFaceColor(old_color), GetRightFaceColor(new_color));
+		RefPtr<Animation> animation = new BrushAnimation(dur, GetFillBrush(desc), GetRightFaceColor(old_color), GetRightFaceColor(new_color));
 		list.push_back(animation);
 	}
 
 	for (auto& type : { FaceType::Left, FaceType::Right, FaceType::Top })
 	{
-		AnimationPtr animation = new BrushAnimation(dur, GetStrokeBrush(type), GetStrokeColor(old_color, type), GetStrokeColor(new_color, type));
+		RefPtr<Animation> animation = new BrushAnimation(dur, GetStrokeBrush(type), GetStrokeColor(old_color, type), GetStrokeColor(new_color, type));
 		list.push_back(animation);
 	}
 	return list;

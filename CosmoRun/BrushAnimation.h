@@ -4,7 +4,7 @@
 class BrushAnimation : public CustomAnimation
 {
 public:
-	BrushAnimation(Duration dur, BrushPtr brush, Color start, Color end)
+	BrushAnimation(Duration dur, RefPtr<Brush> brush, Color start, Color end)
 		: CustomAnimation(dur)
 		, brush_(brush)
 		, start_(start)
@@ -19,7 +19,7 @@ public:
 
 private:
 	Interpolator interpolator_;
-	BrushPtr brush_;
+	RefPtr<Brush> brush_;
 	Color start_;
 	Color end_;
 };
@@ -27,7 +27,7 @@ private:
 class BrushStyleAnimation : public CustomAnimation
 {
 public:
-	BrushStyleAnimation(Duration dur, BrushPtr brush, LinearGradientStyle start, LinearGradientStyle end)
+	BrushStyleAnimation(Duration dur, RefPtr<Brush> brush, LinearGradientStyle start, LinearGradientStyle end)
 		: CustomAnimation(dur)
 		, brush_(brush)
 		, start_(start)
@@ -42,7 +42,7 @@ public:
 
 private:
 	Interpolator interpolator_;
-	BrushPtr brush_;
+	RefPtr<Brush> brush_;
 	LinearGradientStyle start_;
 	LinearGradientStyle end_;
 };

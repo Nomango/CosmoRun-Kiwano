@@ -6,8 +6,8 @@ CubeFace::CubeFace(Cube* cube, FaceType type, Direction d, BrushCreator* brush_c
 	, desc_{ type, d }
 	, brush_creator_(brush_creator)
 {
-	BrushPtr fill = brush_creator_->GetFillBrush(desc_);
-	BrushPtr stroke = brush_creator_->GetStrokeBrush(desc_.type);
+	RefPtr<Brush> fill = brush_creator_->GetFillBrush(desc_);
+	RefPtr<Brush> stroke = brush_creator_->GetStrokeBrush(desc_.type);
 
 	this->SetFillBrush(fill);
 	this->SetStrokeBrush(stroke);
@@ -23,7 +23,7 @@ CubeFace::~CubeFace()
 	}
 }
 
-ActorPtr CubeFace::GetShadow()
+RefPtr<Actor> CubeFace::GetShadow()
 {
 	return shadow_;
 }
@@ -66,7 +66,7 @@ void CubeFace::Show()
 	shadow_->StartAnimation(animation::ScaleTo(300_msec, Vec2(1, 1)));
 }
 
-void CubeFace::Hide(AnimationEventHandlerPtr handler)
+void CubeFace::Hide(RefPtr<AnimationEventHandler> handler)
 {
 	auto action = animation::ScaleTo(300_msec, Vec2(0, 0));
 	action.Handler(handler);

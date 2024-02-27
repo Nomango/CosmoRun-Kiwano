@@ -5,8 +5,6 @@
 // ·½¿é×ø±ê
 typedef std::array<int, 3> CubePos;
 
-KGE_DECLARE_SMART_PTR(Cube);
-
 class Cube : public Actor , public SizeSensor
 {
 public:
@@ -34,7 +32,7 @@ private:
 class CubeMap
 {
 public:
-    CubePtr CreateCube(const CubePos& pos);
+    RefPtr<Cube> CreateCube(const CubePos& pos);
 
     Cube* GetCubeFromMap(const CubePos& pos);
 

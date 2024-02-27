@@ -2,8 +2,6 @@
 #include "Common.h"
 #include "CustomText.h"
 
-KGE_DECLARE_SMART_PTR(ScoreBoard);
-
 class ScoreBoard : public Actor
 {
 public:
@@ -18,8 +16,8 @@ public:
     void Resize(Size size);
 
 private:
-    RectActorPtr bg_;
-    CustomTextPtr title_;
-    CustomTextPtr score_;
-    CustomTextPtr best_score_;
+    RefPtr<RectActor> bg_;
+    RefPtr<CustomText> title_;
+    RefPtr<CustomText> score_;
+    RefPtr<CustomText> best_score_;
 };

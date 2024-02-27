@@ -13,5 +13,5 @@ public:
 	void OnUnitChanged(float unit) override;
 
 private:
-	SpritePtr logo_;
+	RefPtr<Sprite> logo_;
 };

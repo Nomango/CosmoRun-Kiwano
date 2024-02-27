@@ -1,12 +1,10 @@
 #include "Background.h"
 #include "BrushAnimation.h"
 
-KGE_DECLARE_SMART_PTR(Triangle);
-
 class Triangle : public PolygonActor
 {
 public:
-	Triangle(BrushPtr brush)
+	Triangle(RefPtr<Brush> brush)
 	{
 		float unit = Config::Unit() * 0.8f;
 
@@ -58,7 +56,7 @@ Background::Background(Size size)
 	AddChild(bg_shadow_);
 
 	// 添加任务：每隔130ms生成一个三角形
-	TaskPtr task = new Task(Closure(this, &Background::SpawnTriangles), 130_msec);
+	RefPtr<Task> task = new Task(Closure(this, &Background::SpawnTriangles), 130_msec);
 	AddTask(task);
 
 	Resize(size);
@@ -72,7 +70,7 @@ void Background::Resize(Size size)
 	// 重置当前画刷样式
 	current_style_ = GetBrushStyle(Config::Color());
 	// 重置画刷
-	BrushPtr brush = new Brush(current_style_);
+	RefPtr<Brush> brush = new Brush(current_style_);
 
 	bg_rect_->SetRectSize(size);
 	bg_rect_->SetFillBrush(brush);
@@ -85,7 +83,7 @@ void Background::SetColor(ColorEnum color)
 {
 	// 画刷变化动画
 	auto new_style = GetBrushStyle(color);
-	AnimationPtr animation = new BrushStyleAnimation(1000_msec, bg_rect_->GetFillBrush(), current_style_, new_style);
+	RefPtr<Animation> animation = new BrushStyleAnimation(1000_msec, bg_rect_->GetFillBrush(), current_style_, new_style);
 	current_style_ = new_style;
 
 	bg_rect_->StopAllAnimations();
@@ -136,7 +134,7 @@ LinearGradientStyle Background::GetBrushStyle(ColorEnum color)
 	return LinearGradientStyle();
 }
 
-BrushPtr Background::GetShadowBrush()
+RefPtr<Brush> Background::GetShadowBrush()
 {
 	// 背景阴影画刷
 	Size size = this->GetSize();
@@ -160,7 +158,7 @@ void Background::SpawnTriangles(Task* task, Duration dt)
 		triangle_brush_ = new Brush(Color(Color::White, 0.2f));
 	}
 
-	TrianglePtr t = new Triangle(triangle_brush_);
+	RefPtr<Triangle> t = new Triangle(triangle_brush_);
 	// 随机设置三角形的位置
 	t->SetPositionX(GetWidth() * math::Random(0.0f, 1.0f));
 	t->SetPositionY(GetHeight() * math::Random(0.0f, 1.0f));

@@ -14,7 +14,7 @@ Ball::Ball()
 	particle_brush_ = new Brush(Color::White);
 
 	// 生成动态小方块粒子
-	TaskPtr task = new Task(Closure(this, &Ball::SpawnParticles), 80_msec);
+	RefPtr<Task> task = new Task(Closure(this, &Ball::SpawnParticles), 80_msec);
 	AddTask(task);
 
 	RandomParticleType();
@@ -53,17 +53,17 @@ void Ball::SetRadius(float radius)
 {
 	radius_ = radius;
 
-	CircleActorPtr ball1 = new CircleActor(radius);
+	RefPtr<CircleActor> ball1 = new CircleActor(radius);
 	ball1->SetAnchor(0.5f, 0.5f);
 
 	RadialGradientStyle style;
 	style.center = Point(radius, radius);
 	style.radius = style.center;
 	style.stops = { { 0.6f, Color::SkyBlue }, { 1.0f, Color(Color::SkyBlue, 0.0f) } };
-	BrushPtr ball1_brush = new Brush(style);
+	RefPtr<Brush> ball1_brush = new Brush(style);
 	ball1->SetFillBrush(ball1_brush);
 
-	CircleActorPtr ball2 = new CircleActor(radius * 0.7f);
+	RefPtr<CircleActor> ball2 = new CircleActor(radius * 0.7f);
 	ball2->SetFillColor(Color::Rgba(Color::White, 1.0f));
 	ball2->SetAnchor(0.5f, 0.5f);
 
@@ -291,13 +291,13 @@ void Ball::RandomParticleType()
 
 void Ball::SpawnParticles(Task* task, Duration dt)
 {
-	ActorPtr particle;
+	RefPtr<Actor> particle;
 	switch (particle_type_)
 	{
 	case 1:
 	{
 		float side = math::Random(radius_ * 0.4f, radius_ * 0.7f);
-		CircleActorPtr circle = new CircleActor(side);
+		RefPtr<CircleActor> circle = new CircleActor(side);
 		circle->SetAnchor(0.5f, 0.5f);
 		circle->SetFillBrush(particle_brush_);
 		particle = circle;
@@ -306,7 +306,7 @@ void Ball::SpawnParticles(Task* task, Duration dt)
 	case 2:
 	{
 		float side = math::Random(radius_ * 0.7f, radius_ * 1.3f);
-		RectActorPtr rect = new RectActor(Size(side, side));
+		RefPtr<RectActor> rect = new RectActor(Size(side, side));
 		rect->SetAnchor(0.5f, 0.5f);
 		rect->SetFillBrush(particle_brush_);
 		particle = rect;
@@ -316,7 +316,7 @@ void Ball::SpawnParticles(Task* task, Duration dt)
 	AddParticle(particle);
 }
 
-void Ball::AddParticle(ActorPtr particle)
+void Ball::AddParticle(RefPtr<Actor> particle)
 {
 	// 粒子动画
 	float pos_radius = math::Random(0.0f, radius_ * 0.5f);

@@ -4,23 +4,25 @@
 class Music : public Singleton<Music>
 {
 public:
+	enum ID
+	{
+		Bg,
+		Die,
+		Click,
+	};
+
 	void Load();
 
 	void Destroy();
 
-	void PlayBackground();
+	void Play(ID id, int loop = 0);
 
-	void PlayDie();
+	Resource GetResource(ID id);
 
-	void PlayClick();
+	RefPtr<Animation> LowVolume();
 
-	AnimationPtr LowVolume();
-
-	AnimationPtr HighVolume();
+	RefPtr<Animation> HighVolume();
 
 private:
-	size_t bg_id_ = 0;
-	size_t die_id_ = 0;
-	size_t click_id_ = 0;
-	SoundPlayer player_;
+	RefPtr<audio::SoundPlayer> player_;
 };

@@ -1,8 +1,6 @@
 #pragma once
 #include "Cube.h"
 
-KGE_DECLARE_SMART_PTR(CubeGroup);
-
 class CubeGroup
     : public Actor
 {

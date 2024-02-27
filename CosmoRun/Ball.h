@@ -2,8 +2,6 @@
 #include "Common.h"
 #include "CubeFace.h"
 
-KGE_DECLARE_SMART_PTR(Ball);
-
 class Ball : public Actor, public SizeSensor
 {
 public:
@@ -48,17 +46,17 @@ private:
 
 	void SpawnParticles(Task* task, Duration dt);
 
-	void AddParticle(ActorPtr particle);
+	void AddParticle(RefPtr<Actor> particle);
 
 private:
 	float radius_;
 	float v_angle_;
 	Direction direction_;
 	CubeFace* where_ = nullptr;
-	ActorPtr body_;
+	RefPtr<Actor> body_;
 
 	// Á£×ÓÏà¹Ø
 	int particle_type_;
-	ActorPtr particles_;
-	BrushPtr particle_brush_;
+	RefPtr<Actor> particles_;
+	RefPtr<Brush> particle_brush_;
 };

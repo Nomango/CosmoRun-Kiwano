@@ -7,11 +7,11 @@ class BrushCreator
 public:
 	void Init();
 
-	BrushPtr GetFillBrush(FaceDesc desc);
+	RefPtr<Brush> GetFillBrush(FaceDesc desc);
 
-	BrushPtr GetStrokeBrush(FaceType type);
+	RefPtr<Brush> GetStrokeBrush(FaceType type);
 
-	List<AnimationPtr> CreateColorAnimation(Duration dur, ColorEnum old_color, ColorEnum new_color);
+	List<RefPtr<Animation>> CreateColorAnimation(Duration dur, ColorEnum old_color, ColorEnum new_color);
 
 private:
 	LinearGradientStyle GetTopFaceStyle(ColorEnum color, Direction d);

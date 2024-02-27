@@ -34,9 +34,9 @@ void SplashStage::LoadResources()
 	// —” ±500∫¡√Î
 	(500_msec).Sleep();
 
-	Application::GetInstance().PreformInMainThread([]() {
-		StagePtr stage = new MainStage;
-		TransitionPtr transition = new FadeTransition(1500_msec);
+	Application::GetInstance().PerformInMainThread([]() {
+		RefPtr<Stage> stage = new MainStage;
+		RefPtr<Transition> transition = new FadeTransition(1500_msec);
 		Director::GetInstance().EnterStage(stage, transition);
 	});
 }

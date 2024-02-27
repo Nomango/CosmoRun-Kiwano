@@ -3,8 +3,6 @@
 
 class Cube;
 
-KGE_DECLARE_SMART_PTR(CubeFace);
-
 class CubeFace : public PolygonActor
 {
 public:
@@ -12,7 +10,7 @@ public:
 
 	~CubeFace();
 
-	ActorPtr GetShadow();
+	RefPtr<Actor> GetShadow();
 
 	FaceType GetType() const;
 
@@ -24,7 +22,7 @@ public:
 
 	void Show();
 
-	void Hide(AnimationEventHandlerPtr handler);
+	void Hide(RefPtr<AnimationEventHandler> handler);
 
 	CubeFace* GetNext() const;
 
@@ -44,5 +42,5 @@ private:
 	CubeFace* next_ = nullptr;
 	Cube* cube_ = nullptr;
 	BrushCreator* brush_creator_ = nullptr;
-	PolygonActorPtr shadow_;
+	RefPtr<PolygonActor> shadow_;
 };

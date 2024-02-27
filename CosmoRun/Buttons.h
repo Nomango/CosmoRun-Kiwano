@@ -35,7 +35,7 @@ protected:
 protected:
 	float width_;
 	Status status_;
-	ButtonPtr button_;
+	RefPtr<Button> button_;
 	Function<void()> click_;
 };
 
@@ -49,7 +49,7 @@ public:
 	void OnUnitChanged(float unit) override;
 
 private:
-	CustomTextPtr text_;
+	RefPtr<CustomText> text_;
 };
 
 class SpecialHexButton : public HexagonButton
@@ -64,7 +64,7 @@ public:
 	void OnUnitChanged(float unit) override;
 
 private:
-	PolygonActorPtr inner_polygon_;
+	RefPtr<PolygonActor> inner_polygon_;
 };
 
 class TryAgainButton : public SpecialHexButton

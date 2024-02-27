@@ -36,7 +36,7 @@ CubeFace* Cube::GetFace(FaceType type) const
 CubeFace* Cube::AddFace(FaceDesc desc, BrushCreator* brush_creator)
 {
 	ColorEnum color = Config::Color();
-	CubeFacePtr face = new CubeFace(this, desc.type, desc.direction, brush_creator);
+	RefPtr<CubeFace> face = new CubeFace(this, desc.type, desc.direction, brush_creator);
 
 	this->AddChild(face);
 
@@ -72,9 +72,9 @@ void Cube::OnUnitChanged(float unit)
 	}
 }
 
-CubePtr CubeMap::CreateCube(const CubePos& pos)
+RefPtr<Cube> CubeMap::CreateCube(const CubePos& pos)
 {
-	CubePtr cube = new Cube(pos);
+	RefPtr<Cube> cube = new Cube(pos);
 
 	int key = pos[0] + (pos[1] << 8) + (pos[2] << 16);
 	cube_map_.insert(std::make_pair(key, cube.Get()));

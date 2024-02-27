@@ -84,7 +84,7 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 {
 	// 获取新方块位置
 	auto pos = GetNewCubePos(desc);
-	CubePtr cube = cube_map_.GetCubeFromMap(pos);
+	RefPtr<Cube> cube = cube_map_.GetCubeFromMap(pos);
 	if (!cube)
 	{
 		cube = cube_map_.CreateCube(pos);
@@ -98,7 +98,7 @@ CubeFace* CubeGroup::AppendCubeFace(FaceDesc desc)
 	face->SetVisible(false);
 
 	// 添加方块面的阴影
-	ActorPtr shadow = face->GetShadow();
+	RefPtr<Actor> shadow = face->GetShadow();
 	this->AddChild(shadow, -1);
 
 	if (!hide_faces_.empty())

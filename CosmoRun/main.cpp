@@ -2,7 +2,6 @@
 #include "Music.h"
 #include "resource.h"
 
-KGE_DECLARE_SMART_PTR(DemoRunner);
 class DemoRunner
 	: public Runner
 {
@@ -30,10 +29,10 @@ public:
 		SetSettings(s);
 
 		Config::Color(Config::RandomColor());
-		Config::SetWindowSize(Size(s.window.width, s.window.height));
+		Config::SetWindowSize(Size(float(s.window.width), float(s.window.height)));
 
 		// 使用音频模块
-		Application::GetInstance().Use(AudioModule::GetInstance());
+		Application::GetInstance().Use(audio::Module::GetInstance());
 
 		// 对象创建失败时抛出
 		ObjectBase::SetObjectPolicy(ObjectPolicy::Exception());
@@ -44,8 +43,8 @@ public:
 		// 设置窗口最小大小
 		GetWindow()->SetMinimumSize(600, 400);
 
-		StagePtr stage = new SplashStage;
-		TransitionPtr transition = new FadeTransition(1500_msec);
+		RefPtr<Stage> stage = new SplashStage;
+		RefPtr<Transition> transition = new FadeTransition(1500_msec);
 		Director::GetInstance().EnterStage(stage, transition);
 	}
 
@@ -64,7 +63,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int)
 
 	try
 	{
-		DemoRunnerPtr runner = new DemoRunner;
+		RefPtr<DemoRunner> runner = new DemoRunner;
 		Application::GetInstance().Run(runner);
 	}
 	catch (std::exception& e)

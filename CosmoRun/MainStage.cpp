@@ -95,7 +95,7 @@ MainStage::MainStage()
 		}
 	};
 
-	EventListenerPtr lis = new DragListener(this);
+	RefPtr<EventListener> lis = new DragListener(this);
 	AddListener(lis);
 #endif
 }
@@ -142,7 +142,7 @@ void MainStage::GameOver()
 	score_board_->SetScore(score_, best_score_, is_best);
 
 	// ≤•∑≈À¿Õˆ…˘“Ù
-	Music::GetInstance().PlayDie();
+	Music::GetInstance().Play(Music::Die);
 
 	// µ˜–°…˘“Ù
 	this->StartAnimation(Music::GetInstance().LowVolume());
@@ -231,7 +231,7 @@ void MainStage::OnKeyDown(Event* evt)
 void MainStage::OnEnter()
 {
 	// ”Œœ∑±≥æ∞“Ù¿÷
-	Music::GetInstance().PlayBackground();
+	Music::GetInstance().Play(Music::Bg, -1);
 }
 
 void MainStage::Move(Vec2 trans)
@@ -248,7 +248,7 @@ void MainStage::OnUpdate(Duration dt)
 	if (status_ == GameStatus::Ready && space_pressed)
 	{
 		StartGame();
-		Music::GetInstance().PlayClick();
+		Music::GetInstance().Play(Music::Click);
 	}
 	else if (status_ == GameStatus::Running)
 	{
@@ -260,7 +260,7 @@ void MainStage::OnUpdate(Duration dt)
 	else if (status_ == GameStatus::Gameover && space_pressed)
 	{
 		Restart();
-		Music::GetInstance().PlayClick();
+		Music::GetInstance().Play(Music::Click);
 	}
 
 	if (status_ != GameStatus::Running)

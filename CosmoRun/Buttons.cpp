@@ -65,7 +65,7 @@ void HexagonButton::OnButtonEvent(Button* btn, Button::Event evt)
 		if (click_)
 		{
 			click_();
-			Music::GetInstance().PlayClick();
+			Music::GetInstance().Play(Music::Click);
 		}
 		break;
 	}
@@ -187,34 +187,34 @@ void TryAgainButton::OnUnitChanged(float unit)
 
 	float stroke_width = unit / 12;
 	float radius = unit / 5;
-	StrokeStylePtr stroke = new StrokeStyle(stroke_width);
+	RefPtr<StrokeStyle> stroke = new StrokeStyle(stroke_width);
 
 	ShapeMaker maker;
 	maker.BeginPath(Point(radius, radius * 2));
 	maker.AddArc(Point(radius * 2, radius), Size(radius, radius), 270, true, false);
 	maker.EndPath();
-	ShapeActorPtr arc = new ShapeActor(maker.GetShape());
+	RefPtr<ShapeActor> arc = new ShapeActor(maker.GetShape());
 	arc->SetStrokeColor(Color::White);
 	arc->SetStrokeStyle(stroke);
 	arc->SetAnchor(0.5f, 0.5f);
 	arc->SetPosition(this->GetWidth() - unit / 2 - radius * 2, this->GetHeight() / 2);
 	this->AddChild(arc);
 
-	RectActorPtr rect1 = new RectActor(Size(stroke_width * 3, stroke_width));
+	RefPtr<RectActor> rect1 = new RectActor(Size(stroke_width * 3, stroke_width));
 	rect1->SetFillColor(Color::White);
 	rect1->SetAnchor(1.0f, 0.5f);
 	rect1->SetPosition(radius * 2 + stroke_width / 2, radius);
 	rect1->SetRotation(15);
 	arc->AddChild(rect1);
 
-	RectActorPtr rect2 = new RectActor(Size(stroke_width * 3, stroke_width));
+	RefPtr<RectActor> rect2 = new RectActor(Size(stroke_width * 3, stroke_width));
 	rect2->SetFillColor(Color::White);
 	rect2->SetAnchor(1.0f, 0.5f);
 	rect2->SetPosition(radius * 2, radius + stroke_width / 2);
 	rect2->SetRotation(105);
 	arc->AddChild(rect2);
 
-	CustomTextPtr text = new CustomText(Lang::Get("gameover", "tryagain"), 48);
+	RefPtr<CustomText> text = new CustomText(Lang::Get("gameover", "tryagain"), 48);
 	text->SetAnchor(0, 0.5f);
 	text->SetPosition(unit / 4 * 3, this->GetHeight() / 2);
 	AddChild(text);

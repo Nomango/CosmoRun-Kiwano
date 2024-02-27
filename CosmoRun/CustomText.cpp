@@ -25,7 +25,7 @@ void CustomText::SetText(const String& text)
 	}
 }
 
-FontPtr CustomText::GetFont(float size) const
+RefPtr<Font> CustomText::GetFont(float size) const
 {
 	String font_name;
 	switch (Lang::Current())
@@ -37,7 +37,7 @@ FontPtr CustomText::GetFont(float size) const
 		font_name = "Microsoft YaHei UI Light";
 		break;
 	}
-	FontPtr font = new Font(font_name, size, FontWeight::Bold, FontPosture::Normal, FontStretch::Condensed);
+	RefPtr<Font> font = new Font(font_name, size, FontWeight::Bold, FontPosture::Normal, FontStretch::Condensed);
 	return font;
 }
 
@@ -45,7 +45,7 @@ void CustomText::OnUnitChanged(float)
 {
 	float unit = Config::NormalizeUnit();
 
-	FontPtr font = GetFont(font_size_ * unit);
+	RefPtr<Font> font = GetFont(font_size_ * unit);
 	this->SetFont(font);
 	shadow_->SetFont(font);
 	shadow_->MoveTo(font_size_ / 20 * unit, font_size_ / 20 * unit);
